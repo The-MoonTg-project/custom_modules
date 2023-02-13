@@ -31,8 +31,8 @@ def auth_required(function):
     async def wrapped(client: Client, message: Message):
         if db.get("custom.spotify", "token") is None:
             await message.edit(
-                f"<b>⚠️Для использования модуля необходима авторизация.\n"
-                f"ℹ️Выполните <code>{prefix}spauth</code> для авторизации.</b>"
+                f"<b>⚠️Authorization is required to use the module.\n"
+                f"ℹ️Execute <code>{prefix}spauth</code> to authorize.</b>"
             )
         else:
             return await function(client, message)
@@ -57,7 +57,8 @@ async def check_token():
             )
         else:
             ttc = datetime.datetime.strptime(
-                db.get("custom.spotify", "last_token_update"), "%Y-%m-%dT%H:%M:%S.%f"
+                db.get("custom.spotify",
+                       "last_token_update"), "%Y-%m-%dT%H:%M:%S.%f"
             ) + datetime.timedelta(minutes=45)
             if ttc < datetime.datetime.now():
                 db.set(
@@ -87,35 +88,36 @@ loop.create_task(check_token_loop())
 @Client.on_message(filters.command("spauth", prefix) & filters.me)
 async def auth(client: Client, message: Message):
     if not db.get("custom.spotify", "token") is None:
-        await message.edit("⚠️Вы уже авторизованы")
+        await message.edit("⚠️You are already logged in")
     else:
         sp_auth.get_authorize_url()
         await message.edit(
-            f'<a href="{sp_auth.get_authorize_url()}">ℹ️Перейдите по этой ссылке</a>,'
-            " подтвердите доступ, затем скопируйте адрес редиректа и выполните"
-            f" <code>{prefix}spcodeauth [адрес редедиректа]</code>"
+            f'<a href="{sp_auth.get_authorize_url()}">ℹ️Go to this link</a>,'
+            "confirm access, then copy the redirect address and execute"
+            f" <code>{prefix}spcodeauth [rededirect address]</code>"
         )
 
 
 @Client.on_message(filters.command("spcodeauth", prefix) & filters.me)
 async def codeauth(client: Client, message: Message):
     if db.get("custom.spotify", "token") is not None:
-        await message.edit("⚠️Вы уже авторизованы")
+        await message.edit("⚠️You are already logged in")
     else:
         try:
             url = message.text.split(" ")[1]
             code = sp_auth.parse_auth_response_url(url)
             db.set(
-                "custom.spotify", "token", sp_auth.get_access_token(code, True, False)
+                "custom.spotify", "token", sp_auth.get_access_token(
+                    code, True, False)
             )
             await message.edit(
-                "<b>✅Авторизация успешна. Теперь вы можете использовать модуль\n"
-                f"Список команд: <code>{prefix}help spotify</code></b>"
+                "<b>✅Authorization successful. Now you can use the module\n"
+                f"List of commands: <code>{prefix}help spotify</code></b>"
             )
         except Exception as e:
             await message.edit(
-                "<b>⚠️Произошла какая-то ошибка. Проверьте, что вы все делаете верно.\n"
-                f"Ошибка:</b> <code>{e.__class__.__name__}</code>"
+                "<b>⚠️ An error has occurred. Check that you are doing everything right.\n"
+                f"Error:</b> <code>{e.__class__.__name__}</code>"
             )
 
 
@@ -124,13 +126,14 @@ async def codeauth(client: Client, message: Message):
 async def unauth(client: Client, message: Message):
     db.remove("custom.spotify", "token")
     db.remove("custom.spotify", "last_token_update")
-    await message.edit("<b>✅Данные авторизации удалены успешно.</b>")
+    await message.edit("<b>✅Authorization data deleted successfully.</b>")
 
 
 @Client.on_message(filters.command("spnow", prefix) & filters.me)
 @auth_required
 async def now(client: Client, message: Message):
-    sp = spotipy.Spotify(auth=db.get("custom.spotify", "token")["access_token"])
+    sp = spotipy.Spotify(auth=db.get(
+        "custom.spotify", "token")["access_token"])
     current_playback = sp.current_playback()
     success = True
     from_playlist = False
@@ -194,11 +197,11 @@ async def now(client: Client, message: Message):
     if from_playlist and success:
         res = textwrap.dedent(
             f"""
-                <b>🎶 Сейчас играет: <i>{", ".join(artists)} - <a href='{track_url}'>{track}</a> <a href="https://song.link/s/{track_id}">(другие платформы)</a></i>
-                📱 Устройство: <code>{device}</code>
-                🔊 Громкость: {volume}
-                🎵 Плейлист: <a href="{playlist_link}">{playlist_name}</a> (<code>{playlist_id}</code>)
-                🫂 Владелец плейлиста: {playlist_owner}
+                <b>🎶 Now playing: <i>{", ".join(artists)} - <a href='{track_url}'>{track}</a> <a href="https://song.link/s/{track_id}">(other platforms)</a></i>
+                📱 Device: <code>{device}</code>
+                🔊 Volume: {volume}
+                🎵 Playlist: <a href="{playlist_link}">{playlist_name}</a> (<code>{playlist_id}</code>)
+                🫂 Playlist Owner: {playlist_owner}
                 
                 <code>{bar}</code></b>
             """
@@ -213,7 +216,8 @@ async def now(client: Client, message: Message):
                 if r["type"] == "audio":
                     await client.send_cached_media(
                         message.chat.id,
-                        Document._parse(client, r["document"], "audio")["file_id"],
+                        Document._parse(client, r["document"], "audio")[
+                            "file_id"],
                         res,
                         reply_to_message_id=(
                             message.reply_to_message.message_id
@@ -226,19 +230,19 @@ async def now(client: Client, message: Message):
         except Exception as e:
             err = True
             res += (
-                "\n<b>ℹ️Не удалось найти песню.\nОшибка:</b>"
+                "\n<b>ℹ️Could not find the song.\nОшибка:</b>"
                 f" <code>{e.__class__.__name__}</code>"
             )
             await message.edit(res, disable_web_page_preview=True)
         if not err:
-            res += "\n<b>ℹ️Не удалось найти песню.</b>"
+            res += "\n<b>ℹ️Could not find the song.</b>"
             await message.edit(res, disable_web_page_preview=True)
     elif success:
         res = textwrap.dedent(
             f"""
-                <b>🎶 Сейчас играет: <i>{", ".join(artists)} - <a href='{track_url}'>{track}</a> <a href="https://song.link/s/{track_id}">(другие платформы)</a></i>
-                📱 Устройство: <code>{device}</code>
-                🔊 Громкость: {volume}
+                <b>🎶 Now playing:<i>{", ".join(artists)} - <a href='{track_url}'>{track}</a> <a href="https://song.link/s/{track_id}">(other platforms)</a></i>
+                📱 Device: <code>{device}</code>
+                🔊 Volume: {volume}
                     
                 <code>{bar}</code></b>
             """
@@ -253,7 +257,8 @@ async def now(client: Client, message: Message):
                 if r["type"] == "audio":
                     await client.send_cached_media(
                         message.chat.id,
-                        Document._parse(client, r["document"], "audio")["file_id"],
+                        Document._parse(client, r["document"], "audio")[
+                            "file_id"],
                         res,
                         reply_to_message_id=(
                             message.reply_to_message.message_id
@@ -274,7 +279,8 @@ async def now(client: Client, message: Message):
                 if r["type"] == "audio":
                     await client.send_cached_media(
                         message.chat.id,
-                        Document._parse(client, r["document"], "audio")["file_id"],
+                        Document._parse(client, r["document"], "audio")[
+                            "file_id"],
                         res,
                         reply_to_message_id=(
                             message.reply_to_message.message_id
@@ -295,7 +301,8 @@ async def now(client: Client, message: Message):
                 if r["type"] == "audio":
                     await client.send_cached_media(
                         message.chat.id,
-                        Document._parse(client, r["document"], "audio")["file_id"],
+                        Document._parse(client, r["document"], "audio")[
+                            "file_id"],
                         res,
                         reply_to_message_id=(
                             message.reply_to_message.message_id
@@ -307,12 +314,12 @@ async def now(client: Client, message: Message):
                     return
         except:
             pass
-        res += "\n<b>ℹ️Не удалось найти песню.</b>"
+        res += "\n<b>ℹ️Could not find the song.</b>"
         await message.edit(res, disable_web_page_preview=True)
     else:
         await message.edit(
-            "<b>⚠️Не удалось получить трек\n"
-            "Проверьте, что Spotify включен и проигрывает трек</b>"
+            "<b>⚠️Unable to get track\n"
+            "Make sure Spotify is on and playing a track</b>"
         )
 
 
@@ -320,13 +327,14 @@ async def now(client: Client, message: Message):
 @auth_required
 async def repeat(client: Client, message: Message):
     try:
-        sp = spotipy.Spotify(auth=db.get("custom.spotify", "token")["access_token"])
+        sp = spotipy.Spotify(auth=db.get(
+            "custom.spotify", "token")["access_token"])
         sp.repeat("track")
-        await message.edit("🔂Поставлено на репит успешно. Счастливого прослушивания!")
+        await message.edit("🔂Successfully put on repeat. Happy listening!")
     except Exception as e:
         await message.edit(
-            "<b>⚠️Произошла какая-то ошибка. Проверьте, что вы все делаете верно.\n"
-            f"Ошибка:</b> <code>{e.__class__.__name__}</code>"
+            "<b>⚠️ An error has occurred. Check that you are doing everything right.\n"
+            f"Error:</b> <code>{e.__class__.__name__}</code>"
         )
 
 
@@ -334,13 +342,14 @@ async def repeat(client: Client, message: Message):
 @auth_required
 async def derepeat(client: Client, message: Message):
     try:
-        sp = spotipy.Spotify(auth=db.get("custom.spotify", "token")["access_token"])
+        sp = spotipy.Spotify(auth=db.get(
+            "custom.spotify", "token")["access_token"])
         sp.repeat("context")
-        await message.edit("🎶Снято с репита успешно.")
+        await message.edit("🎶Successfully removed from the replay.")
     except Exception as e:
         await message.edit(
-            "<b>⚠️Произошла какая-то ошибка. Проверьте, что вы все делаете верно.\n"
-            f"Ошибка:</b> <code>{e.__class__.__name__}</code>"
+            "<b>⚠️ An error has occurred. Check that you are doing everything right.\n"
+            f"Error:</b> <code>{e.__class__.__name__}</code>"
         )
 
 
@@ -348,13 +357,14 @@ async def derepeat(client: Client, message: Message):
 @auth_required
 async def next(client: Client, message: Message):
     try:
-        sp = spotipy.Spotify(auth=db.get("custom.spotify", "token")["access_token"])
+        sp = spotipy.Spotify(auth=db.get(
+            "custom.spotify", "token")["access_token"])
         sp.next_track()
         await message.edit("⏭️Трек переключен успешно.")
     except Exception as e:
         await message.edit(
-            "<b>⚠️Произошла какая-то ошибка. Проверьте, что вы все делаете верно.\n"
-            f"Ошибка:</b> <code>{e.__class__.__name__}</code>"
+            "<b>⚠️ An error has occurred. Check that you are doing everything right.\n"
+            f"Error:</b> <code>{e.__class__.__name__}</code>"
         )
 
 
@@ -362,13 +372,14 @@ async def next(client: Client, message: Message):
 @auth_required
 async def pausetr(client: Client, message: Message):
     try:
-        sp = spotipy.Spotify(auth=db.get("custom.spotify", "token")["access_token"])
+        sp = spotipy.Spotify(auth=db.get(
+            "custom.spotify", "token")["access_token"])
         sp.pause_playback()
-        await message.edit("⏸️Поставлено на паузу успешно.")
+        await message.edit("⏸️Paused successfully.")
     except Exception as e:
         await message.edit(
-            "<b>⚠️Произошла какая-то ошибка. Проверьте, что вы все делаете верно.\n"
-            f"Ошибка:</b> <code>{e.__class__.__name__}</code>"
+            "<b>⚠️ An error has occurred. Check that you are doing everything right.\n"
+            f"Error:</b> <code>{e.__class__.__name__}</code>"
         )
 
 
@@ -376,13 +387,14 @@ async def pausetr(client: Client, message: Message):
 @auth_required
 async def unpausetr(client: Client, message: Message):
     try:
-        sp = spotipy.Spotify(auth=db.get("custom.spotify", "token")["access_token"])
+        sp = spotipy.Spotify(auth=db.get(
+            "custom.spotify", "token")["access_token"])
         sp.start_playback()
         await message.edit("▶️Снято с паузы успешно")
     except Exception as e:
         await message.edit(
-            "<b>⚠️Произошла какая-то ошибка. Проверьте, что вы все делаете верно.\n"
-            f"Ошибка:</b> <code>{e.__class__.__name__}</code>"
+            "<b>⚠️Some error has occurred. Check that you are doing everything right.\n"
+            f"Error:</b> <code>{e.__class__.__name__}</code>"
         )
 
 
@@ -390,13 +402,14 @@ async def unpausetr(client: Client, message: Message):
 @auth_required
 async def back(client: Client, message: Message):
     try:
-        sp = spotipy.Spotify(auth=db.get("custom.spotify", "token")["access_token"])
+        sp = spotipy.Spotify(auth=db.get(
+            "custom.spotify", "token")["access_token"])
         sp.previous_track()
-        await message.edit("◀️Вернул трек назад успешно.")
+        await message.edit("◀️Returned the track back successfully.")
     except Exception as e:
         await message.edit(
-            "<b>⚠️Произошла какая-то ошибка. Проверьте, что вы все делаете верно.\n"
-            f"Ошибка:</b> <code>{e.__class__.__name__}</code>"
+            "<b>⚠️ An error has occurred. Check that you are doing everything right.\n"
+            f"Error:</b> <code>{e.__class__.__name__}</code>"
         )
 
 
@@ -404,13 +417,14 @@ async def back(client: Client, message: Message):
 @auth_required
 async def restr(client: Client, message: Message):
     try:
-        sp = spotipy.Spotify(auth=db.get("custom.spotify", "token")["access_token"])
+        sp = spotipy.Spotify(auth=db.get(
+            "custom.spotify", "token")["access_token"])
         sp.seek_track(0)
-        await message.edit("🔁Трек перезапущен.")
+        await message.edit("🔁 The track has been restarted.")
     except Exception as e:
         await message.edit(
-            "<b>⚠️Произошла какая-то ошибка. Проверьте, что вы все делаете верно.\n"
-            f"Ошибка:</b> <code>{e.__class__.__name__}</code>"
+            "<b>⚠️ An error has occurred. Check that you are doing everything right.\n"
+            f"Error:</b> <code>{e.__class__.__name__}</code>"
         )
 
 
@@ -418,14 +432,15 @@ async def restr(client: Client, message: Message):
 @auth_required
 async def liketr(client: Client, message: Message):
     try:
-        sp = spotipy.Spotify(auth=db.get("custom.spotify", "token")["access_token"])
+        sp = spotipy.Spotify(auth=db.get(
+            "custom.spotify", "token")["access_token"])
         cupl = sp.current_playback()
         sp.current_user_saved_tracks_add([cupl["item"]["id"]])
-        await message.edit("💚Лайкнуто!")
+        await message.edit("💚 Liked!")
     except Exception as e:
         await message.edit(
-            "<b>⚠️Произошла какая-то ошибка. Проверьте, что вы все делаете верно.\n"
-            f"Ошибка:</b> <code>{e.__class__.__name__}</code>"
+            "<b>⚠️ An error has occurred. Check that you are doing everything right.\n"
+            f"Error:</b> <code>{e.__class__.__name__}</code>"
         )
 
 

@@ -28,7 +28,7 @@ async def manul(client: Client, message: Message):
     await message.delete()
 
     for i in range(1, count + 1):
-        await client.send_message(message.chat.id, f"{i} манула(ов)")
+        await client.send_message(message.chat.id, f"{i} Manula(s)")
         await asyncio.sleep(0.2)
 
 
