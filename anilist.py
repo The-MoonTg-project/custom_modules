@@ -39,7 +39,7 @@ from tracemoepy.errors import ServerError
 from motor.motor_asyncio import AsyncIOMotorClient
 from motor.core import AgnosticDatabase, AgnosticCollection
 
-from utils.db import db, get_collection
+from utils.db.Database import get_collection
 
 class Dynamic:
 
