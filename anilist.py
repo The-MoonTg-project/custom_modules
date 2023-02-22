@@ -21,7 +21,7 @@ from utils.misc import modules_help, prefix
 from pyrogram import Client, filters
 
 
-flag = import_library("emoji-country-flag")
+
 tracemoepy = import_library("tracemoepy")
 humanize = import_library("humanize")
 html_telegraph_poster = import_library("html_telegraph_poster")
