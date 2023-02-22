@@ -43,7 +43,7 @@ from utils.db import db
 _DATABASE: AgnosticDatabase = AsyncIOMotorClient(db)["Moon-UB"]
 
 
-def get_collection(name: str) -> AgnosticCollection:
+def gimme_collection(name: str) -> AgnosticCollection:
     """ Create or Get Collection from your database """
     return _DATABASE[name]
 
@@ -63,7 +63,7 @@ ANIME_TEMPLATE = """[{c_flag}]**{romaji}**
 🎬 {trailer_link}
 📖 [Synopsis & More]({synopsis_link})"""
 
-SAVED = get_collection("TEMPLATES")
+SAVED = gimme_collection("TEMPLATES")
 
 # GraphQL Queries.
 ANIME_QUERY = """
@@ -543,18 +543,18 @@ async def trace_bek(message: Message):
     if not (replied.photo or replied.video or replied.animation):
         await message.err("Nani, reply to gif/photo/video")
         return
-    if not os.path.isdir(config.Dynamic.DOWN_PATH):
-        os.makedirs(config.Dynamic.DOWN_PATH)
+    if not os.path.isdir(Dynamic.DOWN_PATH):
+        os.makedirs(Dynamic.DOWN_PATH)
     await message.edit("He he, let me use my skills")
     dls = await message.client.download_media(
         message=message.reply_to_message,
-        file_name=config.Dynamic.DOWN_PATH,
+        file_name=Dynamic.DOWN_PATH,
         progress=progress,
         progress_args=(message, "Downloading Media")
     )
-    dls_loc = os.path.join(config.Dynamic.DOWN_PATH, os.path.basename(dls))
+    dls_loc = os.path.join(Dynamic.DOWN_PATH, os.path.basename(dls))
     if replied.animation or replied.video:
-        img_loc = os.path.join(config.Dynamic.DOWN_PATH, "trace.png")
+        img_loc = os.path.join(Dynamic.DOWN_PATH, "trace.png")
         await take_screen_shot(dls_loc, 0, img_loc)
         if not os.path.lexists(img_loc):
             await message.err("Media not found...", del_in=5)
