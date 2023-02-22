@@ -41,6 +41,7 @@ from motor.core import AgnosticDatabase, AgnosticCollection
 
 from utils.db import Database
 
+from Database import get_collection
 class Dynamic:
 
     MSG_DELETE_TIMEOUT = 120
