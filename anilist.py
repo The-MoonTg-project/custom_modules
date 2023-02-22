@@ -202,7 +202,8 @@ query ($search: String, $asHtml: Boolean) {
 """
 
 
-@Client.on_start
+@Client
+@on_start
 async def _init():
     global ANIME_TEMPLATE  # pylint: disable=global-statement
     template = await SAVED.find_one({'_id': "ANIME_TEMPLATE"})
