@@ -16,11 +16,11 @@
 import os
 from datetime import datetime
 
-from os import environ
+import environ
 from utils.scripts import import_library
 from utils.misc import modules_help, prefix
 from pyrogram import Client, filters
-
+from utils import config
 
 
 tracemoepy = import_library("tracemoepy")
@@ -49,7 +49,7 @@ class Dynamic:
 
     USER_IS_PREFERRED = False
 
-_DATABASE: AgnosticDatabase = AsyncIOMotorClient(db)["Moon-UB"]
+_DATABASE: AgnosticDatabase = AsyncIOMotorClient(config.db_url)["Moon-UB"]
 
 
 def gimme_collection(name: str) -> AgnosticCollection:
