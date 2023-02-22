@@ -21,7 +21,7 @@ from utils.scripts import import_library
 from utils.misc import modules_help, prefix
 from pyrogram import Client, filters
 from utils import config
-
+from utils.scripts import with_reply
 
 tracemoepy = import_library("tracemoepy")
 humanize = import_library("humanize")
@@ -202,8 +202,6 @@ query ($search: String, $asHtml: Boolean) {
 """
 
 
-@Client
-@on_start
 async def _init():
     global ANIME_TEMPLATE  # pylint: disable=global-statement
     template = await SAVED.find_one({'_id': "ANIME_TEMPLATE"})
