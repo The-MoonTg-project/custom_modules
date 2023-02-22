@@ -39,7 +39,7 @@ from tracemoepy.errors import ServerError
 from motor.motor_asyncio import AsyncIOMotorClient
 from motor.core import AgnosticDatabase, AgnosticCollection
 
-from utils.db import db
+from utils.db import db, get_collection
 
 class Dynamic:
 
@@ -48,12 +48,6 @@ class Dynamic:
 
     USER_IS_PREFERRED = False
 
-_DATABASE: AgnosticDatabase = AsyncIOMotorClient(db)["Moon-UB"]
-
-
-def gimme_collection(name: str) -> AgnosticCollection:
-    """ Create or Get Collection from your database """
-    return _DATABASE[name]
 
 # Default templates for Query Formatting
 ANIME_TEMPLATE = """[{c_flag}]**{romaji}**
