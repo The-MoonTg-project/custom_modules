@@ -65,7 +65,7 @@ ANIME_TEMPLATE = """[{c_flag}]**{romaji}**
 🎬 {trailer_link}
 📖 [Synopsis & More]({synopsis_link})"""
 
-SAVED = gimme_collection("TEMPLATES")
+SAVED = get_collection("TEMPLATES")
 
 # GraphQL Queries.
 ANIME_QUERY = """
