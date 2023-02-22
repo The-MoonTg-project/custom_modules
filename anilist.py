@@ -16,6 +16,7 @@
 import os
 from datetime import datetime
 
+from os import environ
 from utils.scripts import import_library
 from utils.misc import modules_help, prefix
 from pyrogram import Client, filters
