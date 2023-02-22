@@ -19,7 +19,8 @@ from datetime import datetime
 
 from utils.scripts import import_library
 from utils.misc import modules_help, prefix
-from pyrogram import Client, filters, Message
+from pyrogram import Client, filters
+from pyrogram.types import Message
 from utils import config
 from utils.scripts import with_reply
 
