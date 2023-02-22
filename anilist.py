@@ -39,9 +39,7 @@ from tracemoepy.errors import ServerError
 from motor.motor_asyncio import AsyncIOMotorClient
 from motor.core import AgnosticDatabase, AgnosticCollection
 
-from utils.db import Database
 
-from Database import get_collection
 class Dynamic:
 
     MSG_DELETE_TIMEOUT = 120
@@ -66,7 +64,7 @@ ANIME_TEMPLATE = """[{c_flag}]**{romaji}**
 🎬 {trailer_link}
 📖 [Synopsis & More]({synopsis_link})"""
 
-SAVED = get_collection("TEMPLATES")
+SAVED = "TEMPLATES"
 
 # GraphQL Queries.
 ANIME_QUERY = """
