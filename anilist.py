@@ -48,7 +48,7 @@ class Dynamic:
 
     USER_IS_PREFERRED = False
 
-_DATABASE: AgnosticDatabase = AsyncIOMotorClient(config.db_url)["Moon-UB"]
+_DATABASE: AgnosticDatabase = AsyncIOMotorClient(db)["Moon-UB"]
 
 
 def gimme_collection(name: str) -> AgnosticCollection:
