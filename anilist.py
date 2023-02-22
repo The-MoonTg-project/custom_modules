@@ -40,7 +40,7 @@ from motor.core import AgnosticDatabase, AgnosticCollection
 
 from utils.db import db
 
-_DATABASE: AgnosticDatabase = AsyncIOMotorClient(config.db)["Moon-UB"]
+_DATABASE: AgnosticDatabase = AsyncIOMotorClient(db)["Moon-UB"]
 
 
 def get_collection(name: str) -> AgnosticCollection:
