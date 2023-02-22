@@ -16,7 +16,7 @@
 import os
 from datetime import datetime
 
-import environ
+import environs
 from utils.scripts import import_library
 from utils.misc import modules_help, prefix
 from pyrogram import Client, filters
@@ -42,7 +42,7 @@ from motor.core import AgnosticDatabase, AgnosticCollection
 from utils.db import db
 
 class Dynamic:
-    DOWN_PATH = environ.get("DOWN_PATH")
+    DOWN_PATH = environs.get("DOWN_PATH")
 
     MSG_DELETE_TIMEOUT = 120
     EDIT_SLEEP_TIMEOUT = 10
