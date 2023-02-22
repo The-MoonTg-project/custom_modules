@@ -40,6 +40,14 @@ from motor.core import AgnosticDatabase, AgnosticCollection
 
 from utils.db import db
 
+class Dynamic:
+    DOWN_PATH = environ.get("DOWN_PATH")
+
+    MSG_DELETE_TIMEOUT = 120
+    EDIT_SLEEP_TIMEOUT = 10
+
+    USER_IS_PREFERRED = False
+
 _DATABASE: AgnosticDatabase = AsyncIOMotorClient(db)["Moon-UB"]
 
 
