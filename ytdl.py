@@ -3,18 +3,19 @@ import asyncio
 import os
 import time
 import requests
+from utils.scripts import format_exc, import_library
+wget = import_library("wget")
 import wget
 youtube_dl = import_library("yt_dlp")
 from youtube_dl import YoutubeDL
 from youtubesearchpython import SearchVideos
 import threading
-from traceback import format_exc
 from concurrent.futures import ThreadPoolExecutor
 from pyrogram.errors import FloodWait, MessageNotModified
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc, import_library
+
 
 async def edit_or_reply(message, text, parse_mode="md"):
     sudo_lis_t = await sudo_list()
