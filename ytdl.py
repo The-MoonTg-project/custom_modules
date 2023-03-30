@@ -7,7 +7,7 @@ import os
 from asyncio import get_event_loop
 
 
-youtube_dl = import_library("yt-dlp","yt-dlp==2023.3.4")
+youtube_dl = import_library("yt_dlp")
 pillow = import_library("PIL")
 YoutubeDL = youtube_dl.YoutubeDL
 DownloadError = youtube_dl.utils.DownloadError
