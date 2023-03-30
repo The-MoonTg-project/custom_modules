@@ -10,6 +10,9 @@ youtube_dl = import_library("youtube_dl")
 from youtube_dl import YoutubeDL
 from youtubesearchpython import SearchVideos
 import threading
+import functools
+import multiprocessing
+import mimetypes
 from concurrent.futures import ThreadPoolExecutor
 from pyrogram.errors import FloodWait, MessageNotModified
 from pyrogram import Client, filters
