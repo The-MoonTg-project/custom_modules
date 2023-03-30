@@ -39,14 +39,12 @@ strings = {
 }
 
 
-rip_data = None
-
 
 def download_video(opts, url):
     global rip_data
     try:
         with YoutubeDL(opts) as rip:
-            rip_data = rip.extract_info(url)
+            rip_data = rip.extract_info(url, download=True)
     except Exception as ex:
         rip_data = ex
 
@@ -74,7 +72,7 @@ async def ytdl_handler(client: Client, message: Message):
                     "preferredquality": "320",
                 }
             ],
-            "outtmpl": "downloads/%(id)s.mp3",
+            "outtmpl": "%(id)s.mp3",
             "quiet": True,
             "logtostderr": False,
         }
@@ -144,9 +142,9 @@ async def ytdl_handler(client: Client, message: Message):
         except:
             pass
     else:
-        await message.reply_audio(f"downloads/{rip_data['id']}.mp3", caption=f'<b>{rip_data["title"]}</b>',
+        await message.reply_audio(f"{rip_data['id']}.mp3", caption=f'<b>{rip_data["title"]}</b>',
                                   duration=rip_data["duration"])
-        os.remove(f"downloads/{rip_data['id']}.mp3")
+        os.remove(f"{rip_data['id']}.mp3")
 
     return await message.delete()
 
