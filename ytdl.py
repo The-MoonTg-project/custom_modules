@@ -6,7 +6,7 @@ import requests
 from utils.scripts import format_exc, import_library
 wget = import_library("wget")
 import wget
-youtube_dl = import_library("yt_dlp")
+youtube_dl = import_library("youtube_dl")
 from youtube_dl import YoutubeDL
 from youtubesearchpython import SearchVideos
 import threading
