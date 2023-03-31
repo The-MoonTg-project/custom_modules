@@ -70,11 +70,11 @@ async def ytdl_handler(client: Client, message: Message):
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
-                    "preferedformat": "mp3",
+                    "preferredcodec": "mp3",
                     "preferredquality": "320",
                 }
             ],
-            "outtmpl": "%(id)s.mp3",
+            "outtmpl": "%(id)s",
             "quiet": True,
             "logtostderr": False,
         }
