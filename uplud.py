@@ -28,3 +28,7 @@ async def urldl(client: Client, message: Message):
         await message.edit(format_exc(e))
     finally:
         os.remove(link)
+
+modules_help["uplud"] = {
+    "uplud": f"[filepath]/[reply to path]*"
+}
