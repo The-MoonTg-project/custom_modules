@@ -13,6 +13,13 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc, import_library
 
+class Engine:
+    def __init__(self):
+        self.path = "./bot_utils_files/Localization/strings/"
+        
+    def get_all_files_in_path(self, path):
+        path = pathlib.Path(path)
+        return [i.absolute() for i in path.glob("**/*")]
 
 async def edit_or_reply(message, text, parse_mode="md"):
     if not message:
