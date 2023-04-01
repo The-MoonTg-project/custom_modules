@@ -5,8 +5,11 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc, import_library
 
-@Client.on_message(filters.command(["upl"], prefix) & filters.me)
+rip_data = None
+
+
+@Client.on_message(filters.command(["upk"], prefix) & filters.me)
 async def upl(client: Client, message: Message):
     file = message.command[1:]
     await message.edit(f"<b>Uploading{file}</b>")
-    await message.reply(f"{file}")
+    await message.reply_document(f"{rip_data[file]}.mkv")
