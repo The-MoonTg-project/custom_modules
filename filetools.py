@@ -4,8 +4,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 import requests
 from utils.misc import modules_help, prefix
-from utils.scripts import 
-
+from utils.scripts import format_exc
 
 
 @Client.on_message(filters.command("upl", prefix) & filters.me)
