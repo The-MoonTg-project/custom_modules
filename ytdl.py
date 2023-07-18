@@ -81,7 +81,7 @@ async def ytdl_handler(client: Client, message: Message):
         video = False
     else:
         opts = {
-            "format": "best",
+            "format": "bv+ba/b",
             "addmetadata": True,
             "key": "FFmpegMetadata",
             "prefer_ffmpeg": True,
