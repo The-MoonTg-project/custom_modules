@@ -1,4 +1,3 @@
-from aiohttp import ClientSession
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
@@ -9,6 +8,8 @@ from asyncio import get_event_loop
 
 youtube_dl = import_library("yt_dlp")
 pillow = import_library("PIL")
+aiohttp = import_library("aiohttp")
+from aiohttp import ClientSession
 YoutubeDL = youtube_dl.YoutubeDL
 DownloadError = youtube_dl.utils.DownloadError
 ContentTooShortError = youtube_dl.utils.ContentTooShortError
