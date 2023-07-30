@@ -1,8 +1,67 @@
+import os
+import sys
+from enum import Enum
+from enum import auto
 from pyrogram import Client, filters
-from pyrogram.enums import MessageMediaType
+import pyrogram.enums.MessageMediaType as MessageMediaType
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
+
+class AutoName(Enum):
+    def _generate_next_value_(self, *args):
+        return self.lower()
+
+    def __repr__(self):
+        return f"pyrogram.enums.{self}"
+
+class MessageMediaType(AutoName):
+    """Message media type enumeration used in :obj:`~pyrogram.types.Message`."""
+
+    AUDIO = auto()
+    "Audio media"
+
+    DOCUMENT = auto()
+    "Document media"
+
+    PHOTO = auto()
+    "Photo media"
+
+    STICKER = auto()
+    "Sticker media"
+
+    VIDEO = auto()
+    "Video media"
+
+    ANIMATION = auto()
+    "Animation media"
+
+    VOICE = auto()
+    "Voice media"
+
+    VIDEO_NOTE = auto()
+    "Video note media"
+
+    CONTACT = auto()
+    "Contact media"
+
+    LOCATION = auto()
+    "Location media"
+
+    VENUE = auto()
+    "Venue media"
+
+    POLL = auto()
+    "Poll media"
+
+    WEB_PAGE = auto()
+    "Web page media"
+
+    DICE = auto()
+    "Dice media"
+
+    GAME = auto()
+    "Game media"
 
 def ReplyCheck(message: Message):
     reply_id = None
