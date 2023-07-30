@@ -3,7 +3,6 @@ import sys
 from enum import Enum
 from enum import auto
 from pyrogram import Client, filters
-import pyrogram.enums.MessageMediaType as MessageMediaType
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
