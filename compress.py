@@ -2,6 +2,7 @@ import os
 import sys
 from enum import Enum
 from enum import auto
+from typing import Tuple
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
