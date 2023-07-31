@@ -1,78 +1,13 @@
 import os
 import sys
-from enum import Enum
-from enum import auto
 from typing import Tuple
+import shlex
+import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
-
-class AutoName(Enum):
-    def _generate_next_value_(self, *args):
-        return self.lower()
-
-    def __repr__(self):
-        return f"pyrogram.enums.{self}"
-
-class MessageMediaType(AutoName):
-    """Message media type enumeration used in :obj:`~pyrogram.types.Message`."""
-
-    AUDIO = auto()
-    "Audio media"
-
-    DOCUMENT = auto()
-    "Document media"
-
-    PHOTO = auto()
-    "Photo media"
-
-    STICKER = auto()
-    "Sticker media"
-
-    VIDEO = auto()
-    "Video media"
-
-    ANIMATION = auto()
-    "Animation media"
-
-    VOICE = auto()
-    "Voice media"
-
-    VIDEO_NOTE = auto()
-    "Video note media"
-
-    CONTACT = auto()
-    "Contact media"
-
-    LOCATION = auto()
-    "Location media"
-
-    VENUE = auto()
-    "Venue media"
-
-    POLL = auto()
-    "Poll media"
-
-    WEB_PAGE = auto()
-    "Web page media"
-
-    DICE = auto()
-    "Dice media"
-
-    GAME = auto()
-    "Game media"
-
-def ReplyCheck(message: Message):
-    reply_id = None
-
-    if message.reply_to_message:
-        reply_id = message.reply_to_message.id
-
-    elif not message.from_user.is_self:
-        reply_id = message.id
-
-    return reply_id
+from utils.scripts import with_reply
 
 async def run_cmd(prefix: str) -> Tuple[str, str, int, int]:
     """Run Commands"""
@@ -89,32 +24,36 @@ async def run_cmd(prefix: str) -> Tuple[str, str, int, int]:
     )
 
 @Client.on_message(filters.command("compress", prefix) & filters.me)
+@with_reply
 async def compress(client: Client, message: Message):
     replied = message.reply_to_message
-    if not replied:
+    if not replied.media:
         await message.edit("**Please Reply To A Video**")
         return
-    if replied.media == MessageMediaType.VIDEO:
+    if replied.media:
         await message.edit("`Downloading Video . . .`")
         file = await client.download_media(
             message=replied,
-            file_name="Moon-Userbot/resources/",
+            file_name="resources/",
         )
-        replied.video.duration
+        #replied.media.duration
         out_file = file
         try:
             await message.edit("`Trying to compress. . .`")
-            prefix = f"ffmpeg -i {file} -vcodec libx264 -crf 24 {out_file}"
-            await run_cmd(prefix)
+            await message.edit("`If video size is big it'll take a while please be patient`")
+            cmp = f"ffmpeg -i {file} -vcodec libx265 -crf 24 {out_file}"
+            await run_cmd(cmp)
             await message.edit("`Uploading File . . .`")
             await message.delete()
-            await client.send_document(
-                message.chat.id,
-                avid=out_file,
-                reply_to_message_id=ReplyCheck(message),
-            )
+            await client.send_document(message.chat.id, out_file)
         except BaseException as e:
             await message.edit(f"**INFO:** `{e}`")
+        finally:
+            os.remove(file)
     else:
         await message.edit("**Please Reply To A Video**")
         return
+
+modules_help["compress"] = {
+    "compress": f"reply to a video to compress it :)"
+}
