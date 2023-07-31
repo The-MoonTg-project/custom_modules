@@ -49,8 +49,7 @@ async def compress(client: Client, message: Message):
         except BaseException as e:
             await message.edit(f"<b>INFO:</b> <code>{e}</code>")
         finally:
-            os.remove(file)
-            os.remove(out_file)
+            os.remove(file, out_file)
     else:
         await message.edit("<b>Please Reply To A Video</b>")
         return
