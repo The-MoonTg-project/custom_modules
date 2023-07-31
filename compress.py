@@ -41,7 +41,7 @@ async def compress(client: Client, message: Message):
         try:
             await message.edit("<code>Trying to compress. . .</code>")
             await message.edit("<code>If video size is big it'll take a while please be patient</code>")
-            cmp = f"ffmpeg -i {file} -vcodec libx264 -crf 24 {out_file}"
+            cmp = f"ffmpeg -i {file} -vcodec libx265 -crf 24 -preset ultrafast {out_file}"
             await run_cmd(cmp)
             await message.edit("<code>Uploading File . . .</code>")
             await message.delete()
