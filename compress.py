@@ -37,7 +37,7 @@ async def compress(client: Client, message: Message):
             file_name="resources/",
         )
         #replied.media.duration
-        out_file = file
+        out_file = file + ".mp4"
         try:
             await message.edit("<code>Trying to compress. . .</code>")
             await message.edit("<code>If video size is big it'll take a while please be patient</code>")
@@ -50,6 +50,7 @@ async def compress(client: Client, message: Message):
             await message.edit(f"<b>INFO:</b> <code>{e}</code>")
         finally:
             os.remove(file)
+            os.remove(out_file)
     else:
         await message.edit("<b>Please Reply To A Video</b>")
         return
