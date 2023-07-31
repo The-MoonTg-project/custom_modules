@@ -28,10 +28,10 @@ async def run_cmd(prefix: str) -> Tuple[str, str, int, int]:
 async def compress(client: Client, message: Message):
     replied = message.reply_to_message
     if not replied.media:
-        await message.edit("**Please Reply To A Video**")
+        await message.edit("<b>Please Reply To A Video</b>")
         return
     if replied.media:
-        await message.edit("`Downloading Video . . .`")
+        await message.edit("<code>Downloading Video . . .</code>")
         file = await client.download_media(
             message=replied,
             file_name="resources/",
@@ -39,19 +39,19 @@ async def compress(client: Client, message: Message):
         #replied.media.duration
         out_file = file
         try:
-            await message.edit("`Trying to compress. . .`")
-            await message.edit("`If video size is big it'll take a while please be patient`")
+            await message.edit("<code>Trying to compress. . .</code>")
+            await message.edit("<code>If video size is big it'll take a while please be patient</code>")
             cmp = f"ffmpeg -i {file} -vcodec libx265 -crf 24 {out_file}"
             await run_cmd(cmp)
-            await message.edit("`Uploading File . . .`")
+            await message.edit("<code>Uploading File . . .</code>")
             await message.delete()
             await client.send_document(message.chat.id, out_file)
         except BaseException as e:
-            await message.edit(f"**INFO:** `{e}`")
+            await message.edit(f"<b>INFO:</b> <code>{e}</code>")
         finally:
             os.remove(file)
     else:
-        await message.edit("**Please Reply To A Video**")
+        await message.edit("<b>Please Reply To A Video</b>")
         return
 
 modules_help["compress"] = {
