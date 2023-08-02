@@ -1,16 +1,13 @@
 import asyncio
 from pyrogram import filters
-from main_startup.core.decorators import friday_on_cmd
-from main_startup.helper_func.basic_helpers import edit_or_reply, get_text
+from pyrogram import Client, filters
+from pyrogram.types import Message
+
+from utils.misc import modules_help, prefix
+from utils.scripts import edit_or_reply, get_text
 from pyrogram.errors import RPCError
 
-@friday_on_cmd(
-    ["shift"],
-    cmd_help={
-        "help": "Steal all from one chat to other chat \n .shift fromchat | to chat | limit none for no limits\nNote: | is essential",
-        "example": "{ch}shift @fridaysupportofficial | @fridaychat | 100",
-    },
-)
+@Client.on_message(filters.command("shift", prefix) & filters.me)
 async def shift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = get_text(message)
@@ -83,13 +80,7 @@ async def shift(client, message):
             await lol.edit(i)
             return
 
-@friday_on_cmd(
-    ["mediashift"],
-    cmd_help={
-        "help": "Steal all media from one chat to other chat \n .mediashift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
-        "example": "{ch}mediashift @fridaysupportofficial | @fridaychat | I stole this file | 100",
-    },
-)
+@Client.on_message(filters.command("mediashift", prefix) & filters.me)
 async def mediashift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = get_text(message)
@@ -168,13 +159,7 @@ async def mediashift(client, message):
             return
         
 
-@friday_on_cmd(
-    ["audioshift"],
-    cmd_help={
-        "help": "Steal all audio from one chat to other chat \n .audioshift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
-        "example": "{ch}audioshift @fridaysupportofficial | @fridaychat | I stole this file | 100",
-    },
-)
+@Client.on_message(filters.command("audioshift", prefix) & filters.me)
 async def audioshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = get_text(message)
@@ -249,13 +234,7 @@ async def audioshift(client, message):
             await lol.edit(i)
             return
         
-@friday_on_cmd(
-    ["videoshift"],
-    cmd_help={
-        "help": "Steal all video from one chat to other chat \n .videoshift fromchat | to chat | If caption or None for not | limit none for no limit\nNote: | is essential",
-        "example": "{ch}videoshift @fridaysupportofficial | @fridaychat | I stole this file | 100",
-    },
-)
+@Client.on_message(filters.command("videoshift", prefix) & filters.me)
 async def videoshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = get_text(message)
@@ -333,13 +312,7 @@ async def videoshift(client, message):
             await lol.edit(i)
             return
         
-@friday_on_cmd(
-    ["imageshift"],
-    cmd_help={
-        "help": "Steal all photos from one chat to other chat \n .imageshift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
-        "example": "{ch}imageshift @fridaysupportofficial | @fridaychat | I stole this file | 100",
-    },
-)
+@Client.on_message(filters.command("imageshift", prefix) & filters.me)
 async def imageshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = get_text(message)
@@ -419,14 +392,8 @@ async def imageshift(client, message):
             return
 
 
-@friday_on_cmd(
-    ["docshift"],
-    cmd_help={
-        "help": "Steal all documents from one chat to other chat \n .docshift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
-        "example": "{ch}docshift @fridaysupportofficial | @fridaychat | I stole this file | 100",
-    },
-)
-async def imageshift(client, message):
+@Client.on_message(filters.command("docshift", prefix) & filters.me)
+async def docshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = get_text(message)
     try:
@@ -502,13 +469,7 @@ async def imageshift(client, message):
             await lol.edit(i)
             return
         
-@friday_on_cmd(
-    ["msgshift"],
-    cmd_help={
-        "help": "Steal all text messages from one chat to other chat \n .msgshift fromchat | to chat | limit non for unlimited\nNote: | is essential",
-        "example": "{ch}docshift @fridaysupportofficial | @fridaychat | 100",
-    },
-)
+@Client.on_message(filters.command("msgshift", prefix) & filters.me)
 async def msgshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = get_text(message)
@@ -583,14 +544,8 @@ async def msgshift(client, message):
             return
 
 
-@friday_on_cmd(
-    ["forward"],
-    cmd_help={
-        "help": "forward all from one chat to other chat \n .forward fromchat | to chat | limit none for no limits\nNote: | is essential",
-        "example": "{ch}forward @fridaysupportofficial | @fridaychat | 100",
-    },
-)
-async def forward(client, message):
+@Client.on_message(filters.command("forshift", prefix) & filters.me)
+async def forshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = get_text(message)
     x=x.replace(" ","")
@@ -665,14 +620,8 @@ async def forward(client, message):
 
 
 
-@friday_on_cmd(
-    ["dm"],
-    cmd_help={
-        "help": "forward a message to someone without forward tag",
-        "example": "{ch}dm @fridaychat",
-    },
-)
-async def dm(client, message):
+@Client.on_message(filters.command("dmshift", prefix) & filters.me)
+async def dmshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = get_text(message)
     x=x.replace(" ","")
@@ -687,8 +636,29 @@ async def dm(client, message):
             await lol.edit("Enter a vailed username or id")
             return
     try:
-        await reply.copy(x)
+        await reply.copy(x)    
     except RPCError as i:
         await lol.edit(i)
         return
     await lol.edit(f"Message Delivered to {x}")
+
+modules_help["shift"] = {
+        "shift": "Steal all from one chat to other chat \n .shift fromchat | to chat | limit none for no limits\nNote: | is essential",
+        "example": "{preffix}shift @moonuserbot | @moonub_chat | 100",
+        "dmshift": "forward a message to someone without forward tag",
+        "example": "{prefix}dmshift @qbtaumai",
+        "forshift": "forward all from one chat to other chat \n .forshift fromchat | to chat | limit none for no limits\nNote: | is essential",
+        "example": "{preffix}forshift @moonuserbot | @moonub_chat | 100",
+        "msgshift": "Steal all text messages from one chat to other chat \n .msgshift fromchat | to chat | limit non for unlimited\nNote: | is essential",
+        "example": "{prefix}msgshift @moonuserbot | @moonub_chat | 100",
+        "docshift": "Steal all documents from one chat to other chat \n .docshift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
+        "example": "{prefix}docshift @moonuserbot | @moonub_chat | I stole this file | 100",
+        "imageshift": "Steal all photos from one chat to other chat \n .imageshift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
+        "example": "{prefix}imageshift @moonuserbot | @moonub_chat | I stole this file | 100",
+        "videoshift": "Steal all video from one chat to other chat \n .videoshift fromchat | to chat | If caption or None for not | limit none for no limit\nNote: | is essential",
+        "example": "{prefix}videoshift @moonuserbot | @moonub_chat | I stole this file | 100",
+        "audioshift": "Steal all audio from one chat to other chat \n .audioshift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
+        "example": "{prefix}audioshift @moonuserbot | @moonub_chat | I stole this file | 100",
+        "mediashift": "Steal all media from one chat to other chat \n .mediashift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
+        "example": "{prefix}mediashift @moonuserbot | @moonub_chat | I stole this file | 100",
+    }
