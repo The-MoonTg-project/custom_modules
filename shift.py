@@ -10,7 +10,7 @@ from pyrogram.errors import RPCError
 @Client.on_message(filters.command("shift", prefix) & filters.me)
 async def shift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = text(message)
     x=x.replace(" ","")
     try:
        fromchat, tochat, limit, reverse = x.split("|")
@@ -83,7 +83,7 @@ async def shift(client, message):
 @Client.on_message(filters.command("mediashift", prefix) & filters.me)
 async def mediashift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = text(message)
     try:
        fromchat, tochat , cap, limit, reverse = x.split("|")
        if reverse == "reverse":
@@ -162,7 +162,7 @@ async def mediashift(client, message):
 @Client.on_message(filters.command("audioshift", prefix) & filters.me)
 async def audioshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = text(message)
     try:
        fromchat, tochat , cap, limit, reverse = x.split("|")
        if reverse == "reverse":
@@ -237,7 +237,7 @@ async def audioshift(client, message):
 @Client.on_message(filters.command("videoshift", prefix) & filters.me)
 async def videoshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = text(message)
     try:
        fromchat, tochat , cap, limit, reverse = x.split("|")
        if reverse == "reverse":
@@ -315,7 +315,7 @@ async def videoshift(client, message):
 @Client.on_message(filters.command("imageshift", prefix) & filters.me)
 async def imageshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = text(message)
     try:
        fromchat, tochat , cap, limit, reverse = x.split("|")
        if reverse == "reverse":
@@ -395,7 +395,7 @@ async def imageshift(client, message):
 @Client.on_message(filters.command("docshift", prefix) & filters.me)
 async def docshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = text(message)
     try:
        fromchat, tochat , cap, limit, reverse = x.split("|")
        if reverse == "reverse":
@@ -472,7 +472,7 @@ async def docshift(client, message):
 @Client.on_message(filters.command("msgshift", prefix) & filters.me)
 async def msgshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = text(message)
     x=x.replace(" ","")
     try:
        fromchat, tochat , cap, limit, reverse = x.split("|")
@@ -547,7 +547,7 @@ async def msgshift(client, message):
 @Client.on_message(filters.command("forshift", prefix) & filters.me)
 async def forshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = text(message)
     x=x.replace(" ","")
     try:
        fromchat, tochat, limit, reverse = x.split("|")
@@ -623,7 +623,7 @@ async def forshift(client, message):
 @Client.on_message(filters.command("dmshift", prefix) & filters.me)
 async def dmshift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = text(message)
     x=x.replace(" ","")
 
     if not message.reply_to_message:
