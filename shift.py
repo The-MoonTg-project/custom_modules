@@ -4,7 +4,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
-from utils.scripts import edit_or_reply, get_text
+from utils.scripts import edit_or_reply, text
 from pyrogram.errors import RPCError
 
 @Client.on_message(filters.command("shift", prefix) & filters.me)
