@@ -30,5 +30,5 @@ async def urldl(client: Client, message: Message):
         os.remove(link)
 
 modules_help["uplud"] = {
-    "uplud": f"[filepath]/[reply to path]*"
+    "upl": f"[filepath]/[reply to path]*"
 }
