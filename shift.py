@@ -644,11 +644,11 @@ async def dmshift(client, message):
 
 modules_help["shift"] = {
         "shift": "Steal all from one chat to other chat \n .shift fromchat | to chat | limit none for no limits\nNote: | is essential",
-        "example": "{preffix}shift @moonuserbot | @moonub_chat | 100",
+        "example": "{prefix}shift @moonuserbot | @moonub_chat | 100",
         "dmshift": "forward a message to someone without forward tag",
         "example": "{prefix}dmshift @qbtaumai",
         "forshift": "forward all from one chat to other chat \n .forshift fromchat | to chat | limit none for no limits\nNote: | is essential",
-        "example": "{preffix}forshift @moonuserbot | @moonub_chat | 100",
+        "example": "{prefix}forshift @moonuserbot | @moonub_chat | 100",
         "msgshift": "Steal all text messages from one chat to other chat \n .msgshift fromchat | to chat | limit non for unlimited\nNote: | is essential",
         "example": "{prefix}msgshift @moonuserbot | @moonub_chat | 100",
         "docshift": "Steal all documents from one chat to other chat \n .docshift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
