@@ -661,4 +661,5 @@ modules_help["shift"] = {
         "example": "{prefix}audioshift @moonuserbot | @moonub_chat | I stole this file | 100",
         "mediashift": "Steal all media from one chat to other chat \n .mediashift fromchat | to chat | If caption or None for not | limit\nNote: | is essential",
         "example": "{prefix}mediashift @moonuserbot | @moonub_chat | I stole this file | 100",
+        "Special Thanks": "FridayUB",
     }
