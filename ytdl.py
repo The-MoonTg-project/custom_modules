@@ -254,6 +254,6 @@ modules_help['ytdl'] = {
     'ytdl [link]': 'Download video by link with best quality',
     'yt [link]': 'Download video by link with best quality',
     'yt3 [link]': 'Download audio by link with best quality',
-    'ytlow [link]': 'Download audio by link with 360p quality',
-    'ytdlow [link]': 'Download audio by link with 360p quality',
+    'ytlow [link]': 'Download video by link with 360p quality',
+    'ytdlow [link]': 'Download video by link with 360p quality',
 }
