@@ -9,8 +9,6 @@ from utils.misc import modules_help, prefix
 from utils.scripts import with_reply, format_exc
 
 @Client.on_message(filters.command(["vo", "voicy"], prefix) & filters.me)
-# The function name is duplicated, causing a syntax error. 
-# We need to rename the second function to avoid the conflict.
 @with_reply
 async def voice_text_second(client: Client, message: Message):
     try:
@@ -37,13 +35,6 @@ async def voice_text_second(client: Client, message: Message):
             await message.edit("<b>It's not a voice</b>", parse_mode=enums.ParseMode.HTML)
     except Exception as e:
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
-
-    modules_help.update({"voicy": "voicy [reply]*: get text from voice"})
-@with_reply
-async def voice_text(client: Client, message: Message):
-    try:
-        if message.reply_to_message.voice:
-            await message.edit("<b>Wait...</b>", parse_mode=enums.ParseMode.HTML)
             await client.unblock_user("@voicybot")
             await message.reply_to_message.forward("@voicybot")
             await asyncio.sleep(5)
