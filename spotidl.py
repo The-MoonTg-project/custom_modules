@@ -30,7 +30,7 @@ except:
 async def spotdl_handler(client: Client, message: Message):
     try:
         if len(message.command) == 1 and not message.reply_to_message:
-            await message.edit("<b>Please use:</b> <code>.spotdl [link]</code>")
+            await message.edit("<b>Please use:</b> <code>.spotdl [link]</code>",parse_mode=enums.ParseMode.HTML)
             return
         elif len(message.command) > 1:
             spoti_query = message.command[1]
@@ -41,6 +41,7 @@ async def spotdl_handler(client: Client, message: Message):
             return await message.edit(
                 "<b>Please install (ffmpeg.org) library on your os (and restart Dragon-Userbot)</b>",
                 disable_web_page_preview=True,
+                parse_mode=enums.ParseMode.HTML
             )
 
         await message.edit("<b>Downloading...</b>")
@@ -58,12 +59,14 @@ async def spotdl_handler(client: Client, message: Message):
                 await message.reply_audio(
                     f"downloads/{name}.mp3",
                     caption=f"<b>{name}</b>\n" f"<code>{spoti_query}</code>",
+                    parse_mode=enums.ParseMode.HTML
                 )
                 os.remove(f"downloads/{name}.mp3")
                 return await message.delete()
             else:
                 return await message.edit(
-                    f"<b>Spotify-Download error:</b>\n<code>{logs}</code>"
+                    f"<b>Spotify-Download error:</b>\n<code>{logs}</code>",
+                    parse_mode=enums.ParseMode.HTML
                 )
 
         music_names = re.findall(r"(?<= for \")[^\"]+", logs)
@@ -72,12 +75,13 @@ async def spotdl_handler(client: Client, message: Message):
             await message.reply_audio(
                 f"downloads/{name}.mp3",
                 caption=f"<b>{name}</b>\n" f"<code>{spoti_query}</code>",
+                parse_mode=enums.ParseMode.HTML
             )
             os.remove(f"downloads/{name}.mp3")
             await asyncio.sleep(0.5)
         return await message.delete()
     except Exception as e:
-        await message.edit(f"<b>Spotify-Download error:</b>\n{format_exc(e)}")
+        await message.edit(f"<b>Spotify-Download error:</b>\n{format_exc(e)}",parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["spotdl"] = {
