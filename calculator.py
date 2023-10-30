@@ -20,7 +20,7 @@ async def calc(_, message: Message):
                 if i == 0:
                     await message.edit(
                         f"<i>{args}</i><b>=</b><code>{result[x:x + 4000]}</code>",
-                        parse_mode=enums.ParseMode.HTML,
+                        parse_mode=enums.ParseMode.HTML
                     )
                 else:
                     await message.reply(
