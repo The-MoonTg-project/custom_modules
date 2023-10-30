@@ -4,7 +4,7 @@
 from io import BytesIO
 from random import randint
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from requests import get
