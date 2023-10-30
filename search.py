@@ -1,6 +1,6 @@
 from asyncio import sleep
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
@@ -17,7 +17,8 @@ async def search_cmd(client: Client, message: Message):
     if now.get(message.chat.id):
         return await message.edit(
             "<b>You already have a search in progress!\n"
-            "Type: <code>{}scancel</code> to cancel it.</b>".format(prefix)
+            "Type: <code>{}scancel</code> to cancel it.</b>".format(prefix),
+            parse_mode=enums.ParseMode.HTML
         )
 
     await message.edit("<b>Start searching...</b>")
@@ -31,7 +32,8 @@ async def search_cmd(client: Client, message: Message):
         return await message.edit(
             "<b>Usage:</b> <code>{}search [/cmd]* [search_word]* [timeout=2.0]</code>".format(
                 prefix
-            )
+            ),
+            parse_mode=enums.ParseMode.HTML
         )
 
     now[message.chat.id] = True
@@ -60,9 +62,9 @@ async def search_cmd(client: Client, message: Message):
 @Client.on_message(filters.command(["scancel"], prefix) & filters.me)
 async def scancel_cmd(_: Client, message: Message):
     if not now.get(message.chat.id):
-        return await message.edit("<b>There is no search in progress!</b>")
+        return await message.edit("<b>There is no search in progress!</b>", parse_mode=enums.ParseMode.HTML)
     now[message.chat.id] = False
-    await message.edit("<b>Search cancelled!</b>")
+    await message.edit("<b>Search cancelled!</b>", parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["search"] = {
