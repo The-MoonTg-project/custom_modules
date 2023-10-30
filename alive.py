@@ -52,7 +52,7 @@ async def alive(client, message):
     end_time = time.time()
     reply_msg += f"\nUptime: <code>{uptime}</code>"
     await message.delete()
-    await client.send_message(message.chat.id, reply_msg, disable_web_page_preview=True)
+    await client.send_message(message.chat.id, reply_msg, disable_web_page_preview=True, parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["alive"] = {
