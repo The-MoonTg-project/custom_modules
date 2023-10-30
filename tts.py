@@ -16,7 +16,7 @@
 
 from io import BytesIO
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -29,7 +29,7 @@ gTTS = import_library("gtts").gTTS
 async def tts(client: Client, message: Message):
     lang = message.command[1]
     text = " ".join(message.command[2:])
-    await message.edit("<b>Speech synthesis...</b>")
+    await message.edit("<b>Speech synthesis...</b>",parse_mode=enums.ParseMode.HTML)
 
     try:
         tts = gTTS(text, lang=lang)
@@ -43,7 +43,7 @@ async def tts(client: Client, message: Message):
         else:
             await client.send_audio(message.chat.id, voice)
     except Exception as e:
-        await message.edit(format_exc(e))
+        await message.edit(format_exc(e),parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["tts"] = {"tts [lang]* [text]*": "Say text"}
