@@ -35,9 +35,6 @@ async def voice_text_second(client: Client, message: Message):
             await message.edit("<b>It's not a voice</b>", parse_mode=enums.ParseMode.HTML)
     except Exception as e:
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
-            await client.unblock_user("@voicybot")
-            await message.reply_to_message.forward("@voicybot")
-            await asyncio.sleep(5)
             messages = await client.get_history("@voicybot", limit=1)
             await client.read_history("@voicybot")
             text = (
