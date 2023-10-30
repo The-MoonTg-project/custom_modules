@@ -34,4 +34,4 @@ async def voice_text(client: Client, message: Message):
             await message.edit("<b>It's not a voice</b>", parse_mode=enums.ParseMode.HTML)
             await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
-modules_help["voicy"] = {"voicy [reply]*": "get text from voice"}
+    modules_help.update({"voicy": "voicy [reply]*: get text from voice"})
