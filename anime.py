@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
@@ -53,7 +53,7 @@ async def anime_handler(client: Client, message: Message):
         img = await ra.image
         await message.reply_photo(
             photo=img,
-            caption=f'<b>{ra.tag_string_general if ra.tag_string_general else "Без названия"}</b>',
+            caption=f'<b>{ra.tag_string_general if ra.tag_string_general else "Untitled"}</b>',
             parse_mode=enums.ParseMode.HTML
         )
         return await message.delete()
