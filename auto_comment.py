@@ -1,5 +1,5 @@
 from contextlib import suppress
-from pyrogram import Client, filters, ContinuePropagation
+from pyrogram import Client, filters, ContinuePropagation, enums
 from pyrogram.types import Message
 from pyrogram.errors import MsgIdInvalid
 from utils.misc import modules_help, prefix
@@ -26,11 +26,12 @@ async def auto_comment(_, message: Message):
         db.set("custom.auto_comment", "text", comment)
 
         await message.edit(
-            f"<b>Auto comment enabled\nComment:</b> <code>{comment}</code>"
+            f"<b>Auto comment enabled\nComment:</b> <code>{comment}</code>",
+            parse_mode=enums.ParseMode.HTML
         )
     else:
         db.set("custom.auto_comment", "enabled", False)
-        await message.edit("<b>Auto comment disabled</b>")
+        await message.edit("<b>Auto comment disabled</b>", parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["auto_comment"] = {

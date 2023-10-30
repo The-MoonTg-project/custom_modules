@@ -35,7 +35,7 @@ async def ghoul_counter(_, message: Message):
         await msg.edit(prettify(counter))
         await sleep(1)
 
-    await msg.edit("<b>🤡 GAME 🤡</b>")
+    await msg.edit("<b>🤡 GAME 🤡</b>",parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["1000-7"] = {

@@ -1,6 +1,6 @@
 from random import choice, randint
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -16,7 +16,7 @@ async def aniquotes_handler(client: Client, message: Message):
     elif len(message.command) > 1:
         query = message.text.split(maxsplit=1)[1][:512]
     else:
-        return await message.edit('<b>[💮 Aniquotes] <i>Please enter text to create sticker.</i></b>')
+        return await message.edit('<b>[💮 Aniquotes] <i>Please enter text to create sticker.</i></b>', parse_mode=enums.ParseMode.HTML)
 
     try:
         await message.delete()
@@ -26,7 +26,7 @@ async def aniquotes_handler(client: Client, message: Message):
                                                      reply_to_message_id=message.reply_to_message.message_id if
                                                      message.reply_to_message else None)
     except Exception as e:
-        return await message.reply(f'<b>[💮 Aniquotes]</b>\n<code>{format_exc(e)}</code>')
+        return await message.reply(f'<b>[💮 Aniquotes]</b>\n<code>{format_exc(e)}</code>', parse_mode=enums.ParseMode.HTML)
 
 
 modules_help['aniquotes'] = {

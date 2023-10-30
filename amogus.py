@@ -4,7 +4,7 @@
 from io import BytesIO
 from random import randint
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from requests import get
@@ -18,11 +18,11 @@ from utils.misc import modules_help, prefix
 async def amogus(client: Client, message: Message):
     text = " ".join(message.command[1:])
 
-    await message.edit("<b>amgus, tun tun tun tun tun tun tun tudududn tun tun...</b>")
+    await message.edit("<b>amgus, tun tun tun tun tun tun tun tudududn tun tun...</b>",parse_mode=enums.ParseMode.HTML)
 
     clr = randint(1, 12)
 
-    url = "https://raw.githubusercontent.com/KeyZenD/AmongUs/master/"
+    url = "https://raw.githubusercontent.com/The-MoonTg-project/AmongUs/master/"
     font = ImageFont.truetype(BytesIO(get(url + "bold.ttf").content), 60)
     imposter = Image.open(BytesIO(get(f"{url}{clr}.png").content))
 

@@ -1,8 +1,7 @@
 import urllib
 
-from pyrogram import Client, filters
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
 from utils.misc import modules_help, prefix
 
 MAX_URL = "https://img.youtube.com/vi/{id}/maxresdefault.jpg"
@@ -27,7 +26,7 @@ async def preview(client: Client, message: Message):
                 message.chat.id,
                 video_id,
                 caption=f"<a href='{video_id}'>Download Link</a>",
-                parse_mode="HTML",
+                parse_mode=enums.ParseMode.HTML,
             )
             await message.delete()
         elif len(message.command) == 2:
@@ -38,7 +37,7 @@ async def preview(client: Client, message: Message):
                 message.chat.id,
                 video_id,
                 caption=f"<a href='{video_id}'>Download Link</a>",
-                parse_mode="HTML",
+                parse_mode=enums.ParseMode.HTML,
             )
             await message.delete()
         elif len(message.command) == 3:
@@ -51,21 +50,31 @@ async def preview(client: Client, message: Message):
                     message.chat.id,
                     video_id,
                     caption=f"<a href='{video_id}'>Download Link</a>",
-                    parse_mode="HTML",
+                    parse_mode=enums.ParseMode.HTML,
                 )
                 await message.delete()
             elif view == "2":
                 await client.send_photo(
-                    message.chat.id, video_id, caption=f"Download Link - {video_id}"
+                    message.chat.id,
+                    video_id,
+                    caption=f"Download Link - {video_id}",
+                    parse_mode=enums.ParseMode.HTML,
                 )
                 await message.delete()
             elif view == "3":
                 await client.send_photo(
-                    message.chat.id, video_id, caption=f"{video_id}"
+                    message.chat.id,
+                    video_id,
+                    caption=f"{video_id}",
+                    parse_mode=enums.ParseMode.HTML,
                 )
                 await message.delete()
             elif view == "4":
-                await client.send_photo(message.chat.id, video_id)
+                await client.send_photo(
+                    message.chat.id,
+                    video_id,
+                    parse_mode=enums.ParseMode.HTML,
+                )
                 await message.delete()
             elif view == "5":
                 captionText = message.command[3:]
@@ -74,7 +83,7 @@ async def preview(client: Client, message: Message):
                     message.chat.id,
                     video_id,
                     caption=f"<a href='{video_id}'>{captionText}</a>",
-                    parse_mode="HTML",
+                    parse_mode=enums.ParseMode.HTML,
                 )
                 await message.delete()
     except:
