@@ -1,12 +1,12 @@
 import urllib
 
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
 from utils.misc import modules_help, prefix
 
 MAX_URL = "https://img.youtube.com/vi/{id}/maxresdefault.jpg"
 HQ_URL = "https://img.youtube.com/vi/{id}/hqdefault.jpg"
+
 
 def get_video_id(url):
     try:
@@ -55,18 +55,24 @@ async def preview(client: Client, message: Message):
                 await message.delete()
             elif view == "2":
                 await client.send_photo(
-                    message.chat.id, video_id, caption=f"Download Link - {video_id}",
+                    message.chat.id,
+                    video_id,
+                    caption=f"Download Link - {video_id}",
                     parse_mode=enums.ParseMode.HTML,
                 )
                 await message.delete()
             elif view == "3":
                 await client.send_photo(
-                    message.chat.id, video_id, caption=f"{video_id}",
+                    message.chat.id,
+                    video_id,
+                    caption=f"{video_id}",
                     parse_mode=enums.ParseMode.HTML,
                 )
                 await message.delete()
             elif view == "4":
-                await client.send_photo(message.chat.id, video_id,
+                await client.send_photo(
+                    message.chat.id,
+                    video_id,
                     parse_mode=enums.ParseMode.HTML,
                 )
                 await message.delete()
