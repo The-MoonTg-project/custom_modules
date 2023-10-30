@@ -2,12 +2,11 @@
 import asyncio
 import aiohttp
 import json
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 
 # taken from pyrogram documentation if not works kindly inform me :)
-
 
 class AioHttp:
 
@@ -33,7 +32,8 @@ async def unsplash(client: Client, message: Message):
         keyword = message.command[1]
 
         if len(message.command) > 2 and int(message.command[2]) < 10:
-            await message.edit("<b>Getting Pictures</b>")
+            await message.edit("<b>Getting Pictures</b>", parse_mode=enums.ParseMode.HTML)
+            await message.edit("<b>Getting Picture</b>", parse_mode=enums.ParseMode.HTML)
             count = int(message.command[2])
             images = []
             while len(images) is not count:
