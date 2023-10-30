@@ -31,6 +31,34 @@ async def voice_text(client: Client, message: Message):
                 )
             )
             await message.edit(f"<b>Text: {text}</b>", parse_mode=enums.ParseMode.HTML)
+        else:
+            await message.edit("<b>It's not a voice</b>", parse_mode=enums.ParseMode.HTML)
+    except Exception as e:
+        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
+
+    modules_help.update({"voicy": "voicy [reply]*: get text from voice"})
+@with_reply
+async def voice_text(client: Client, message: Message):
+    try:
+        if message.reply_to_message.voice:
+            await message.edit("<b>Wait...</b>", parse_mode=enums.ParseMode.HTML)
+            await client.unblock_user("@voicybot")
+            await message.reply_to_message.forward("@voicybot")
+            await asyncio.sleep(5)
+            messages = await client.get_history("@voicybot", limit=1)
+            await client.read_history("@voicybot")
+            text = (
+                messages[0]
+                .text.replace(
+                    "Путин и его свита убивают мирное население на войне в Украине #stopputin",
+                    "",
+                )
+                .replace(
+                    "Putin and his cronies kill civilians in the war in Ukraine #stopputin",
+                    "",
+                )
+            )
+            await message.edit(f"<b>Text: {text}</b>", parse_mode=enums.ParseMode.HTML)
             await message.edit("<b>It's not a voice</b>", parse_mode=enums.ParseMode.HTML)
             await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
