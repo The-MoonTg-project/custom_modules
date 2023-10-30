@@ -1,8 +1,7 @@
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
 from utils.misc import modules_help, prefix
-from utils.scripts import import_library, format_exc
+from utils.scripts import format_exc, import_library
 
 wikipedia = import_library("wikipedia")
 
@@ -24,10 +23,11 @@ async def wiki(_, message: Message):
 <code>{user_request}</code>
 <b>Result:</b>
 <code>{result}</code>""",
-            parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
         )
     except Exception as e:
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
+
 
 modules_help["wikipedia"] = {
     "wiki [lang]* [request]*": "Search in Russian Wikipedia",
