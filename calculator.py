@@ -1,6 +1,6 @@
 import asyncio
 
-from program_library import ParseMode
+from pyrogram import enums
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
