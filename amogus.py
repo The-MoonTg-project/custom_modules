@@ -22,7 +22,7 @@ async def amogus(client: Client, message: Message):
 
     clr = randint(1, 12)
 
-    url = "https://raw.githubusercontent.com/KeyZenD/AmongUs/master/"
+    url = "https://raw.githubusercontent.com/The-MoonTg-project/AmongUs/master/"
     font = ImageFont.truetype(BytesIO(get(url + "bold.ttf").content), 60)
     imposter = Image.open(BytesIO(get(f"{url}{clr}.png").content))
 
