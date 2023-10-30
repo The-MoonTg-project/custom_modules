@@ -1,6 +1,6 @@
 import asyncio
 from pyrogram import utils
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 import logging
 from utils.misc import modules_help, prefix
@@ -32,7 +32,7 @@ async def shift(client, message):
            fromchat, tochat, limit = x.split("|")
            reverse = False
         except:
-            await lol.edit("Check command syntax")
+            await lol.edit("Check command syntax", parse_mode=enums.ParseMode.HTML)
     try:
         fromchat =int(fromchat)
     except:
@@ -95,7 +95,7 @@ async def dmshift(client, message):
 
     command_parts = message.text.split()
     if len(command_parts) != 2:
-        await message.edit("Invalid command format. Use: !dmshift @username_or_id")
+        await message.edit("Invalid command format. Use: !dmshift @username_or_id", parse_mode=enums.ParseMode.HTML)
         return
 
     x = command_parts[1]
