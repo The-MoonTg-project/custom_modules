@@ -1,6 +1,6 @@
 from utils.scripts import import_library
 from utils.misc import modules_help, prefix
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 
 googletrans = import_library("googletrans", "googletrans==4.0.0rc1")
 from googletrans import Translator
@@ -10,13 +10,14 @@ trl = Translator()
 
 @Client.on_message(filters.command(["tr", "trans"], prefix) & filters.me)
 async def translate(_client, message):
-    await message.edit_text("<b>Translating text...</b>")
+    await message.edit_text("<b>Translating text...</b>",parse_mode=enums.ParseMode.HTML)
     if message.reply_to_message and (
         message.reply_to_message.text or message.reply_to_message.caption
     ):
         if len(message.text.split()) == 1:
             await message.edit(
-                f"<b>Usage: Reply to a message, then <code>{prefix}tr [lang]*</code></b>"
+                f"<b>Usage: Reply to a message, then <code>{prefix}tr [lang]*</code></b>",
+                parse_mode=enums.ParseMode.HTML
             )
             return
         target = message.text.split()[1]
@@ -28,16 +29,17 @@ async def translate(_client, message):
         try:
             tekstr = trl.translate(text, dest=target)
         except ValueError as err:
-            await message.edit("Error: <code>{}</code>".format(str(err)))
+            await message.edit("Error: <code>{}</code>".format(str(err)),parse_mode=enums.ParseMode.HTML)
             return
         await message.edit(
             "<b>Translated from <code>{}</code> to <code>{}</code></b>:\n\n<code>{}</code>".format(
                 detectlang.lang, target, tekstr.text
-            )
+            ),
+            parse_mode=enums.ParseMode.HTML
         )
     else:
         if len(message.text.split()) <= 2:
-            await message.edit(f"<b>Usage: <code>{prefix}tr [lang]* [text]*</code></b>")
+            await message.edit(f"<b>Usage: <code>{prefix}tr [lang]* [text]*</code></b>",parse_mode=enums.ParseMode.HTML)
             return
         target = message.text.split(None, 2)[1]
         text = message.text.split(None, 2)[2]
@@ -45,12 +47,13 @@ async def translate(_client, message):
         try:
             tekstr = trl.translate(text, dest=target)
         except ValueError as err:
-            await message.edit("Error: <code>{}</code>".format(str(err)))
+            await message.edit("Error: <code>{}</code>".format(str(err)),parse_mode=enums.ParseMode.HTML)
             return
         await message.edit(
             "<b>Translated from <code>{}</code> to <code>{}</code></b>:\n\n<code>{}</code>".format(
                 detectlang.lang, target, tekstr.text
-            )
+            ),
+            parse_mode=enums.ParseMode.HTML
         )
 
 
@@ -61,7 +64,7 @@ async def translatedl(_client, message):
     try:
         dtekstr = trl.translate(dtext, dest=dtarget)
     except ValueError as err:
-        await message.edit("Error: <code>{}</code>".format(str(err)))
+        await message.edit("Error: <code>{}</code>".format(str(err)),parse_mode=enums.ParseMode.HTML)
         return
     await message.edit("{}".format(dtekstr.text))
 
