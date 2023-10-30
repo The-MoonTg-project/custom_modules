@@ -54,10 +54,11 @@ async def anime_handler(client: Client, message: Message):
         await message.reply_photo(
             photo=img,
             caption=f'<b>{ra.tag_string_general if ra.tag_string_general else "Без названия"}</b>',
+            parse_mode=enums.ParseMode.HTML
         )
         return await message.delete()
     except Exception as e:
-        await message.edit(format_exc(e))
+        await message.edit(format_exc(e),parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["anime"] = {
