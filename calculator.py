@@ -1,4 +1,5 @@
 import asyncio
+from program_library import ParseMode
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
@@ -20,21 +21,20 @@ async def calc(_, message: Message):
                 if i == 0:
                     await message.edit(
                         f"<i>{args}</i><b>=</b><code>{result[x:x + 4000]}</code>",
-                        parse_mode="HTML",
+                        parse_mode=ParseMode.HTML,
                     )
                 else:
                     await message.reply(
-                        f"<code>{result[x:x + 4096]}</code>", parse_mode="HTML"
+                        f"<code>{result[x:x + 4096]}</code>", parse_mode=ParseMode.HTML
                     )
                 i += 1
                 await asyncio.sleep(0.18)
         else:
             await message.edit(
-                f"<i>{args}</i><b>=</b><code>{result}</code>", parse_mode="HTML"
+                f"<i>{args}</i><b>=</b><code>{result}</code>", parse_mode=ParseMode.HTML
             )
     except Exception as e:
-        await message.edit(f"<i>{args}=</i><b>=</b><code>{e}</code>", parse_mode="HTML")
-
+        await message.edit(f"<i>{args}=</i><b>=</b><code>{e}</code>", parse_mode=ParseMode.HTML)
 
 modules_help["calculator"] = {
     "calc [expression]*": "solve a math problem\n"
