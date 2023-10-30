@@ -1,8 +1,8 @@
 import os
 
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
 import requests
+from pyrogram import Client, enums, filters
+from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc
 
@@ -16,12 +16,11 @@ async def urldl(client: Client, message: Message):
     else:
         await message.edit(
             f"<b>Usage: </b><code>{prefix}upl [filepath to upload]</code>",
-            parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
         )
         return
 
     try:
-        
         await message.edit("<b>Uploading Now...</b>", parse_mode=enums.ParseMode.HTML)
         await client.send_document(message.chat.id, link)
         await message.delete()
@@ -30,6 +29,5 @@ async def urldl(client: Client, message: Message):
     finally:
         os.remove(link)
 
-modules_help["uplud"] = {
-    "upl": f"[filepath]/[reply to path]*"
-}
+
+modules_help["uplud"] = {"upl": f"[filepath]/[reply to path]*"}
