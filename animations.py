@@ -55,7 +55,7 @@ async def bombs(client: Client, message: Message):
     await asyncio.sleep(0.5)
     await message.edit_text("▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n😵😵😵😵 \n")
     await asyncio.sleep(0.5)
-    await message.edit_text("<b>RIP PLOXXX......</b>")
+    await message.edit_text("<b>RIP PLOXXX......</b>",parse_mode=enums.ParseMode.HTML)
     await asyncio.sleep(2)
 
 
@@ -87,7 +87,7 @@ async def cell(client: Client, message: Message):
     ]
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 18])
+        await message.edit_text(animation_chars[i % 18],parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command("wtf", prefix) & filters.me)
@@ -123,7 +123,7 @@ async def ding(client: Client, message: Message):
         "⬜⬜⬛⬜⬜\n⬜⬜⬛⬜⬜\n⬜⬜🔴⬜⬜",
         "⬜⬜⬛⬜⬜\n⬜⬛⬜⬜⬜\n🔴⬜⬜⬜⬜",
         "🔴⬛⬛⬜⬜\n⬜⬜⬜⬜⬜\n⬜⬜⬜⬜⬜",
-        "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜\n⬜ Dragon IS BEST ⬜\n⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜",
+        "⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜\n⬜ Moon IS BEST ⬜\n⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜",
     ]
 
     await message.edit_text("ding..dong..ding..dong ...")
@@ -183,7 +183,8 @@ async def gangster(client: Client, message: Message):
 async def timer_blankx(client: Client, message: Message):
     txt = (
         message.text[10:]
-        + "\n\n<b>Tesla Wireless Charging (beta) Started...\nDevice Detected: Apple iPad 13\nBattery Percentage:</b> "
+        + "\n\n<b>Tesla Wireless Charging (beta) Started...\nDevice Detected: Apple iPad 13\nBattery Percentage:</b> ",
+        parse_mode=enums.ParseMode.HTML
     )
     j = 10
     k = j
@@ -195,6 +196,7 @@ async def timer_blankx(client: Client, message: Message):
     await message.edit_text(
         "<b>Tesla Wireless Charging (beta) Completed...\nDevice Detected: Apple iPad 13 (Space Grey Varient)\nBattery Percentage:</b> [100%](https://telegra.ph/file/a45aa7450c8eefed599d9.mp4) ",
         link_preview=True,
+        parse_mode=enums.ParseMode.HTML
     )
 
 
@@ -221,7 +223,7 @@ async def kill(client: Client, message: Message):
     await asyncio.sleep(3)
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 103])
+        await message.edit_text(animation_chars[i % 103],parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command("earth", prefix) & filters.me)
@@ -358,11 +360,11 @@ async def deploy(client: Client, message: Message):
         "<b>Build Succeeded</b>",
     ]
 
-    await message.edit_text("<code>Deploying...</code>")
+    await message.edit_text("<code>Deploying...</code>",parse_mode=enums.ParseMode.HTML)
     await asyncio.sleep(3)
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 12])
+        await message.edit_text(animation_chars[i % 12],parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command("tmoon", prefix) & filters.me)
