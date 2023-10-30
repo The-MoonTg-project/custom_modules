@@ -16,10 +16,9 @@
 import os
 from datetime import datetime
 
-
 from utils.scripts import import_library
 from utils.misc import modules_help, prefix
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 from utils import config
 from utils.scripts import with_reply
@@ -347,7 +346,7 @@ async def anim_arch(message: Message):
     html_pc += f"<img src='{bannerImg}'/>"
 
     title_h = english or romaji
-    synopsis_link = post_to_tp(title_h, html_pc)
+    synopsis_link = post_to_tp(title_h, html_pc, parse_mode=enums.ParseMode.HTML)
     try:
         finals_ = ANIME_TEMPLATE.format(**locals())
     except KeyError as kys:
@@ -422,7 +421,7 @@ async def airing_anim(message: Message):
         out += f"**Airing Episode:** `[{episode}/{episodes}]`\n"
         out += f"\n`{air_on}`"
     if len(out) > 1024:
-        await message.edit(out)
+        await message.edit(out, parse_mode=enums.ParseMode.HTML)
         return
     await message.reply_photo(coverImg, caption=out)
     await message.delete()
@@ -432,7 +431,7 @@ async def airing_anim(message: Message):
 async def get_schuled(message: Message):
     """ Get List of Scheduled Anime """
     var = {'notYetAired': True}
-    await message.edit("`Fetching Scheduled Animes`")
+    await message.edit("`Fetching Scheduled Animes`", parse_mode=enums.ParseMode.HTML)
     result = await return_json_senpai(AIRING_QUERY, var)
     error = result.get('errors')
     if error:
@@ -461,8 +460,8 @@ async def get_schuled(message: Message):
         c += 1
     if out:
         out_p = f"<h1>Showing [{c}/{totl_schld}] Scheduled Animes:</h1><br><br>{out}"
-        link = post_to_tp("Scheduled Animes", out_p)
-        await message.edit(f"[Open in Telegraph]({link})")
+        link = post_to_tp("Scheduled Animes", out_p, parse_mode=enums.ParseMode.HTML)
+        await message.edit(f"[Open in Telegraph]({link})", parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command(["character"], prefix) & filters.me)
@@ -521,7 +520,7 @@ async def character_search(message: Message):
     if cntnt:
         html_cntnt += "<h2>Top Featured Anime</h2>"
         html_cntnt += cntnt
-        html_cntnt += "<br><br>"
+        html_cntnt += "<br><br>", parse_mode=enums.ParseMode.HTML
     url_ = post_to_tp(name, html_cntnt)
     cap_text = f"""[🇯🇵] __{native}__
     (`{name}`)
@@ -579,7 +578,8 @@ async def trace_bek(message: Message):
                 f" (`{result['anilist']['title']['native']}`)\n"
                 f"\n**Anilist ID:** `{result['anilist']['id']}`"
                 f"\n**Similarity**: `{(str(result['similarity']*100))[:5]}`"
-                f"\n**Episode**: `{result['episode']}`"
+                f"\n**Episode**: `{result['episode']}`",
+                parse_mode=enums.ParseMode.HTML
             )
             preview = result['video']
         await message.reply_video(preview, caption=caption_)
