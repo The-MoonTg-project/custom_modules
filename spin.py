@@ -4,7 +4,7 @@ from io import BytesIO
 
 import aiohttp
 
-from pyrogram import Client, filters, types
+from pyrogram import Client, filters, types, enums
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
@@ -52,7 +52,7 @@ async def quote_cmd(client: Client, message: types.Message):
 
     if send_for_me:
         await message.delete()
-        message = await client.send_message("me", "<b>Generating...</b>")
+        message = await client.send_message("me", "<b>Generating...</b>", parse_mode=enums.ParseMode.HTML)
     else:
         await message.edit("<b>Generating...</b>")
 
@@ -68,8 +68,9 @@ async def quote_cmd(client: Client, message: types.Message):
     response = await aiohttp.ClientSession().post(url, json=params)
     if response.status != 200:
         return await message.edit(
-            f"<b>Quotes API error!</b>\n" f"<code>{response.text}</code>"
-        )
+                    f"<b>Quotes API error!</b>\n" f"<code>{response.text}</code>",
+                    parse_mode=enums.ParseMode.HTML
+                )
 
     resized = resize_image(
         BytesIO(await response.read()), img_type="PNG" if is_png else "WEBP"
@@ -80,9 +81,10 @@ async def quote_cmd(client: Client, message: types.Message):
 @Client.on_message(filters.command(['spin', 'dspin'], prefix) & filters.me)
 async def spin_handler(client: Client, message: Message):
     if not message.reply_to_message:
-        await message.edit('<b>Reply to a <i>message</i> to spin it!</b>')
-        return
-    await message.edit('<b>Downloading sticker...</b>')
+        await message.edit('<b>Reply to a <i>message</i> to spin it!</b>', parse_mode=enums.ParseMode.HTML)
+        await message.edit('<b>Downloading sticker...</b>', parse_mode=enums.ParseMode.HTML)
+        return await message.edit('<b>Invalid file type!</b>', parse_mode=enums.ParseMode.HTML)
+        return await message.edit('<b>Video stickers not allowed</b>', parse_mode=enums.ParseMode.HTML)
     try:
         coro = True
         if message.reply_to_message.document:
