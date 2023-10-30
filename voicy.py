@@ -9,8 +9,10 @@ from utils.misc import modules_help, prefix
 from utils.scripts import with_reply, format_exc
 
 @Client.on_message(filters.command(["vo", "voicy"], prefix) & filters.me)
+# The function name is duplicated, causing a syntax error. 
+# We need to rename the second function to avoid the conflict.
 @with_reply
-async def voice_text(client: Client, message: Message):
+async def voice_text_second(client: Client, message: Message):
     try:
         if message.reply_to_message.voice:
             await message.edit("<b>Wait...</b>", parse_mode=enums.ParseMode.HTML)
