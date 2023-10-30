@@ -319,7 +319,7 @@ async def anim_arch(message: Message):
         html_ += f"<em>{c_flag} {character['name']['native']}</em><br>"
         html_ += f"<b>Character ID</b>: {character['id']}<br>"
         html_ += f"<h4>About Character and Role:</h4>{character.get('description', 'N/A')}"
-        html_char += f"{html_}<br><br>"
+        html_char += f"{html_}<br><br>", parse_mode=enums.ParseMode.HTML
 
     studios = ""
     for studio in data['studios']['nodes']:
@@ -343,10 +343,10 @@ async def anim_arch(message: Message):
     html_pc += f"<br><b>Studios:</b> {studios}<br>"
     html_pc += f"<a href='https://myanimelist.net/anime/{idmal}'>View on MAL</a>"
     html_pc += f"<a href='{url}'> View on anilist.co</a>"
-    html_pc += f"<img src='{bannerImg}'/>"
+    html_pc += f"<img src='{bannerImg}'/>", parse_mode=enums.ParseMode.HTML
 
     title_h = english or romaji
-    synopsis_link = post_to_tp(title_h, html_pc, parse_mode=enums.ParseMode.HTML)
+    synopsis_link = post_to_tp(title_h, html_pc)
     try:
         finals_ = ANIME_TEMPLATE.format(**locals())
     except KeyError as kys:
