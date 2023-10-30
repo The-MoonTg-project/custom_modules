@@ -150,6 +150,7 @@ async def ytdl_handler(client: Client, message: Message):
         await message.reply_video(
             f"downloads/{rip_data['id']}.mp4",
             caption=f'<b>{rip_data["title"]}</b>',
+            parse_mode=enums.ParseMode.HTML
             thumb=thumb,
             duration=rip_data["duration"],
             width=rip_data["width"],
@@ -164,6 +165,7 @@ async def ytdl_handler(client: Client, message: Message):
         await message.reply_audio(
             f"{rip_data['id']}.mp3",
             caption=f'<b>{rip_data["title"]}</b>',
+            parse_mode=enums.ParseMode.HTML
             duration=rip_data["duration"],
         )
         os.remove(f"{rip_data['id']}.mp3")
@@ -270,6 +272,7 @@ async def ytdl_handler(client: Client, message: Message):
         await message.reply_video(
             f"downloads/{rip_data['id']}.mp4",
             caption=f'<b>{rip_data["title"]}</b>',
+            parse_mode=enums.ParseMode.HTML
             thumb=thumb,
             duration=rip_data["duration"],
             width=rip_data["width"],
@@ -284,7 +287,9 @@ async def ytdl_handler(client: Client, message: Message):
         await message.reply_audio(
             f"{rip_data['id']}.mp3",
             caption=f'<b>{rip_data["title"]}</b>',
+            parse_mode=enums.ParseMode.HTML
             duration=rip_data["duration"],
+            parse_mode=enums.ParseMode.HTML
         )
         os.remove(f"{rip_data['id']}.mp3")
 

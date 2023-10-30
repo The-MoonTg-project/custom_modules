@@ -2,7 +2,7 @@
 import os
 
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -41,12 +41,12 @@ async def make(client, message, o):
             return await reply.reply_sticker(sticker=path)
         os.remove(path)
 
-    return await message.edit("<b>Need to answer the photo/sticker</b>")
+    return await message.edit("<b>Need to answer the photo/sticker</b>", parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command(["ll", "rr", "dd", "uu"], prefix) & filters.me)
 async def mirror_flip(client: Client, message: Message):
-    await message.edit("<b>Processing...</b>")
+    await message.edit("<b>Processing...</b>", parse_mode=enums.ParseMode.HTML)
     param = {"ll": 1, "rr": 2, "dd": 3, "uu": 4}[message.command[0]]
     await make(client, message, param)
 

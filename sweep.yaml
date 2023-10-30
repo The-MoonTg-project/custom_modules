@@ -5,7 +5,6 @@
 rules:
   - "Avoid using unnecessary imports in the code."
   - "Remove any debug log or print statements before submitting a PR."
-  - "Follow a consistent code formatting style throughout the repository."
 
 # This is the branch that Sweep will develop from and make pull requests to. Most people use 'main' or 'master' but some users also use 'dev' or 'staging'.
 branch: 'main'

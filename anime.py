@@ -48,7 +48,7 @@ async def random():
 @Client.on_message(filters.command(["arnd", "arandom"], prefix) & filters.me)
 async def anime_handler(client: Client, message: Message):
     try:
-        await message.edit("<b>Searching art</b>")
+        await message.edit("<b>Searching art</b>", parse_mode=enums.ParseMode.HTML)
         ra = await random()
         img = await ra.image
         await message.reply_photo(
@@ -58,9 +58,10 @@ async def anime_handler(client: Client, message: Message):
         )
         return await message.delete()
     except Exception as e:
-        await message.edit(format_exc(e),parse_mode=enums.ParseMode.HTML)
+        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["anime"] = {
     "arnd": "Random anime art (May get caught 18+)",
+    "arandom": "Random anime art (May get caught 18+)",
 }

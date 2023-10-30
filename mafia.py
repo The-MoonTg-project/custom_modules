@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
@@ -26,9 +26,9 @@ async def mafia_basic_lovler(client: Client, message: Message):
     try:
         if message.reply_markup and message.reply_markup.inline_keyboard:
             await message.click(0)
-            return await client.send_message('me', '<b>🧛 MafiaDrawing:</b> gift successfully caught!')
+            return await client.send_message('me', '<b>🧛 MafiaDrawing:</b> gift successfully caught!', parse_mode=enums.ParseMode.HTML)
     except Exception as e:
-        return await client.send_message('me', f'<b>🧛 Mafia Drawing:</b>\n{format_exc(e)}')
+        return await client.send_message('me', f'<b>🧛 Mafia Drawing:</b>\n{format_exc(e)}', parse_mode=enums.ParseMode.HTML)
 
 
 # noinspection PyUnusedLocal
@@ -40,7 +40,7 @@ async def mafia_handler(client: Client, message: Message):
     now = not now_status
     db.set('lordcodes.mafia', 'status', now)
     now_status = now
-    return await message.edit('<b><i>🧛 MafiaDrawing is now</i> ' + ('enabled</b>' if now else 'disabled</b>'))
+    return await message.edit('<b><i>🧛 MafiaDrawing is now</i> ' + ('enabled</b>' if now else 'disabled</b>'), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help['mafia'] = {

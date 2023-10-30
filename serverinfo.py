@@ -2,7 +2,7 @@ import os
 import platform
 import sys
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
@@ -52,7 +52,7 @@ text = (
 
 @Client.on_message(filters.command(["serverinfo", "sinfo"], prefix) & filters.me)
 async def serverinfo_cmd(_: Client, message: Message):
-    await message.edit("<b>🔄 Getting server info...</b>",parse_mode=enums.ParseMode.HTML)
+    await message.edit("<b>🔄 Getting server info...</b>", parse_mode=enums.ParseMode.HTML)
 
     inf = []
     try:
@@ -127,7 +127,7 @@ async def serverinfo_cmd(_: Client, message: Message):
     except Exception:
         inf.append("n/a")
 
-    await message.edit(text.format(*inf),parse_mode=enums.ParseMode.HTML)
+    await message.edit(text.format(*inf), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["serverinfo"] = {

@@ -1,8 +1,8 @@
 import asyncio
 
-from pyrogram import enums
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
+
 from utils.misc import modules_help, prefix
 
 
@@ -20,7 +20,7 @@ async def calc(_, message: Message):
                 if i == 0:
                     await message.edit(
                         f"<i>{args}</i><b>=</b><code>{result[x:x + 4000]}</code>",
-                        parse_mode=enums.ParseMode.HTML
+                        parse_mode=enums.ParseMode.HTML,
                     )
                 else:
                     await message.reply(
@@ -33,9 +33,7 @@ async def calc(_, message: Message):
                 f"<i>{args}</i><b>=</b><code>{result}</code>", parse_mode=enums.ParseMode.HTML
             )
     except Exception as e:
-        await message.edit(
-            f"<i>{args}=</i><b>=</b><code>{e}</code>", parse_mode=enums.ParseMode.HTML
-        )
+        await message.edit(f"<i>{args}=</i><b>=</b><code>{e}</code>", parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["calculator"] = {

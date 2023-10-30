@@ -6,7 +6,7 @@ from utils.misc import modules_help, prefix
 from utils.db import db
 
 
-@Client.on_message(filters.channel & ~filters.edited)
+@Client.on_edited_message(filters.channel)
 async def send_comment(client: Client, message: Message):
     enabled = db.get("custom.auto_comment", "enabled", False)
     with suppress(MsgIdInvalid):
@@ -14,7 +14,7 @@ async def send_comment(client: Client, message: Message):
             msg = await client.get_discussion_message(
                 message.chat.id, message.message_id
             )
-            await msg.reply(db.get("custom.auto_comment", "text"))
+            await msg.reply(db.get("custom.auto_comment", "text"), parse_mode=enums.ParseMode.HTML)
     raise ContinuePropagation
 
 

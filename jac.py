@@ -22,11 +22,11 @@ async def jac(client: Client, message: Message):
         text = " "
     await message.delete()
     ufr = requests.get(
-        "https://github.com/Dragon-Userbot/files/blob/main/CascadiaCodePL.ttf?raw=true"
+        "https://github.com/The-MoonTg-project/Moon-Userbot/files/blob/main/CascadiaCodePL.ttf?raw=true"
     )
     f = ufr.content
     pic = requests.get(
-        "https://raw.githubusercontent.com/Dragon-Userbot/files/main/jac.jpg"
+        "https://raw.githubusercontent.com/Moon-Userbot/files/main/jac.jpg"
     )
     pic.raw.decode_content = True
     img = Image.open(io.BytesIO(pic.content)).convert("RGB")

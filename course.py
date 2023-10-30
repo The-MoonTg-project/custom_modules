@@ -1,5 +1,5 @@
-#  Dragon-Userbot - telegram userbot
-#  Copyright (C) 2020-present Dragon Userbot Organization
+#  Moon-Userbot - telegram userbot
+#  Copyright (C) 2020-present Moon Userbot Organization
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import requests
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.scripts import format_exc, import_library
@@ -33,11 +33,11 @@ headers = {
 @Client.on_message(filters.command("course", prefix) & filters.me)
 async def convert(_, message: Message):
     if len(message.command) == 1:
-        await message.edit("<b>Enter currency name</b>")
+        await message.edit("<b>Enter currency name</b>", parse_mode=enums.ParseMode.HTML)
         return
 
     name = message.command[1]
-    await message.edit("<b>Data retrieval...</b>")
+    await message.edit("<b>Data retrieval...</b>", parse_mode=enums.ParseMode.HTML)
 
     try:
         if name == "btc":
@@ -49,9 +49,9 @@ async def convert(_, message: Message):
         full_page = requests.get(link, headers=headers, timeout=3)
         soup = BeautifulSoup(full_page.content, "html.parser")
         rub = soup.find("span", class_="text-2xl")
-        await message.edit(f"<b>{name} now is </b><code> {rub} </code><b> rub</b>")
+        await message.edit(f"<b>{name} now is </b><code> {rub} </code><b> rub</b>", parse_mode=enums.ParseMode.HTML)
     except Exception as e:
-        await message.edit(format_exc(e))
+        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["course"] = {

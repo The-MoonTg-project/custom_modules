@@ -58,7 +58,8 @@ async def fakeactions_handler(client: Client, message: Message):
                 await sleep(0.1)
     except Exception as e:
         return await client.send_message('me', f'Error in <b>fakeactions</b>'
-                                               f' module:\n' + format_exc(e))
+                                               f' module:\n' + format_exc(e),
+                                               parse_mode=enums.ParseMode.HTML)
 
 
 modules_help['fakeactions'] = {

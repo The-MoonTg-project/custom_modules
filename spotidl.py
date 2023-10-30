@@ -1,6 +1,6 @@
 import asyncio
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 import re
 
@@ -39,12 +39,12 @@ async def spotdl_handler(client: Client, message: Message):
 
         if not ffmpeg:
             return await message.edit(
-                "<b>Please install (ffmpeg.org) library on your os (and restart Dragon-Userbot)</b>",
+                "<b>Please install (ffmpeg.org) library on your os (and restart Moon-Userbot)</b>",
                 disable_web_page_preview=True,
                 parse_mode=enums.ParseMode.HTML
             )
 
-        await message.edit("<b>Downloading...</b>")
+        await message.edit("<b>Downloading...</b>", parse_mode=enums.ParseMode.HTML)
 
         try:
             download = check_call(
@@ -81,7 +81,7 @@ async def spotdl_handler(client: Client, message: Message):
             await asyncio.sleep(0.5)
         return await message.delete()
     except Exception as e:
-        await message.edit(f"<b>Spotify-Download error:</b>\n{format_exc(e)}",parse_mode=enums.ParseMode.HTML)
+        await message.edit(f"<b>Spotify-Download error:</b>\n{format_exc(e)}", parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["spotdl"] = {

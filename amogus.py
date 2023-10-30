@@ -1,5 +1,5 @@
 # Original module author: t.me/KeyZenD
-# Adaptation for Dragon-Userbot by t.me/AmokDev (github.com/AmokDev)
+# Adaptation for Moon-Userbot by t.me/AmokDev (github.com/AmokDev)
 
 from io import BytesIO
 from random import randint
@@ -18,7 +18,7 @@ from utils.misc import modules_help, prefix
 async def amogus(client: Client, message: Message):
     text = " ".join(message.command[1:])
 
-    await message.edit("<b>amgus, tun tun tun tun tun tun tun tudududn tun tun...</b>",parse_mode=enums.ParseMode.HTML)
+    await message.edit("<b>amgus, tun tun tun tun tun tun tun tudududn tun tun...</b>", parse_mode=enums.ParseMode.HTML)
 
     clr = randint(1, 12)
 

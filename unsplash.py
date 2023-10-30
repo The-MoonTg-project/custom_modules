@@ -54,7 +54,7 @@ async def unsplash(client: Client, message: Message):
             await message.delete()
             return
         else:
-            await message.edit("<b>Getting Picture</b>")
+            await message.edit("<b>Getting Picture</b>", parse_mode=enums.ParseMode.HTML)
             img = await AioHttp().get_url(
                 f"https://source.unsplash.com/1600x900/?{keyword}"
             )

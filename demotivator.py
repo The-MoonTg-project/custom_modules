@@ -1,7 +1,7 @@
 import random
 from io import BytesIO
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -15,13 +15,13 @@ from PIL import Image, ImageDraw, ImageFont
 
 @Client.on_message(filters.command(["dem"], prefix) & filters.me)
 async def demotivator(client: Client, message: Message):
-    await message.edit("<code>Process of demotivation...</code>")
+    await message.edit("<code>Process of demotivation...</code>", parse_mode=enums.ParseMode.HTML)
     font = requests.get(
-        "https://github.com/Dragon-Userbot/files/blob/main/Times%20New%20Roman.ttf?raw=true"
+        "https://github.com/The-MoonTg-project/Moon-Userbot/files/blob/main/Times%20New%20Roman.ttf?raw=true"
     )
     f = font.content
     template_dem = requests.get(
-        "https://raw.githubusercontent.com/Dragon-Userbot/files/main/demotivator.png"
+        "https://raw.githubusercontent.com/Moon-Userbot/files/main/demotivator.png"
     )
     if message.reply_to_message:
         words = ["random", "text", "typing", "fuck"]
@@ -73,11 +73,11 @@ async def demotivator(client: Client, message: Message):
                 )
                 await message.delete()
             else:
-                await message.edit("<b>Animated stickers are not supported</b>")
+                await message.edit("<b>Animated stickers are not supported</b>", parse_mode=enums.ParseMode.HTML)
         else:
-            await message.edit("<b>Need to answer the photo/sticker</b>")
+            await message.edit("<b>Need to answer the photo/sticker</b>", parse_mode=enums.ParseMode.HTML)
     else:
-        await message.edit("<b>Need to answer the photo/sticker</b>")
+        await message.edit("<b>Need to answer the photo/sticker</b>", parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["demotivator"] = {

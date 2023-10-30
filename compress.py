@@ -3,7 +3,7 @@ import sys
 from typing import Tuple
 import shlex
 import asyncio
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -28,10 +28,10 @@ async def run_cmd(prefix: str) -> Tuple[str, str, int, int]:
 async def compress(client: Client, message: Message):
     replied = message.reply_to_message
     if not replied.media:
-        await message.edit("<b>Please Reply To A Video</b>")
+        await message.edit("<b>Please Reply To A Video</b>", parse_mode=enums.ParseMode.HTML)
         return
     if replied.media:
-        await message.edit("<code>Downloading Video . . .</code>")
+        await message.edit("<code>Downloading Video . . .</code>", parse_mode=enums.ParseMode.HTML)
         file = await client.download_media(
             message=replied,
             file_name="resources/",
@@ -39,19 +39,19 @@ async def compress(client: Client, message: Message):
         #replied.media.duration
         out_file = file + ".mp4"
         try:
-            await message.edit("<code>Trying to compress. . .</code>")
-            await message.edit("<code>If video size is big it'll take a while please be patient</code>")
+            await message.edit("<code>Trying to compress. . .</code>", parse_mode=enums.ParseMode.HTML)
+            await message.edit("<code>If video size is big it'll take a while please be patient</code>", parse_mode=enums.ParseMode.HTML)
             cmp = f"ffmpeg -i {file} -vcodec libx265 -crf 24 -preset ultrafast {out_file}"
             await run_cmd(cmp)
-            await message.edit("<code>Uploading File . . .</code>")
+            await message.edit("<code>Uploading File . . .</code>", parse_mode=enums.ParseMode.HTML)
             await message.delete()
             await client.send_document(message.chat.id, out_file)
         except BaseException as e:
-            await message.edit(f"<b>INFO:</b> <code>{e}</code>")
+            await message.edit(f"<b>INFO:</b> <code>{e}</code>", parse_mode=enums.ParseMode.HTML)
         finally:
             os.remove(file, out_file)
     else:
-        await message.edit("<b>Please Reply To A Video</b>")
+        await message.edit("<b>Please Reply To A Video</b>", parse_mode=enums.ParseMode.HTML)
         return
 
 modules_help["compress"] = {

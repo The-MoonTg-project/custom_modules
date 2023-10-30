@@ -1,5 +1,5 @@
-#  Dragon-Userbot - telegram userbot
-#  Copyright (C) 2020-present Dragon Userbot Organization
+#  Moon-Userbot - telegram userbot
+#  Copyright (C) 2020-present Moon Userbot Organization
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 import asyncio
 
 import requests
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -33,21 +33,22 @@ async def neko(_, message: Message):
     if len(message.command) == 1:
         await message.edit(
             "<b>Neko type isn't provided\n"
-            f"You can get available neko types with <code>{prefix}neko_types</code></b>"
+            f"You can get available neko types with <code>{prefix}neko_types</code></b>",
+            parse_mode=enums.ParseMode.HTML
         )
 
     query = message.command[1]
-    await message.edit("<b>Loading...</b>")
+    await message.edit("<b>Loading...</b>", parse_mode=enums.ParseMode.HTML)
     try:
-        await message.edit(f"{get_neko_media(query)}", disable_web_page_preview=False)
+        await message.edit(f"{get_neko_media(query)}", disable_web_page_preview=False, parse_mode=enums.ParseMode.HTML)
     except Exception as e:
-        await message.edit(format_exc(e, hint="maybe you entered wrong type"))
+        await message.edit(format_exc(e, hint="maybe you entered wrong type"), parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command(["nekotypes", "neko_types"], prefix) & filters.me)
 async def neko_types_func(_, message: Message):
     neko_types = """femdom tickle classic ngif erofeet meow erok poke les hololewd lewdk keta feetg nsfw_neko_gif eroyuri kiss 8ball kuni tits pussy_jpg cum_jpg pussy lewdkemo lizard slap lewd cum cuddle spank smallboobs goose Random_hentai_gif avatar fox_girl nsfw_avatar hug gecg boobs pat feet smug kemonomimi solog holo wallpaper bj woof yuri trap anal baka blowjob holoero feed neko gasm hentai futanari ero solo waifu pwankg eron erokemo"""
-    await message.edit(" ".join(f"<code>{n}</code>" for n in neko_types.split()))
+    await message.edit(" ".join(f"<code>{n}</code>" for n in neko_types.split()), parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command(["nekospam", "neko_spam"], prefix) & filters.me)

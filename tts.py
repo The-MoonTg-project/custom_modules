@@ -1,5 +1,5 @@
-#  Dragon-Userbot - telegram userbot
-#  Copyright (C) 2020-present Dragon Userbot Organization
+#  Moon-Userbot - telegram userbot
+#  Copyright (C) 2020-present Moon Userbot Organization
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ gTTS = import_library("gtts").gTTS
 async def tts(client: Client, message: Message):
     lang = message.command[1]
     text = " ".join(message.command[2:])
-    await message.edit("<b>Speech synthesis...</b>",parse_mode=enums.ParseMode.HTML)
+    await message.edit("<b>Speech synthesis...</b>", parse_mode=enums.ParseMode.HTML)
 
     try:
         tts = gTTS(text, lang=lang)
@@ -43,7 +43,7 @@ async def tts(client: Client, message: Message):
         else:
             await client.send_audio(message.chat.id, voice)
     except Exception as e:
-        await message.edit(format_exc(e),parse_mode=enums.ParseMode.HTML)
+        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["tts"] = {"tts [lang]* [text]*": "Say text"}

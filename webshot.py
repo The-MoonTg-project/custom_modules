@@ -12,7 +12,7 @@ url = "https://webshot.deam.io/{}/?width=1920&height=1080?type=jpg"
 @Client.on_message(filters.command(["ws", "webshot"], prefix) & filters.me)
 async def webshot_handler(client: Client, message: Message):
     try:
-        await message.edit("<b>Screenshotting...</b>")
+        await message.edit("<b>Screenshotting...</b>", parse_mode=enums.ParseMode.HTML)
         link = message.command[1]
         async with ClientSession() as session:
             async with session.get(url.format(link)) as response:
@@ -26,7 +26,7 @@ async def webshot_handler(client: Client, message: Message):
                     parse_mode=enums.ParseMode.HTML,
                 )
     except Exception as e:
-        await message.edit(format_exc(e))
+        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["webshot"] = {

@@ -24,3 +24,8 @@ async def killme_cmd(client, message: Message):
     except:
         pass
     await message.edit("Killed myself! Closing session...")
+
+
+modules_help["killme"] = {
+	"killme": "STop UB"
+}

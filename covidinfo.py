@@ -1,5 +1,5 @@
-#  Dragon-Userbot - telegram userbot
-#  Copyright (C) 2020-present Dragon Userbot Organization
+#  Moon-Userbot - telegram userbot
+#  Copyright (C) 2020-present Moon Userbot Organization
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ Covid = import_library("covid").Covid
 @Client.on_message(filters.command("covid", prefix) & filters.me)
 async def covid_local(_, message: Message):
     region = " ".join(message.command[1:])
-    await message.edit("<b>Data retrieval...</b>")
+    await message.edit("<b>Data retrieval...</b>", parse_mode=enums.ParseMode.HTML)
     covid = Covid(source="worldometers")
     try:
         local_status = covid.get_status_by_country_name(region)
@@ -40,20 +40,21 @@ async def covid_local(_, message: Message):
             + f"<b>❗️ Active:</b> <code>{local_status['active']}</code>\n"
             + f"<b>⚠️ Critical</b>: <code>{local_status['critical']}</code>\n"
             + f"<b>💀 Deaths</b>: <code>{local_status['deaths']}</code>\n"
-            + f"<b>🚑 Recovered</b>: <code>{local_status['recovered']}</code>\n"
+            + f"<b>🚑 Recovered</b>: <code>{local_status['recovered']}</code>\n",
+            parse_mode=enums.ParseMode.HTML
         )
     except ValueError:
-        await message.edit(f"<b>There is no region called {region}</b>")
+        await message.edit(f"<b>There is no region called {region}</b>", parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command("regions", prefix) & filters.me)
 async def regions_cmd(_, message: Message):
     countries = ""
-    await message.edit("<b>Data retrieval...</b>")
+    await message.edit("<b>Data retrieval...</b>", parse_mode=enums.ParseMode.HTML)
     covid = Covid(source="worldometers")
     for region in covid.list_countries():
         countries += f"<code>{region}</code>\n"
-    await message.edit(countries)
+    await message.edit(countries, parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["covidinfo"] = {

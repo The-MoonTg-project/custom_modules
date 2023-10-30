@@ -127,7 +127,7 @@ async def dmshift(client, message):
     try:
         await reply.copy(chat_id=x)
     except Exception as e:
-        await message.edit(f"Error: {str(e)}")
+        await message.edit(f"Error: {str(e)}", parse_mode=enums.ParseMode.HTML)
         return
 
     await message.edit(f"Message Delivered to {x}")

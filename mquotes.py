@@ -1,7 +1,7 @@
 from io import BytesIO
 
 import requests
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -14,10 +14,10 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 @Client.on_message(filters.command(["mquote", "mq"], prefix) & filters.me)
 @with_reply
 async def quotes(client: Client, message: Message):
-    await message.edit("<b>Quoting...</b>")
+    await message.edit("<b>Quoting...</b>", parse_mode=enums.ParseMode.HTML)
 
     font = requests.get(
-        "https://github.com/Dragon-Userbot/files/blob/main/HelveticaNeue.ttc?raw=true"
+        "https://github.com/The-MoonTg-project/Moon-Userbot/files/blob/main/HelveticaNeue.ttc?raw=true"
     )
     f = font.content
     if message.reply_to_message.text and message.reply_to_message.from_user:

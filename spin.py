@@ -61,7 +61,7 @@ async def quote_cmd(client: Client, message: types.Message):
             "me", "<b>Generating...</b>", parse_mode=enums.ParseMode.HTML
         )
     else:
-        await message.edit("<b>Generating...</b>")
+        await message.edit("<b>Generating...</b>", parse_mode=enums.ParseMode.HTML)
 
     url = "https://quotes.fl1yd.su/generate"
     params = {
@@ -98,9 +98,6 @@ async def spin_handler(client: Client, message: Message):
         return await message.edit(
             "<b>Invalid file type!</b>", parse_mode=enums.ParseMode.HTML
         )
-        return await message.edit(
-            "<b>Video stickers not allowed</b>", parse_mode=enums.ParseMode.HTML
-        )
     try:
         coro = True
         if message.reply_to_message.document:
@@ -111,10 +108,10 @@ async def spin_handler(client: Client, message: Message):
                 and not filename.endswith(".jpg")
                 and not filename.endswith(".jpeg")
             ):
-                return await message.edit("<b>Invalid file type!</b>")
+                return await message.edit("<b>Invalid file type!</b>", parse_mode=enums.ParseMode.HTML)
         elif message.reply_to_message.sticker:
             if message.reply_to_message.sticker.is_video:
-                return await message.edit("<b>Video stickers not allowed</b>")
+                return await message.edit("<b>Video stickers not allowed</b>", parse_mode=enums.ParseMode.HTML)
             filename = "sticker.webp"
         elif message.reply_to_message.text:
             result = await quote_cmd(client, message)
@@ -130,9 +127,9 @@ async def spin_handler(client: Client, message: Message):
             await message.reply_to_message.download(f"downloads/{filename}")
     except Exception as ex:
         return await message.edit(
-            f"<b>Message can not be loaded:</b>\n<code>{format_exc(ex)}</code>"
+            f"<b>Message can not be loaded:</b>\n<code>{format_exc(ex)}</code>", parse_mode=enums.ParseMode.HTML
         )
-    await message.edit("<b>Spinning...</b>")
+    await message.edit("<b>Spinning...</b>", parse_mode=enums.ParseMode.HTML)
     offset = int(message.command[1]) if len(message.command) > 1 else 10
     fps = int(message.command[2]) if len(message.command) > 2 else 30
     try:
@@ -147,7 +144,7 @@ async def spin_handler(client: Client, message: Message):
             reply_to_message_id=message.reply_to_message.message_id,
         )
     except Exception as e:
-        await message.reply(format_exc(e))
+        await message.reply(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["spin"] = {

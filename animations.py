@@ -31,7 +31,7 @@ async def stupid(client: Client, message: Message):
     for i in animation_ttl:
 
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 14])
+        await message.edit_text(animation_chars[i % 14], parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command("bombs", prefix) & filters.me)
@@ -55,7 +55,7 @@ async def bombs(client: Client, message: Message):
     await asyncio.sleep(0.5)
     await message.edit_text("▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n😵😵😵😵 \n")
     await asyncio.sleep(0.5)
-    await message.edit_text("<b>RIP PLOXXX......</b>",parse_mode=enums.ParseMode.HTML)
+    await message.edit_text("<b>RIP PLOXXX......</b>")
     await asyncio.sleep(2)
 
 
@@ -69,13 +69,13 @@ async def cell(client: Client, message: Message):
         "<b>Connecting To Telegram Headquarters...</b>",
         "<b>Call Connected.</b>",
         "<b>Telegram: Hello This is Telegram HQ. Who is this?</b>",
-        f"<b>Me: Yo this is Dragon ,Please Connect me to my lil bro,Pavel Durov </b>",
+        f"<b>Me: Yo this is Moon ,Please Connect me to my lil bro,Pavel Durov </b>",
         "<b>User Authorised.</b>",
         "<b>Calling Shivamani </b>  <code>At +916969696969</code>",
         "<b>Private  Call Connected...</b>",
         "<b>Me: Hello Sir, Please Ban This Telegram Account.</b>",
         "<b>Shivamani : May I Know Who Is This?</b>",
-        f"<b>Me: Yo Brah, I Am Dragon</b>",
+        f"<b>Me: Yo Brah, I Am Moon</b>",
         "<b>Shivamani : OMG!!! Long time no see, Wassup cat...\nI'll Make Sure That Guy Account Will Get Blocked Within 24Hrs.</b>",
         "<b>Me: Thanks, See You Later Brah.</b>",
         "<b>Shivamani : Please Don't Thank Brah, Telegram Is Our's. Just Gimme A Call When You Become Free.</b>",
@@ -87,7 +87,7 @@ async def cell(client: Client, message: Message):
     ]
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 18],parse_mode=enums.ParseMode.HTML)
+        await message.edit_text(animation_chars[i % 18])
 
 
 @Client.on_message(filters.command("wtf", prefix) & filters.me)
@@ -106,7 +106,7 @@ async def wtf(client: Client, message: Message):
     for i in animation_ttl:
 
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 5])
+        await message.edit_text(animation_chars[i % 5], parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command("ding", prefix) & filters.me)
@@ -130,7 +130,7 @@ async def ding(client: Client, message: Message):
     await asyncio.sleep(4)
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 10])
+        await message.edit_text(animation_chars[i % 10], parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command("hypo", prefix) & filters.me)
@@ -183,13 +183,12 @@ async def gangster(client: Client, message: Message):
 async def timer_blankx(client: Client, message: Message):
     txt = (
         message.text[10:]
-        + "\n\n<b>Tesla Wireless Charging (beta) Started...\nDevice Detected: Apple iPad 13\nBattery Percentage:</b> ",
-        parse_mode=enums.ParseMode.HTML
+        + "\n\n<b>Tesla Wireless Charging (beta) Started...\nDevice Detected: Apple iPad 13\nBattery Percentage:</b> "
     )
     j = 10
     k = j
     for j in range(j):
-        await message.edit_text(txt + str(k))
+        await message.edit_text(txt + str(k), parse_mode=enums.ParseMode.HTML)
         k = k + 10
         await asyncio.sleep(1)
     await asyncio.sleep(1)
@@ -223,7 +222,7 @@ async def kill(client: Client, message: Message):
     await asyncio.sleep(3)
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 103],parse_mode=enums.ParseMode.HTML)
+        await message.edit_text(animation_chars[i % 103], parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command("earth", prefix) & filters.me)
@@ -338,7 +337,7 @@ async def smoon(client: Client, message: Message):
         await message.edit_text(animation_chars[i % 8])
 
 
-mention = f"<a href = https://github.com/Dragon-Userbot>Dragon-Userbot</a>"
+mention = f"<a href = https://github.com/The-MoonTg-project/Moon-Userbot>Moon-Userbot</a>"
 
 
 @Client.on_message(filters.command("deploy", prefix) & filters.me)
@@ -360,11 +359,11 @@ async def deploy(client: Client, message: Message):
         "<b>Build Succeeded</b>",
     ]
 
-    await message.edit_text("<code>Deploying...</code>",parse_mode=enums.ParseMode.HTML)
+    await message.edit_text("<code>Deploying...</code>", parse_mode=enums.ParseMode.HTML)
     await asyncio.sleep(3)
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 12],parse_mode=enums.ParseMode.HTML)
+        await message.edit_text(animation_chars[i % 12], parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command("tmoon", prefix) & filters.me)

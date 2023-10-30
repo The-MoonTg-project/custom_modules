@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -15,10 +15,11 @@ async def block_True(client: Client, message: Message):
         )
         await client.block_user(user_id)
         await message.edit(
-            f"<b>🤡 The <a href='tg://user?id={user_id}'>user</a> is now blacklisted!</b>"
+            f"<b>🤡 The <a href='tg://user?id={user_id}'>user</a> is now blacklisted!</b>",
+            parse_mode=enums.ParseMode.HTML
         )
     except Exception as e:
-        await message.edit(format_exc(e))
+        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command(["unblock"], prefix) & filters.me)
@@ -31,10 +32,11 @@ async def unblock(client: Client, message: Message):
         )
         await client.unblock_user(user_id)
         await message.edit(
-            f"<b>☺️ <a href='tg://user?id={user_id}'>User</a> removed from the blacklist!</b>"
+            f"<b>☺️ <a href='tg://user?id={user_id}'>User</a> removed from the blacklist!</b>",
+            parse_mode=enums.ParseMode.HTML
         )
     except Exception as e:
-        await message.edit(format_exc(e))
+        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["blacklist"] = {

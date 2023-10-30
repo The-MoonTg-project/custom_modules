@@ -319,7 +319,7 @@ async def anim_arch(message: Message):
         html_ += f"<em>{c_flag} {character['name']['native']}</em><br>"
         html_ += f"<b>Character ID</b>: {character['id']}<br>"
         html_ += f"<h4>About Character and Role:</h4>{character.get('description', 'N/A')}"
-        html_char += f"{html_}<br><br>", parse_mode=enums.ParseMode.HTML
+        html_char += f"{html_}<br><br>"
 
     studios = ""
     for studio in data['studios']['nodes']:
@@ -338,15 +338,15 @@ async def anim_arch(message: Message):
         html_pc += "<h2>Main Characters:</h2>"
         html_pc += html_char
         html_pc += "<br><br>"
-    html_pc += "<h3>More Info:</h3>"
-    html_pc += f"<b>Started On:</b> {s_date['day']}/{s_date['month']}/{s_date['year']}"
-    html_pc += f"<br><b>Studios:</b> {studios}<br>"
-    html_pc += f"<a href='https://myanimelist.net/anime/{idmal}'>View on MAL</a>"
-    html_pc += f"<a href='{url}'> View on anilist.co</a>"
-    html_pc += f"<img src='{bannerImg}'/>", parse_mode=enums.ParseMode.HTML
+        html_pc += "<h3>More Info:</h3>"
+        html_pc += f"<b>Started On:</b> {s_date['day']}/{s_date['month']}/{s_date['year']}"
+        html_pc += f"<br><b>Studios:</b> {studios}<br>"
+        html_pc += f"<a href='https://myanimelist.net/anime/{idmal}'>View on MAL</a>"
+        html_pc += f"<a href='{url}'> View on anilist.co</a>"
+        html_pc += f"<img src='{bannerImg}'/>"
 
     title_h = english or romaji
-    synopsis_link = post_to_tp(title_h, html_pc)
+    synopsis_link = post_to_tp(title_h, html_pc, parse_mode=enums.ParseMode.HTML)
     try:
         finals_ = ANIME_TEMPLATE.format(**locals())
     except KeyError as kys:
@@ -520,8 +520,8 @@ async def character_search(message: Message):
     if cntnt:
         html_cntnt += "<h2>Top Featured Anime</h2>"
         html_cntnt += cntnt
-        html_cntnt += "<br><br>", parse_mode=enums.ParseMode.HTML
-    url_ = post_to_tp(name, html_cntnt)
+        html_cntnt += "<br><br>"
+    url_ = post_to_tp(name, html_cntnt, parse_mode=enums.ParseMode.HTML)
     cap_text = f"""[🇯🇵] __{native}__
     (`{name}`)
 **ID:** {id_}

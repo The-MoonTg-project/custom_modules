@@ -1,7 +1,8 @@
 import urllib
 
-from pyrogram import Client, enums, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
+
 from utils.misc import modules_help, prefix
 
 MAX_URL = "https://img.youtube.com/vi/{id}/maxresdefault.jpg"
@@ -55,26 +56,16 @@ async def preview(client: Client, message: Message):
                 await message.delete()
             elif view == "2":
                 await client.send_photo(
-                    message.chat.id,
-                    video_id,
-                    caption=f"Download Link - {video_id}",
-                    parse_mode=enums.ParseMode.HTML,
+                    message.chat.id, video_id, caption=f"Download Link - {video_id}"
                 )
                 await message.delete()
             elif view == "3":
                 await client.send_photo(
-                    message.chat.id,
-                    video_id,
-                    caption=f"{video_id}",
-                    parse_mode=enums.ParseMode.HTML,
+                    message.chat.id, video_id, caption=f"{video_id}"
                 )
                 await message.delete()
             elif view == "4":
-                await client.send_photo(
-                    message.chat.id,
-                    video_id,
-                    parse_mode=enums.ParseMode.HTML,
-                )
+                await client.send_photo(message.chat.id, video_id)
                 await message.delete()
             elif view == "5":
                 captionText = message.command[3:]
@@ -87,7 +78,7 @@ async def preview(client: Client, message: Message):
                 )
                 await message.delete()
     except:
-        await message.edit(f"This <a href='{video_id}'>link</a> does not exist")
+        await message.edit(f"This <a href='{video_id}'>link</a> does not exist", parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["yt_preview"] = {

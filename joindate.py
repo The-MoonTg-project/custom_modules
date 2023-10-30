@@ -1,7 +1,7 @@
 import asyncio
 import os 
 from datetime import datetime
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.raw import functions
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
@@ -10,7 +10,7 @@ from utils.scripts import format_exc
 
 @Client.on_message(filters.command("joindate", prefix) & filters.me)
 async def joindate(client: Client, message: Message):
-	await message.edit(f"<b>One moment...</b>")
+	await message.edit(f"<b>One moment...</b>", parse_mode=enums.ParseMode.HTML)
 	members = []
 	cgetmsg = await client.get_messages(message.chat.id, 1)
 	async for m in client.iter_chat_members(message.chat.id):

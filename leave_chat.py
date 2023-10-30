@@ -1,5 +1,5 @@
-#  Dragon-Userbot - telegram userbot
-#  Copyright (C) 2020-present Dragon Userbot Organization
+#  Moon-Userbot - telegram userbot
+#  Copyright (C) 2020-present Moon Userbot Organization
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
 import asyncio
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -25,11 +25,11 @@ from utils.misc import modules_help, prefix
 @Client.on_message(filters.command(["leave_chat", "lc"], prefix) & filters.me)
 async def leave_chat(_, message: Message):
     if message.chat.type != "private":
-        await message.edit("<b>Goodbye...</b>")
+        await message.edit("<b>Goodbye...</b>", parse_mode=enums.ParseMode.HTML)
         await asyncio.sleep(3)
         await message.chat.leave()
     else:
-        await message.edit("<b>Not supported in private chats</b>")
+        await message.edit("<b>Not supported in private chats</b>", parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["leave_chat"] = {

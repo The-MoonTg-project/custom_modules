@@ -1,4 +1,4 @@
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -29,7 +29,7 @@ async def prussian_cmd(_, message: Message):
         for j in range(1, 2):
             splitted.insert(i, random.choice(words))
 
-    await message.edit(" ".join(splitted))
+    await message.edit(" ".join(splitted), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["perfectrussian"] = {

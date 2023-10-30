@@ -1,10 +1,9 @@
-from typing import Union
-
-from bs4 import BeautifulSoup
-from pyrogram import Client, enums, filters
-from pyrogram.types import Message
-from utils.misc import modules_help, prefix
 from utils.scripts import import_library
+from utils.misc import modules_help, prefix
+from pyrogram import Client, filters, enums
+from pyrogram.types import Message
+from bs4 import BeautifulSoup
+from typing import Union
 
 aiohttp = import_library("aiohttp")
 
@@ -32,7 +31,7 @@ async def score(_, message: Message):
     sed = "".join(match.get_text() + "\n\n" for match in result)
     await message.edit(
         f"<b>Match information:</b><u> Credits Friday team</u>\n\n\n<code>{sed}</code>",
-        parse_mode=enums.ParseMode.HTML,
+        parse_mode=enums.ParseMode.HTML
     )
 
 

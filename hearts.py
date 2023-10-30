@@ -84,7 +84,7 @@ async def hearts(client: Client, message: Message):
 
     final_caption = " ".join(message.command[1:])
     if not final_caption:
-        final_caption = "💕 by @arte_m_etra"
+        final_caption = "💕 by @moonuserbot"
     await message.edit(final_caption)
 
 

@@ -1,5 +1,5 @@
-#  Dragon-Userbot - telegram userbot
-#  Copyright (C) 2020-present Dragon Userbot Organization
+#  Moon-Userbot - telegram userbot
+#  Copyright (C) 2020-present Moon Userbot Organization
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
@@ -32,13 +32,14 @@ async def webshot(_, message: Message):
             await message.edit(
                 f"<a href={full_request}>{reply_user_request}</a>",
                 disable_web_page_preview=True,
+                parse_mode=enums.ParseMode.HTML
             )
 
     else:
         request = user_request.replace(" ", "+")
         full_request = f"https://lmgtfy.app/?s=g&iie=1&q={request}"
         await message.edit(
-            f"<a href={full_request}>{user_request}</a>", disable_web_page_preview=True
+            f"<a href={full_request}>{user_request}</a>", disable_web_page_preview=True, parse_mode=enums.ParseMode.HTML
         )
 
 

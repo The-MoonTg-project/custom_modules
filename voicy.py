@@ -14,7 +14,7 @@ from utils.scripts import with_reply, format_exc
 async def voice_text(client: Client, message: Message):
     try:
         if message.reply_to_message.voice:
-            await message.edit("<b>Wait...</b>",parse_mode=enums.ParseMode.HTML)
+            await message.edit("<b>Wait...</b>", parse_mode=enums.ParseMode.HTML)
             await client.unblock_user("@voicybot")
             await message.reply_to_message.forward("@voicybot")
             await asyncio.sleep(5)
@@ -25,19 +25,17 @@ async def voice_text(client: Client, message: Message):
                 .text.replace(
                     "Путин и его свита убивают мирное население на войне в Украине #stopputin",
                     "",
-                    parse_mode=enums.ParseMode.HTML
                 )
                 .replace(
                     "Putin and his cronies kill civilians in the war in Ukraine #stopputin",
                     "",
-                    parse_mode=enums.ParseMode.HTML
                 )
             )
-            await message.edit(f"<b>Text: {text}</b>",parse_mode=enums.ParseMode.HTML)
+            await message.edit(f"<b>Text: {text}</b>", parse_mode=enums.ParseMode.HTML)
         else:
-            await message.edit("<b>It's not a voice</b>",parse_mode=enums.ParseMode.HTML)
+            await message.edit("<b>It's not a voice</b>", parse_mode=enums.ParseMode.HTML)
     except Exception as e:
-        await message.edit(format_exc(e),parse_mode=enums.ParseMode.HTML)
+        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["voicy"] = {"voicy [reply]*": "get text from voice"}

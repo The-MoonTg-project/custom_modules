@@ -2,7 +2,7 @@ import json
 import os
 from io import BytesIO
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 
 # noinspection PyUnresolvedReferences
 from pyrogram.types import Message
@@ -33,7 +33,8 @@ async def carbon_handler(_: Client, message: Message):
             and not message.document
         ):
             return await message.edit(
-                "<b>Please reply to a message or send a code.</b>"
+                "<b>Please reply to a message or send a code.</b>",
+                parse_mode=enums.ParseMode.HTML
             )
         elif len(message.command) > 1:
             code = message.text.split(maxsplit=1)[1]
@@ -48,7 +49,8 @@ async def carbon_handler(_: Client, message: Message):
                 code = message.reply_to_message.caption
             else:
                 return await message.edit(
-                    "<b>Please reply to a message or send a code.</b>"
+                    "<b>Please reply to a message or send a code.</b>",
+                    parse_mode=enums.ParseMode.HTML
                 )
         elif message.document:
             filepath = f"downloads/{message.document.file_name}"
@@ -56,10 +58,10 @@ async def carbon_handler(_: Client, message: Message):
             code = open(filepath, "r", encoding="utf-8").read()
         else:
             return await message.edit(
-                "<b>Please reply to a message or send a code.</b>"
+                "<b>Please reply to a message or send a code.</b>",parse_mode=enums.ParseMode.HTML
             )
 
-        await message.edit("<b>Generating image...</b>")
+        await message.edit("<b>Generating image...</b>", parse_mode=enums.ParseMode.HTML)
 
         async with aiohttp.ClientSession() as session:
             async with session.post(
@@ -67,17 +69,17 @@ async def carbon_handler(_: Client, message: Message):
                 json={"code": await get_code(code)},
             ) as resp:
                 if not resp.ok:
-                    return await message.edit("<b>Error while fetching the image.</b>")
+                    return await message.edit("<b>Error while fetching the image.</b>", parse_mode=enums.ParseMode.HTML)
                 image = BytesIO(await resp.read())
                 image.name = "carbon.jpg"
                 image.seek(0)
-        await message.reply_photo(image, caption=f"<b>Generated image:</b>")
+        await message.reply_photo(image, caption=f"<b>Generated image:</b>", parse_mode=enums.ParseMode.HTML)
         await message.delete()
 
         if filepath:
             os.remove(filepath)
     except Exception as e:
-        return await message.edit(format_exc(e))
+        return await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
 modules_help["carbon"] = {
