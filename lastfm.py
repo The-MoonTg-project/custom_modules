@@ -134,7 +134,7 @@
 #                     Document._parse(client, r["document"], "audio")["file_id"],
 #                     res,
 #                     reply_to_message_id=(
-#                         message.reply_to_message.message_id
+#                         message.reply_to_message.id
 #                         if message.reply_to_message is not None
 #                         else None
 #                     ),
@@ -153,7 +153,7 @@
 #                     Document._parse(client, r["document"], "audio")["file_id"],
 #                     res,
 #                     reply_to_message_id=(
-#                         message.reply_to_message.message_id
+#                         message.reply_to_message.id
 #                         if message.reply_to_message is not None
 #                         else None
 #                     ),
@@ -170,7 +170,7 @@
 #                     Document._parse(client, r["document"], "audio")["file_id"],
 #                     res,
 #                     reply_to_message_id=(
-#                         message.reply_to_message.message_id
+#                         message.reply_to_message.id
 #                         if message.reply_to_message is not None
 #                         else None
 #                     ),

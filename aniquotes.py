@@ -23,7 +23,7 @@ async def aniquotes_handler(client: Client, message: Message):
         result = await client.get_inline_bot_results('@quotafbot', query)
         return await message.reply_inline_bot_result(query_id=result.query_id,
                                                      result_id=result.results[randint(1, 2)].id,
-                                                     reply_to_message_id=message.reply_to_message.message_id if
+                                                     reply_to_message_id=message.reply_to_message.id if
                                                      message.reply_to_message else None)
     except Exception as e:
         return await message.reply(f'<b>[💮 Aniquotes]</b>\n<code>{format_exc(e)}</code>', parse_mode=enums.ParseMode.HTML)

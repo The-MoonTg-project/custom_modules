@@ -13,7 +13,7 @@ async def joindate(client: Client, message: Message):
 	await message.edit(f"<b>One moment...</b>", parse_mode=enums.ParseMode.HTML)
 	members = []
 	cgetmsg = await client.get_messages(message.chat.id, 1)
-	async for m in client.iter_chat_members(message.chat.id):
+	async for m in client.get_chat_members(message.chat.id):
 		members.append(
 			(
 				m.user.first_name,

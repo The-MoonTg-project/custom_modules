@@ -96,7 +96,7 @@ async def circle(client: Client, message: Message):
             await asyncio.get_event_loop().run_in_executor(None, process_img, filename)
             await message.delete()
             return await message.reply_sticker(
-                sticker=im, reply_to_message_id=message.reply_to_message.message_id
+                sticker=im, reply_to_message_id=message.reply_to_message.id
             )
         else:
             await message.edit("<b>Processing video</b>🎥", parse_mode=enums.ParseMode.HTML)
@@ -110,7 +110,7 @@ async def circle(client: Client, message: Message):
             await message.reply_video_note(
                 video_note="downloads/result.mp4",
                 duration=int(video.duration),
-                reply_to_message_id=message.reply_to_message.message_id,
+                reply_to_message_id=message.reply_to_message.id,
             )
             os.remove(f"downloads/{filename}")
             os.remove("downloads/result.mp4")

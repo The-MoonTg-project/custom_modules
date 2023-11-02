@@ -41,7 +41,7 @@ async def search_cmd(client: Client, message: Message):
     try:
         await message.reply_text(quote=False, text=cmd, reply_to_message_id=None)
         while not finished and now[message.chat.id]:
-            async for msg in client.iter_history(message.chat.id, limit=2):
+            async for msg in client.get_chat_history(message.chat.id, limit=2):
                 if msg.from_user.id == message.from_user.id:
                     continue
                 elif word in msg.text.lower():

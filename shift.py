@@ -50,7 +50,7 @@ async def shift(client, message):
     a = 0
     if limit == "None" or limit == "none":
         try:
-            async for message in client.iter_history(fromchat, reverse=reverse):
+            async for message in client.get_chat_history(fromchat, reverse=reverse):
                 try:
                     await message.copy(tochat)
                     a = a + 1
@@ -75,7 +75,7 @@ async def shift(client, message):
             lol.edit("Enter a vailed limit")
             return
         try:
-            async for message in client.iter_history(
+            async for message in client.get_chat_history(
                 fromchat, limit=limit, reverse=reverse
             ):
                 try:

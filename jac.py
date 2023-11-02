@@ -50,7 +50,7 @@ async def jac(client: Client, message: Message):
         await client.send_photo(
             message.chat.id,
             out,
-            reply_to_message_id=message.reply_to_message.message_id,
+            reply_to_message_id=message.reply_to_message.id,
         )
     else:
         await client.send_photo(message.chat.id, out)

@@ -40,12 +40,12 @@ async def quote_cmd(client: Client, message: types.Message):
 
     messages = []
 
-    async for msg in client.iter_history(
-        message.chat.id, offset_id=message.reply_to_message.message_id, reverse=True
+    async for msg in client.get_chat_history(
+        message.chat.id, offset_id=message.reply_to_message.id, reverse=True
     ):
         if msg.empty:
             continue
-        if msg.message_id >= message.message_id:
+        if msg.message_id >= message.id:
             break
         if no_reply:
             msg.reply_to_message = None
@@ -141,7 +141,7 @@ async def spin_handler(client: Client, message: Message):
         return await client.send_animation(
             chat_id=message.chat.id,
             animation="downloads/video.gif",
-            reply_to_message_id=message.reply_to_message.message_id,
+            reply_to_message_id=message.reply_to_message.id,
         )
     except Exception as e:
         await message.reply(format_exc(e), parse_mode=enums.ParseMode.HTML)

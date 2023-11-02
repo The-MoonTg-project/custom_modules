@@ -43,9 +43,9 @@ async def demotivator(client: Client, message: Message):
             text_draw.multiline_text(
                 (299, 412), text, font=text_font, fill=(255, 255, 255), anchor="ms"
             )
-            im.save(f"downloads/{message.message_id}.png")
+            im.save(f"downloads/{message.id}.png")
             await message.reply_to_message.reply_photo(
-                f"downloads/{message.message_id}.png"
+                f"downloads/{message.id}.png"
             )
             await message.delete()
         elif message.reply_to_message.sticker:
@@ -67,9 +67,9 @@ async def demotivator(client: Client, message: Message):
                 text_draw.multiline_text(
                     (299, 412), text, font=text_font, fill=(255, 255, 255), anchor="ms"
                 )
-                im.save(f"downloads/{message.message_id}.png")
+                im.save(f"downloads/{message.id}.png")
                 await message.reply_to_message.reply_photo(
-                    f"downloads/{message.message_id}.png"
+                    f"downloads/{message.id}.png"
                 )
                 await message.delete()
             else:

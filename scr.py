@@ -30,7 +30,7 @@ async def screenshot(client: Client, message: Message):
     amount = int(message.command[1]) if len(message.command) > 1 else 1
     await message.delete()
     for _ in range(amount):
-        await client.send(
+        await client.invoke(
             functions.messages.SendScreenshotNotification(
                 peer=await client.resolve_peer(message.chat.id),
                 reply_to_msg_id=0,

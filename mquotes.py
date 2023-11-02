@@ -55,7 +55,7 @@ async def quotes(client: Client, message: Message):
         try:
             reply_msg = await client.get_messages(
                 message.chat.id,
-                reply_to_message_ids=message.reply_to_message.message_id,
+                reply_to_message_ids=message.reply_to_message.id,
             )
             count = 0
             text = ""
@@ -182,7 +182,7 @@ async def quotes(client: Client, message: Message):
             template_msg = Image.new("RGBA", (x + 110, y + 110), (0, 0, 0, 0))
             template_msg.paste(im, (110, 0))
             template_msg.paste(output, (0, 0))
-            template_msg.save(f"downloads/{message.message_id}.webp")
+            template_msg.save(f"downloads/{message.id}.webp")
         except:
             count = 0
             text = ""
@@ -224,9 +224,9 @@ async def quotes(client: Client, message: Message):
             template_msg = Image.new("RGBA", (x + 110, y + 110), (0, 0, 0, 0))
             template_msg.paste(im, (110, 0))
             template_msg.paste(output, (0, 0))
-            template_msg.save(f"downloads/{message.message_id}.webp")
+            template_msg.save(f"downloads/{message.id}.webp")
         await message.reply_to_message.reply_document(
-            f"downloads/{message.message_id}.webp"
+            f"downloads/{message.id}.webp"
         )
         await message.delete()
 
@@ -265,7 +265,7 @@ async def quotes(client: Client, message: Message):
         try:
             reply_msg = await client.get_messages(
                 message.chat.id,
-                reply_to_message_ids=message.reply_to_message.message_id,
+                reply_to_message_ids=message.reply_to_message.id,
             )
             font_name = ImageFont.truetype(BytesIO(f), 30)
             size_name = font_name.getsize(message.reply_to_message.from_user.first_name)
@@ -372,9 +372,9 @@ async def quotes(client: Client, message: Message):
             template_msg = Image.new("RGBA", (x + 110, y + 110), (0, 0, 0, 0))
             template_msg.paste(im, (110, 0))
             template_msg.paste(output, (0, 0))
-            template_msg.save(f"downloads/{message.message_id}.webp")
+            template_msg.save(f"downloads/{message.id}.webp")
             await message.reply_to_message.reply_document(
-                f"downloads/{message.message_id}.webp"
+                f"downloads/{message.id}.webp"
             )
             await message.delete()
         except:
@@ -397,9 +397,9 @@ async def quotes(client: Client, message: Message):
             template_msg = Image.new("RGBA", (x + 110, y + 110), (0, 0, 0, 0))
             template_msg.paste(im, (110, 0))
             template_msg.paste(output, (0, 0))
-            template_msg.save(f"downloads/{message.message_id}.webp")
+            template_msg.save(f"downloads/{message.id}.webp")
             await message.reply_to_message.reply_document(
-                f"downloads/{message.message_id}.webp"
+                f"downloads/{message.id}.webp"
             )
             await message.delete()
     if message.reply_to_message.text and message.reply_to_message.sender_chat:
@@ -437,7 +437,7 @@ async def quotes(client: Client, message: Message):
         try:
             reply_msg = await client.get_messages(
                 message.chat.id,
-                reply_to_message_ids=message.reply_to_message.message_id,
+                reply_to_message_ids=message.reply_to_message.id,
             )
             count = 0
             text = ""
@@ -564,7 +564,7 @@ async def quotes(client: Client, message: Message):
             template_msg = Image.new("RGBA", (x + 110, y + 110), (0, 0, 0, 0))
             template_msg.paste(im, (110, 0))
             template_msg.paste(output, (0, 0))
-            template_msg.save(f"downloads/{message.message_id}.webp")
+            template_msg.save(f"downloads/{message.id}.webp")
         except:
             count = 0
             text = ""
@@ -606,9 +606,9 @@ async def quotes(client: Client, message: Message):
             template_msg = Image.new("RGBA", (x + 110, y + 110), (0, 0, 0, 0))
             template_msg.paste(im, (110, 0))
             template_msg.paste(output, (0, 0))
-            template_msg.save(f"downloads/{message.message_id}.webp")
+            template_msg.save(f"downloads/{message.id}.webp")
         await message.reply_to_message.reply_document(
-            f"downloads/{message.message_id}.webp"
+            f"downloads/{message.id}.webp"
         )
         await message.delete()
     if not message.reply_to_message.text and message.reply_to_message.sender_chat:
@@ -646,7 +646,7 @@ async def quotes(client: Client, message: Message):
         try:
             reply_msg = await client.get_messages(
                 message.chat.id,
-                reply_to_message_ids=message.reply_to_message.message_id,
+                reply_to_message_ids=message.reply_to_message.id,
             )
             font_name = ImageFont.truetype(BytesIO(f), 30)
             size_name = font_name.getsize(message.reply_to_message.sender_chat.title)
@@ -753,9 +753,9 @@ async def quotes(client: Client, message: Message):
             template_msg = Image.new("RGBA", (x + 110, y + 110), (0, 0, 0, 0))
             template_msg.paste(im, (110, 0))
             template_msg.paste(output, (0, 0))
-            template_msg.save(f"downloads/{message.message_id}.webp")
+            template_msg.save(f"downloads/{message.id}.webp")
             await message.reply_to_message.reply_document(
-                f"downloads/{message.message_id}.webp"
+                f"downloads/{message.id}.webp"
             )
             await message.delete()
         except:
@@ -778,9 +778,9 @@ async def quotes(client: Client, message: Message):
             template_msg = Image.new("RGBA", (x + 110, y + 110), (0, 0, 0, 0))
             template_msg.paste(im, (110, 0))
             template_msg.paste(output, (0, 0))
-            template_msg.save(f"downloads/{message.message_id}.webp")
+            template_msg.save(f"downloads/{message.id}.webp")
             await message.reply_to_message.reply_document(
-                f"downloads/{message.message_id}.webp"
+                f"downloads/{message.id}.webp"
             )
             await message.delete()
 

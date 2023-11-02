@@ -45,7 +45,7 @@ async def compress(client: Client, message: Message):
             await run_cmd(cmp)
             await message.edit("<code>Uploading File . . .</code>", parse_mode=enums.ParseMode.HTML)
             await message.delete()
-            await client.send_document(message.chat.id, out_file)
+            await client.send_document(message.chat.id, out_file, parse_mode=enums.ParseMode.HTML)
         except BaseException as e:
             await message.edit(f"<b>INFO:</b> <code>{e}</code>", parse_mode=enums.ParseMode.HTML)
         finally:
