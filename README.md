@@ -29,6 +29,7 @@ async def example_edit(client: Client, message: Message):
 async def example_send(client: Client, message: Message):
     await client.send_message(message.chat.id, "<b>This is an example module</b>", parse_mode=enums.ParseMode.HTML)
 
+# parse_mode is optional if you're using HTML formatting then you don't have to use it but if want to use MARKDOWN then pass it like this
 
 # This adds instructions for your module
 modules_help["example"] = {
