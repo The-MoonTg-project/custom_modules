@@ -1,41 +1,44 @@
-# original module voicy: https://raw.githubusercontent.com/ahmedov777-ai/custom_modules/main/voicy.py
-# author: @THE_BURGERNET777 in telegram
-
 import asyncio
-from pyrogram import Client, filters, enums
+
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+from pyrogram.errors import RPCError
+
 
 from utils.misc import modules_help, prefix
-from utils.scripts import with_reply, format_exc
+from utils.scripts import edit_or_reply
 
 
-@Client.on_message(filters.command(["vo", "voicy"], prefix) & filters.me)
-@with_reply
-async def voice_text(client: Client, message: Message):
+@Client.on_message(filters.command(["voicy", "vo"], prefix) & filters.me)
+async def sg(client: Client, message: Message):
+    lol = await edit_or_reply(message, "`Processing please wait`", parse_mode=enums.ParseMode.MARKDOWN)
+    if len(message.command) > 1:
+        reply = message.text.split(maxsplit=1)[1]
+    elif message.reply_to_message:
+        reply = message.reply_to_message.voice
+    else:
+        await message.edit(f"<b>Usage: </b><code>{prefix}sgb [id]</code>", parse_mode=enums.ParseMode.HTML)
+        return
+    chat = message.chat.id
     try:
-        if message.reply_to_message.voice:
-            await message.edit("<b>Wait...</b>", parse_mode=enums.ParseMode.HTML)
-            await client.unblock_user("@voicybot")
-            await message.reply_to_message.forward("@voicybot")
-            await asyncio.sleep(5)
-            messages = await client.get_history("@voicybot", limit=1)
-            await client.read_history("@voicybot")
-            text = (
-                messages[0]
-                .text.replace(
-                    "Путин и его свита убивают мирное население на войне в Украине #stopputin",
-                    "",
-                )
-                .replace(
-                    "Putin and his cronies kill civilians in the war in Ukraine #stopputin",
-                    "",
-                )
-            )
-            await message.edit(f"<b>Text: {text}</b>", parse_mode=enums.ParseMode.HTML)
+        await client.send_message("@voicybot","/start", parse_mode=enums.ParseMode.MARKDOWN)
+    except RPCError:
+        await lol.edit("**Please unblock @voicybot and try again**", parse_mode=enums.ParseMode.MARKDOWN)
+        return
+    id = "@voicybot"
+    await message.reply_to_message.forward(id)
+    await asyncio.sleep(2)
+    async for opt in client.get_chat_history("@voicybot", limit=1):
+        hmm = opt.text
+        if hmm.startswith("Forward"):
+            await lol.edit("**Can you kindly disable your privacy settings for good**", parse_mode=enums.ParseMode.MARKDOWN)
+            return
+            
         else:
-            await message.edit("<b>It's not a voice</b>", parse_mode=enums.ParseMode.HTML)
-    except Exception as e:
-        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
+            await lol.delete()
+            await opt.copy(chat)
 
-
-modules_help["voicy"] = {"voicy [reply]*": "get text from voice"}
+modules_help["voicy"] = {
+    "voicy [reply]*": "get text from voice",
+    "vo [reply]*": "get text from voice",
+}
