@@ -58,8 +58,8 @@ async def ytdl_handler(client: Client, message: Message):
     try:
         url = message.command[1]
     except IndexError:
-        return await message.edit(strings["noargs"], parse_mode=enums.ParseMode.HTML)
-    await message.edit(strings["preparing"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["noargs"], parse_mode=enums.ParseMode.HTML)
+    await message.edit_text(strings["preparing"], parse_mode=enums.ParseMode.HTML)
     if message.command[0] in ["yt3", "ytdl3"]:
         opts = {
             "format": "bestaudio",
@@ -97,35 +97,35 @@ async def ytdl_handler(client: Client, message: Message):
             "quiet": True,
         }
         video = True
-    await message.edit(strings["downloading"], parse_mode=enums.ParseMode.HTML)
+    await message.edit_text(strings["downloading"], parse_mode=enums.ParseMode.HTML)
     try:
         await get_event_loop().run_in_executor(None, lambda: download_video(opts, url))
         if type(rip_data) != dict:
             raise rip_data
     except DownloadError as DE:
-        return await message.edit(
+        return await message.edit_text(
             strings["err"].format(DE), parse_mode=enums.ParseMode.HTML
         )
     except ContentTooShortError:
-        return await message.edit(
+        return await message.edit_text(
             strings["content_too_short"], parse_mode=enums.ParseMode.HTML
         )
     except GeoRestrictedError:
-        return await message.edit(strings["geoban"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["geoban"], parse_mode=enums.ParseMode.HTML)
     except MaxDownloadsReached:
-        return await message.edit(strings["maxdlserr"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["maxdlserr"], parse_mode=enums.ParseMode.HTML)
     except PostProcessingError:
-        return await message.edit(strings["pperr"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["pperr"], parse_mode=enums.ParseMode.HTML)
     except UnavailableVideoError:
-        return await message.edit(strings["noformat"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["noformat"], parse_mode=enums.ParseMode.HTML)
     except XAttrMetadataError as XAME:
-        return await message.edit(
+        return await message.edit_text(
             strings["xameerr"].format(XAME), parse_mode=enums.ParseMode.HTML
         )
     except ExtractorError:
-        return await message.edit(strings["exporterr"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["exporterr"], parse_mode=enums.ParseMode.HTML)
     except Exception as e:
-        return await message.edit(
+        return await message.edit_text(
             "<b>[YouTube-Dl]</b>\n" + format_exc(e), parse_mode=enums.ParseMode.HTML
         )
 
@@ -148,15 +148,15 @@ async def ytdl_handler(client: Client, message: Message):
             except:
                 thumb = None
         await message.reply_video(
-            f"downloads/{rip_data['id']}.mp4",
+            f"downloads/{rip_data['id']}.mp4.mp4",
             caption=f'<b>{rip_data["title"]}</b>',
-            parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
             thumb=thumb,
             duration=rip_data["duration"],
             width=rip_data["width"],
             height=rip_data["height"],
         )
-        os.remove(f"downloads/{rip_data['id']}.mp4")
+        os.remove(f"downloads/{rip_data['id']}.mp4.mp4")
         try:
             os.remove("downloads/thumb.jpg")
         except:
@@ -165,7 +165,7 @@ async def ytdl_handler(client: Client, message: Message):
         await message.reply_audio(
             f"{rip_data['id']}.mp3",
             caption=f'<b>{rip_data["title"]}</b>',
-            parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
             duration=rip_data["duration"],
         )
         os.remove(f"{rip_data['id']}.mp3")
@@ -176,12 +176,12 @@ async def ytdl_handler(client: Client, message: Message):
 @Client.on_message(
     filters.command(["ytdlow", "ytlow", "yt3", "ytdl3"], prefix) & filters.me
 )
-async def ytdl_handler(client: Client, message: Message):
+async def ytdlow_handler(client: Client, message: Message):
     try:
         url = message.command[1]
     except IndexError:
-        return await message.edit(strings["noargs"], parse_mode=enums.ParseMode.HTML)
-    await message.edit(strings["preparing"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["noargs"], parse_mode=enums.ParseMode.HTML)
+    await message.edit_text(strings["preparing"], parse_mode=enums.ParseMode.HTML)
     if message.command[0] in ["yt3", "ytdl3"]:
         opts = {
             "format": "bestaudio",
@@ -219,35 +219,35 @@ async def ytdl_handler(client: Client, message: Message):
             "quiet": True,
         }
         video = True
-    await message.edit(strings["downloading"], parse_mode=enums.ParseMode.HTML)
+    await message.edit_text(strings["downloading"], parse_mode=enums.ParseMode.HTML)
     try:
         await get_event_loop().run_in_executor(None, lambda: download_video(opts, url))
         if type(rip_data) != dict:
             raise rip_data
     except DownloadError as DE:
-        return await message.edit(
+        return await message.edit_text(
             strings["err"].format(DE), parse_mode=enums.ParseMode.HTML
         )
     except ContentTooShortError:
-        return await message.edit(
+        return await message.edit_text(
             strings["content_too_short"], parse_mode=enums.ParseMode.HTML
         )
     except GeoRestrictedError:
-        return await message.edit(strings["geoban"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["geoban"], parse_mode=enums.ParseMode.HTML)
     except MaxDownloadsReached:
-        return await message.edit(strings["maxdlserr"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["maxdlserr"], parse_mode=enums.ParseMode.HTML)
     except PostProcessingError:
-        return await message.edit(strings["pperr"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["pperr"], parse_mode=enums.ParseMode.HTML)
     except UnavailableVideoError:
-        return await message.edit(strings["noformat"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["noformat"], parse_mode=enums.ParseMode.HTML)
     except XAttrMetadataError as XAME:
-        return await message.edit(
+        return await message.edit_text(
             strings["xameerr"].format(XAME), parse_mode=enums.ParseMode.HTML
         )
     except ExtractorError:
-        return await message.edit(strings["exporterr"], parse_mode=enums.ParseMode.HTML)
+        return await message.edit_text(strings["exporterr"], parse_mode=enums.ParseMode.HTML)
     except Exception as e:
-        return await message.edit(
+        return await message.edit_text(
             "<b>[YouTube-Dl]</b>\n" + format_exc(e), parse_mode=enums.ParseMode.HTML
         )
 
@@ -272,7 +272,7 @@ async def ytdl_handler(client: Client, message: Message):
         await message.reply_video(
             f"downloads/{rip_data['id']}.mp4",
             caption=f'<b>{rip_data["title"]}</b>',
-            parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
             thumb=thumb,
             duration=rip_data["duration"],
             width=rip_data["width"],
@@ -287,9 +287,8 @@ async def ytdl_handler(client: Client, message: Message):
         await message.reply_audio(
             f"{rip_data['id']}.mp3",
             caption=f'<b>{rip_data["title"]}</b>',
-            parse_mode=enums.ParseMode.HTML
             duration=rip_data["duration"],
-            parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
         )
         os.remove(f"{rip_data['id']}.mp3")
 
@@ -297,9 +296,10 @@ async def ytdl_handler(client: Client, message: Message):
 
 
 modules_help["ytdl"] = {
-    "ytdl [link]": "Download video by link with best quality",
-    "yt [link]": "Download video by link with best quality",
-    "yt3 [link]": "Download audio by link with best quality",
-    "ytlow [link]": "Download video by link with 360p quality",
-    "ytdlow [link]": "Download video by link with 360p quality",
+    "ytdl [link]*": "Download video by link with best quality",
+    "yt [link]*": "Download video by link with best quality",
+    "yt3 [link]*": "Download audio by link with best quality",
+    "ytdl3 [link]*": "Download audio by link with best quality",
+    "ytlow [link]*": "Download video by link with 360p quality",
+    "ytdlow [link]*": "Download video by link with 360p quality",
 }
