@@ -187,7 +187,7 @@ async def restoremod(client: Client, message: Message):
         await message.edit(f"<b>Module <code>{mod}</code> restored successfully!</b>", parse_mode=enums.ParseMode.HTML)
         restart()
     except Exception as e:
-        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
+        await message.edit(str(e), parse_mode=enums.ParseMode.HTML)
 
 
 @Client.on_message(filters.command(["restoremods", "resmods"], prefix) & filters.me)
