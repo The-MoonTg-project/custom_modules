@@ -13,7 +13,7 @@ from utils.config import gemini_key
 
 
 
-genai.configure(api_key=gemini_key)
+
 
 model = genai.GenerativeModel('gemini-pro')
 
