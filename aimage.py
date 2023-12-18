@@ -3,7 +3,7 @@
 # YOu can check it out for uses example
 import os
 import PIL.Image
-import google.generativeai as genai
+
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
