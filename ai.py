@@ -28,7 +28,9 @@ async def say(_, message: Message):
         elif message.reply_to_message:
          prompt = message.reply_to_message.text
         else:
-         prompt = "Hi Gemini"
+         await message.edit_text(
+            f"<b>Usage: </b><code>{prefix}gemini [prompt/reply to message]</code>"
+        )
          return
 
         chat = model.start_chat()
