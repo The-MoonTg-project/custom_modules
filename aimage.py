@@ -14,8 +14,7 @@ from utils.scripts import format_exc
 from utils.config import gemini_key
 
 
-# genai.configure(api_key=gemini_key)
-genai.configure(api_key=API_KEY)
+genai.configure(api_key=gemini_key)
 
 model = genai.GenerativeModel("gemini-pro-vision")
 
