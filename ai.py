@@ -2,6 +2,7 @@
 # This is used on my Moon-Userbot: https://github.com/The-MoonTg-project/Moon-Userbot
 # YOu can check it out for uses example
 import os
+
 import google.generativeai as genai
 
 from pyrogram import Client, filters, enums
@@ -10,6 +11,8 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc
 from utils.config import gemini_key
+
+genai.configure(api_key=gemini_key)
 
 
 
@@ -36,7 +39,7 @@ async def say(_, message: Message):
 
         await message.edit_text(f"**Question:**`{prompt}`\n**Answer:** {response.text}", parse_mode=enums.ParseMode.MARKDOWN)
     except Exception as e:
-        await message.edit_text(f"An error occurred: {format_exc(e)}")
+        await message.edit_text(f"An error occurred: Please try again later.")
 
 
 modules_help["gemini"] = {
