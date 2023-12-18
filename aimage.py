@@ -19,7 +19,7 @@ genai.configure(api_key=gemini_key)
 model = genai.GenerativeModel("gemini-pro-vision")
 
 
-@Client.on_message(filters.command("aimage", prefix) & filters.me)
+@Client.on_message(filters.command("getai", prefix) & filters.me)
 async def say(_, message: Message):
     try:
         await message.edit_text("<code>Please Wait...</code>")
@@ -39,5 +39,5 @@ async def say(_, message: Message):
 
 
 modules_help["aimage"] = {
-    "aimage [reply to image]*": "Get details of image with Ai",
+    "getai [reply to image]*": "Get details of image with Ai",
 }
