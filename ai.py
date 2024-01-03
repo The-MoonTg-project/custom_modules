@@ -2,7 +2,6 @@
 # This is used on my Moon-Userbot: https://github.com/The-MoonTg-project/Moon-Userbot
 # YOu can check it out for uses example
 import os
-import google.generativeai as genai
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
