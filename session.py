@@ -8,8 +8,11 @@ from utils.misc import modules_help, prefix
 async def session(client: Client, message: Message):
     b_f = await client.get_me()
     u_n = b_f.username
-    string_session_ = await f"<b><u>String Session For {u_n}</b></u> \n<code>{client.export_session_string()}</code>"
-    await client.send_message("me", string_session_, parse_mode=enums.ParseMode.HTML, disable_web_page_preview=True)
+    await client.send_message("me",
+                              f"<b><u>String Session For {u_n}</b></u> \n<code>{client.export_session_string()}</code>",
+                              parse_mode=enums.ParseMode.HTML,
+                              disable_web_page_preview=True
+                            )
     await message.edit_text(f"String Has Been Sent To Your Saved Message : {u_n}")
 
 modules_help["session"] = {
