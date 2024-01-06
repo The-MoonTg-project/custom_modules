@@ -1,5 +1,7 @@
+import asyncio
 import os
 from contextlib import suppress
+from subprocess import PIPE
 
 import ffmpeg
 from pyrogram import Client, filters
@@ -48,6 +50,28 @@ async def start_playout(_, message: Message):
     await message.edit(f"<b>Playing {message.reply_to_message.audio.title}</b>...")
     group_call.input_filename = input_filename
 
+@Client.on_message(filters.command("yplay", prefix) & filters.me)
+async def start_ytplayout(_, message: Message):
+    if not group_call:
+        await message.reply(
+            f"<b>You are not joined [type <code>{prefix}join</code>]</b>"
+        )
+        return
+    if len(message.command) > 1:
+      yt_link = message.text.split(maxsplit=1)[1]
+    input_filename = "input.raw"
+    await message.edit("<b>Downloading...</b>")
+    # audio_original = await message.reply_to_message.download()
+    # await message.edit("<b>Converting..</b>")
+    yt = await asyncio.create_subprocess_shell(
+                f'ffmpeg -i "$(youtube-dl -x -g "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le input.raw',
+                stdout=PIPE,
+                stderr=PIPE,
+            )
+    while yt.returncode !=0:
+        await message.edit_text(f"<b>Playing {message.text.title}</b>...")
+        group_call.input_filename = input_filename
+
 
 @Client.on_message(filters.command("volume", prefix) & filters.me)
 @init_client
@@ -78,7 +102,6 @@ async def start(_, message: Message):
 @init_client
 async def stop(_, message: Message):
     try:
-        os.remove('input.mp3')
         os.remove('input.raw')
         await group_call.stop()
         await message.edit("<b>Leaving successfully!</b>")
@@ -95,7 +118,6 @@ async def stop(_, message: Message):
 @init_client
 async def stop_playout(_, message: Message):
     group_call.stop_playout()
-    os.remove('input.mp3')
     os.remove('input.raw')
     await message.edit("<b>Stopped successfully!</b>")
 
@@ -130,6 +152,7 @@ async def resume(_, message: Message):
 
 modules_help["voice_chat"] = {
     "play [reply]*": "Play audio in replied message",
+    "yplay [link]*": "Play audio from given link[preferred youtube]",
     "volume [1 – 200]": "Set the volume level from 1 to 200",
     "join [chat_id]": "Join the voice chat",
     "leave_vc": "Leave voice chat",
