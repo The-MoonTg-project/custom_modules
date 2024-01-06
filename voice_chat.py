@@ -60,16 +60,17 @@ async def start_ytplayout(_, message: Message):
     if len(message.command) > 1:
       yt_link = message.text.split(maxsplit=1)[1]
     input_filename = "input.raw"
-    await message.edit("<b>Downloading...</b>")
+    await message.edit_text("<b>Downloading...</b>")
     # audio_original = await message.reply_to_message.download()
     # await message.edit("<b>Converting..</b>")
     yt = await asyncio.create_subprocess_shell(
-                f'ffmpeg -i "$(youtube-dl -x -g "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le input.raw',
+                f'ffmpeg -i "$(yt-dlp -x -g "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le {input_filename}',
                 stdout=PIPE,
                 stderr=PIPE,
             )
     while yt.returncode !=0:
-        await message.edit_text(f"<b>Playing {message.text.title}</b>...")
+        await asyncio.sleep(3)
+        await message.edit_text(f"<b>Playing</b>...")
         group_call.input_filename = input_filename
 
 
@@ -102,7 +103,7 @@ async def start(_, message: Message):
 @init_client
 async def stop(_, message: Message):
     try:
-        os.remove('input.raw')
+        # os.remove('input.raw')
         await group_call.stop()
         await message.edit("<b>Leaving successfully!</b>")
     except Exception as e:
