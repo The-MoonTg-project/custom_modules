@@ -1,3 +1,8 @@
+from voice_chat import suppress
+from sys import stderr
+from sys import stdout
+from os import os
+from spotidl import ffmpeg
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
@@ -60,8 +65,8 @@ async def start_ytplayout(_, message: Message):
     # await message.edit("<b>Converting..</b>")
     yt = await asyncio.create_subprocess_shell(
                 f'ffmpeg -i "$(youtube-dl -x -g "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le input.raw',
-                stdout=PIPE,
-                stderr=PIPE,
+                stdout,
+                stderr,
             )
     while yt.returncode !=0:
         await message.edit_text(f"<b>Playing {message.text.title}</b>...")
