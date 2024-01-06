@@ -1,79 +1,31 @@
-# TODO
-# WARNING! IT COMMENTED FULLY SINCE INSTALL PACKAGES FROM THIS MODULE WILL
-# BROKE ALL FUCKING Moon, NOT JUST THIS MODULE
-# THIS MODULE IS INCOMPATIBLE WITH LAST Moon VERSION
-# SINCE IT USE OUTDATED PACKAGE WITH BROKEN DEPENDENCIES
-# IT NEEDS TO BE REWRITEN
+from utils.scripts import format_small_module_help, import_library
+from utils.misc import modules_help, prefix
+from pyrogram import Client, filters
 
-# from utils.scripts import import_library
-# from utils.misc import modules_help, prefix
-# from pyrogram import Client, filters
+googletrans = import_library("googletrans", "googletrans-py")
+from googletrans import Translator
 
-# googletrans = import_library("googletrans", "googletrans==4.0.0rc1")
-# from googletrans import Translator
+trl = Translator()
 
-# trl = Translator()
-
-
-# @Client.on_message(filters.command(["tr", "trans"], prefix) & filters.me)
-# async def translate(_client, message):
-#     await message.edit_text("<b>Translating text...</b>")
-#     if message.reply_to_message and (
-#         message.reply_to_message.text or message.reply_to_message.caption
-#     ):
-#         if len(message.text.split()) == 1:
-#             await message.edit(
-#                 f"<b>Usage: Reply to a message, then <code>{prefix}tr [lang]*</code></b>"
-#             )
-#             return
-#         target = message.text.split()[1]
-#         if message.reply_to_message.text:
-#             text = message.reply_to_message.text
-#         else:
-#             text = message.reply_to_message.caption
-#         detectlang = trl.detect(text)
-#         try:
-#             tekstr = trl.translate(text, dest=target)
-#         except ValueError as err:
-#             await message.edit("Error: <code>{}</code>".format(str(err)))
-#             return
-#         await message.edit(
-#             "<b>Translated from <code>{}</code> to <code>{}</code></b>:\n\n<code>{}</code>".format(
-#                 detectlang.lang, target, tekstr.text
-#             )
-#         )
-#     else:
-#         if len(message.text.split()) <= 2:
-#             await message.edit(f"<b>Usage: <code>{prefix}tr [lang]* [text]*</code></b>")
-#             return
-#         target = message.text.split(None, 2)[1]
-#         text = message.text.split(None, 2)[2]
-#         detectlang = trl.detect(text)
-#         try:
-#             tekstr = trl.translate(text, dest=target)
-#         except ValueError as err:
-#             await message.edit("Error: <code>{}</code>".format(str(err)))
-#             return
-#         await message.edit(
-#             "<b>Translated from <code>{}</code> to <code>{}</code></b>:\n\n<code>{}</code>".format(
-#                 detectlang.lang, target, tekstr.text
-#             )
-#         )
+@Client.on_message(filters.command(["trans", "tr"], prefix) & filters.me)
+async def translatedl(_client, message):
+    dtarget = message.text.split(None, 2)[1]
+    if len(message.command) > 2:
+        dtext = message.text.split(None, 2)[2]
+    elif message.reply_to_message:
+        dtext = message.reply_to_message.text
+    else:
+        message.edit_text(format_small_module_help("translator"))
+    try:
+        message.edit_text(message.chat.id, "<b>Translating</b>")
+        dtekstr = trl.translate(dtext, dest=dtarget)
+    except ValueError as err:
+        await message.edit("Error: <code>{}</code>".format(str(err)))
+        return
+    await message.edit("{}".format(dtekstr.text))
 
 
-# @Client.on_message(filters.command(["transdl", "trdl"], prefix) & filters.me)
-# async def translatedl(_client, message):
-#     dtarget = message.text.split(None, 2)[1]
-#     dtext = message.text.split(None, 2)[2]
-#     try:
-#         dtekstr = trl.translate(dtext, dest=dtarget)
-#     except ValueError as err:
-#         await message.edit("Error: <code>{}</code>".format(str(err)))
-#         return
-#     await message.edit("{}".format(dtekstr.text))
-
-
-# modules_help["translator"] = {
-#     "tr": "[lang]* [text/reply]* translate message",
-#     "trdl": f"[lang]* [your text]* short variant of {prefix}tr",
-# }
+modules_help["translator"] = {
+    "tr": "[lang]* [text/reply]* translate message",
+    "trdl": f"[lang]* [your text]* short variant of {prefix}tr",
+}
