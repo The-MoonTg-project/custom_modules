@@ -147,16 +147,28 @@ async def ytdl_handler(client: Client, message: Message):
                             thumb = None
             except:
                 thumb = None
-        await message.reply_video(
-            f"downloads/{rip_data['id']}.mp4.mp4",
-            caption=f'<b>{rip_data["title"]}</b>',
-            parse_mode=enums.ParseMode.HTML,
-            thumb=thumb,
-            duration=rip_data["duration"],
-            width=rip_data["width"],
-            height=rip_data["height"],
-        )
-        os.remove(f"downloads/{rip_data['id']}.mp4.mp4")
+        if url.__contains__("youtube"):
+            await message.reply_video(
+                f"downloads/{rip_data['id']}.mp4.mp4",
+                caption=f'<b>{rip_data["title"]}</b>',
+                parse_mode=enums.ParseMode.HTML,
+                thumb=thumb,
+                duration=rip_data["duration"],
+                width=rip_data["width"],
+                height=rip_data["height"],
+            )
+            os.remove(f"downloads/{rip_data['id']}.mp4.mp4")
+        else:
+            await message.reply_video(
+                f"downloads/{rip_data['id']}.mp4",
+                caption=f'<b>{rip_data["title"]}</b>',
+                parse_mode=enums.ParseMode.HTML,
+                thumb=thumb,
+                duration=rip_data["duration"],
+                width=rip_data["width"],
+                height=rip_data["height"],
+            )
+            os.remove(f"downloads/{rip_data['id']}.mp4")
         try:
             os.remove("downloads/thumb.jpg")
         except:
