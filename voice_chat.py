@@ -1,9 +1,4 @@
 import asyncio
-import os
-from contextlib import suppress
-from subprocess import PIPE
-
-import ffmpeg
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
