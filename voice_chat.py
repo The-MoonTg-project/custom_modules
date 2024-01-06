@@ -8,7 +8,7 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import import_library, with_reply, restart
 
-pytgcalls = import_library("pytgcalls","pytgcalls==3.0.0.dev24")
+
 from pytgcalls import GroupCallFactory
 
 group_call = None
