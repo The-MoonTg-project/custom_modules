@@ -63,15 +63,26 @@ async def start_ytplayout(_, message: Message):
     await message.edit_text("<b>Downloading...</b>")
     # audio_original = await message.reply_to_message.download()
     # await message.edit("<b>Converting..</b>")
-    yt = await asyncio.create_subprocess_shell(
-                f'ffmpeg -i "$(yt-dlp -x -g "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le {input_filename}',
-                stdout=PIPE,
-                stderr=PIPE,
-            )
-    while yt.returncode !=0:
-        await asyncio.sleep(3)
-        await message.edit_text(f"<b>Playing</b>...")
-        group_call.input_filename = input_filename
+    if yt_link.startswith("https://"):
+        yt = await asyncio.create_subprocess_shell(
+                    f'ffmpeg -i "$(yt-dlp -x -g "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le {input_filename}',
+                    stdout=PIPE,
+                    stderr=PIPE,
+                )
+        while yt.returncode !=0:
+            await asyncio.sleep(3)
+            await message.edit_text(f"<b>Playing</b>...")
+            group_call.input_filename = input_filename
+    else:
+        yt = await asyncio.create_subprocess_shell(
+                    f'ffmpeg -i "$(yt-dlp -x -g --default-search "ytsearch" "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le {input_filename}',
+                    stdout=PIPE,
+                    stderr=PIPE,
+                )
+        while yt.returncode !=0:
+            await asyncio.sleep(3)
+            await message.edit_text(f"<b>Playing</b>...")
+            group_call.input_filename = input_filename
 
 
 @Client.on_message(filters.command("volume", prefix) & filters.me)
@@ -153,7 +164,7 @@ async def resume(_, message: Message):
 
 modules_help["voice_chat"] = {
     "play [reply]*": "Play audio in replied message",
-    "yplay [link]*": "Play audio from given link[preferred youtube]",
+    "yplay [link/search term]*": "Play audio from given link[preferred youtube]",
     "volume [1 – 200]": "Set the volume level from 1 to 200",
     "join [chat_id]": "Join the voice chat",
     "leave_vc": "Leave voice chat",
