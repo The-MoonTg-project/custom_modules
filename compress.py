@@ -9,8 +9,8 @@ from pyrogram.types import Message
 from subprocess import Popen, PIPE
 
 from utils.misc import modules_help, prefix
-from utils.scripts import (
-    humanbytes,
+from utils.scripts import (humanbytes,
+
     time_formatter,
     with_reply,
     format_exc,
