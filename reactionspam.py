@@ -28,12 +28,11 @@ emojis = [
 @Client.on_message(filters.command("reactspam", prefix) & filters.me)
 async def reactspam(client: Client, message: Message):
     if len(message.command) > 1:
-        intam = message.text.split(None, 2)[1]
-        amount = int(intam)
+        reaction = int(" ".join(message.command[1:]))
     else:
         message.edit_text("amount not given")
     if len(message.command) > 2:
-        reaction = message.text.split(None, 2)[2]
+        reaction = " ".join(message.command[2:])
         print(reaction)
     else:
         message.edit_text("reaction not given")
@@ -41,7 +40,7 @@ async def reactspam(client: Client, message: Message):
     for i in range(amount):
         if reaction in emojis:
             try:
-                await client.send_reaction(message.chat.id, message_id=message.id, emoji=reaction)
+                await client.send_reaction(message.chat.id, message_id=message_id, emoji="❤️")
             except Exception as e:
                 return await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
         else:
