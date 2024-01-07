@@ -34,15 +34,14 @@ async def reactspam(client: Client, message: Message):
         message.edit_text("amount not given")
     if len(message.command) > 2:
         reaction = message.text.split(None, 2)[2]
+        print(reaction)
     else:
         message.edit_text("reaction not given")
     await message.edit(f"<b>One moment...</b>", parse_mode=enums.ParseMode.HTML)
     for i in range(amount):
         if reaction in emojis:
             try:
-                await client.send_reaction(
-                    message.chat.id, message.id - i, reaction
-                )
+                await client.send_reaction(message.chat.id, message_id=message.id, emoji=reaction)
             except Exception as e:
                 return await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
         else:
