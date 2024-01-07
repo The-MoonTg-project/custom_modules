@@ -18,8 +18,8 @@ async def forward(client: Client, message: Message):
             await message.edit("<b>Unknown target.</b>", parse_mode=enums.ParseMode.HTML)
             return
         msgs = []
-        async for msg in client.get_chat_history(message.chat.id, reverse=True):
-            msgs.append(msg.message_id)
+        async for msg in client.get_chat_history(message.chat.id):
+            msgs.append(msg.id)
             if len(msgs) >= 100:
                 try:
                     await client.forward_messages(target.id, message.chat.id, msgs)
