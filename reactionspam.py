@@ -28,7 +28,8 @@ emojis = [
 @Client.on_message(filters.command("reactspam", prefix) & filters.me)
 async def reactspam(client: Client, message: Message):
     if len(message.command) > 1:
-        reaction = int(message.text.split(None, 2)[1])
+        amount = int(message.text.split(None, 2)[1])
+        print(amount)
     else:
         message.edit_text("amount not given")
     if len(message.command) > 2:
