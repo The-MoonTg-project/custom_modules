@@ -26,7 +26,7 @@ async def jac(client: Client, message: Message):
     )
     f = ufr.content
     pic = requests.get(
-        "https://raw.githubusercontent.com/files/main/jac.jpg"
+        "https://raw.githubusercontent.com/The-MoonTg-project/files/main/jac.jpg"
     )
     pic.raw.decode_content = True
     img = Image.open(io.BytesIO(pic.content)).convert("RGB")
