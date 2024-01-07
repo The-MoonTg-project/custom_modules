@@ -71,6 +71,7 @@ async def start_ytplayout(_, message: Message):
                 stdout=PIPE,
                 stderr=PIPE,
             )
+            await asyncio.sleep(30)
             await message.edit_text(f"<b>Playing</b>...")
             group_call.input_filename = input_filename
         except Exception as e:
@@ -82,6 +83,7 @@ async def start_ytplayout(_, message: Message):
                 stdout=PIPE,
                 stderr=PIPE,
             )
+            await asyncio.sleep(30)
             await message.edit_text(f"<b>Playing</b>...")
             group_call.input_filename = input_filename
         except Exception as e:
