@@ -33,27 +33,27 @@ headers = {
 @Client.on_message(filters.command("course", prefix) & filters.me)
 async def convert(_, message: Message):
     if len(message.command) == 1:
-        await message.edit("<b>Enter currency name</b>", parse_mode=enums.ParseMode.HTML)
+        await message.edit("<b>Enter currency name</b>")
         return
 
     name = message.command[1]
-    await message.edit("<b>Data retrieval...</b>", parse_mode=enums.ParseMode.HTML)
+    await message.edit("<b>Data retrieval...</b>")
 
     try:
         if name == "btc":
             name = "1₿"
             link = "https://ru.investing.com/crypto/bitcoin"
         else:
-            link = f"https://ru.investing.com/currencies/{name}-rub"
+            link = f"https://ru.investing.com/currencies/{name}-usd"
 
         full_page = requests.get(link, headers=headers, timeout=3)
         soup = BeautifulSoup(full_page.content, "html.parser")
         rub = soup.find("span", class_="text-2xl")
-        await message.edit(f"<b>{name} now is </b><code> {rub} </code><b> rub</b>", parse_mode=enums.ParseMode.HTML)
+        await message.edit(f"<b>{name} now is </b><code> {rub} </code><b> $</b>")
     except Exception as e:
-        await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
+        await message.edit(format_exc(e))
 
 
 modules_help["course"] = {
-    "course [currency]*": "Transfer from any state currency to the ruble. Don't use more than 10 times per minute"
+    "course [currency]*": "Transfer from any state currency to the dollar. Don't use more than 10 times per minute"
 }
