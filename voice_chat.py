@@ -11,6 +11,7 @@ from utils.misc import modules_help, prefix
 from utils.scripts import import_library, with_reply, restart
 
 pytgcalls = import_library("pytgcalls","pytgcalls==3.0.0.dev24")
+yt_dlp = import_library("yt_dlp")
 from pytgcalls import GroupCallFactory
 
 group_call = None
@@ -70,7 +71,7 @@ async def start_ytplayout(_, message: Message):
                     stderr=PIPE,
                 )
         while yt.returncode !=0:
-            await asyncio.sleep(3)
+            await asyncio.sleep(30)
             await message.edit_text(f"<b>Playing</b>...")
             group_call.input_filename = input_filename
     else:
@@ -80,7 +81,7 @@ async def start_ytplayout(_, message: Message):
                     stderr=PIPE,
                 )
         while yt.returncode !=0:
-            await asyncio.sleep(3)
+            await asyncio.sleep(30)
             await message.edit_text(f"<b>Playing</b>...")
             group_call.input_filename = input_filename
 
