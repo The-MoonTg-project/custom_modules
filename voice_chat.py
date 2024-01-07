@@ -8,7 +8,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
-from utils.scripts import import_library, with_reply, restart
+from utils.scripts import format_exc, import_library, with_reply, restart
 
 pytgcalls = import_library("pytgcalls","pytgcalls==3.0.0.dev24")
 yt_dlp = import_library("yt_dlp")
@@ -65,26 +65,31 @@ async def start_ytplayout(_, message: Message):
     # audio_original = await message.reply_to_message.download()
     # await message.edit("<b>Converting..</b>")
     if yt_link.startswith("https://"):
-        yt = await asyncio.create_subprocess_shell(
-                    f'ffmpeg -i "$(yt-dlp -x -g "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le {input_filename}',
-                    stdout=PIPE,
-                    stderr=PIPE,
-                )
-        while yt.returncode !=0:
-            await asyncio.sleep(30)
-            await message.edit_text(f"<b>Playing</b>...")
-            group_call.input_filename = input_filename
+        try:
+            yt = await asyncio.create_subprocess_shell(
+                f'ffmpeg -i "$(yt-dlp -x -g "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le {input_filename}',
+                stdout=PIPE,
+                stderr=PIPE,
+            )
+            if yt.returncode !=0:
+                await asyncio.sleep(5)
+                await message.edit_text(f"<b>Playing</b>...")
+                group_call.input_filename = input_filename
+        except Exception as e:
+            await message.edit_text(format_exc(e))
     else:
-        yt = await asyncio.create_subprocess_shell(
-                    f'ffmpeg -i "$(yt-dlp -x -g --default-search "ytsearch" "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le {input_filename}',
-                    stdout=PIPE,
-                    stderr=PIPE,
-                )
-        while yt.returncode !=0:
-            await asyncio.sleep(30)
-            await message.edit_text(f"<b>Playing</b>...")
-            group_call.input_filename = input_filename
-
+        try:
+            yt = await asyncio.create_subprocess_shell(
+                f'ffmpeg -i "$(yt-dlp -x -g --default-search "ytsearch" "{yt_link}")" -f s16le -ac 2 -ar 48000 -acodec pcm_s16le {input_filename}',
+                stdout=PIPE,
+                stderr=PIPE,
+            )
+            if yt.returncode !=0:
+                await asyncio.sleep(5)
+                await message.edit_text(f"<b>Playing</b>...")
+                group_call.input_filename = input_filename
+        except Exception as e:
+            await message.edit_text(format_exc(e))
 
 @Client.on_message(filters.command("volume", prefix) & filters.me)
 @init_client
