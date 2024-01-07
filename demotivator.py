@@ -17,11 +17,11 @@ from PIL import Image, ImageDraw, ImageFont
 async def demotivator(client: Client, message: Message):
     await message.edit("<code>Process of demotivation...</code>", parse_mode=enums.ParseMode.HTML)
     font = requests.get(
-        "https://github.com/The-MoonTg-project/Moon-Userbot/files/blob/main/Times%20New%20Roman.ttf?raw=true"
+        "https://github.com/The-MoonTg-project/files/blob/main/Times%20New%20Roman.ttf?raw=true"
     )
     f = font.content
     template_dem = requests.get(
-        "https://raw.githubusercontent.com/Moon-Userbot/files/main/demotivator.png"
+        "https://raw.githubusercontent.com/files/main/demotivator.png"
     )
     if message.reply_to_message:
         words = ["random", "text", "typing", "fuck"]
