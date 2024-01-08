@@ -4,7 +4,7 @@ import logging
 from pyrogram import Client, enums, filters
 from pyrogram.errors import RPCError
 from utils.misc import modules_help, prefix
-from utils.scripts import text
+from utils.scripts import text, edit_or_reply, format_exc
 
 
 # Helper function to get text from a message
@@ -16,6 +16,8 @@ def text(message):
 def parse_limit(limit):
     return int(limit) if limit and limit.isdigit() else None
 
+fromchat = None
+tochat = None
 
 @Client.on_message(filters.command("shift", prefix) & filters.me)
 async def shift(client, message):
@@ -23,15 +25,10 @@ async def shift(client, message):
     x = message.text.split(None, 1)[1]
     x = x.replace(" ", "")
     try:
-        fromchat, tochat, limit, reverse = x.split("|")
-        if reverse == "reverse":
-            reverse = True
-        else:
-            reverse = False
+        fromchat, tochat, limit = x.split("|")
     except:
         try:
             fromchat, tochat, limit = x.split("|")
-            reverse = False
         except:
             await lol.edit("Check command syntax", parse_mode=enums.ParseMode.HTML)
     try:
@@ -50,7 +47,7 @@ async def shift(client, message):
     a = 0
     if limit == "None" or limit == "none":
         try:
-            async for message in client.get_chat_history(fromchat, reverse=reverse):
+            async for message in client.get_chat_history(fromchat):
                 try:
                     await message.copy(tochat)
                     a = a + 1
@@ -76,7 +73,7 @@ async def shift(client, message):
             return
         try:
             async for message in client.get_chat_history(
-                fromchat, limit=limit, reverse=reverse
+                fromchat, limit=limit
             ):
                 try:
                     await message.copy(tochat)
@@ -127,7 +124,7 @@ async def dmshift(client, message):
     try:
         await reply.copy(chat_id=x)
     except Exception as e:
-        await message.edit(f"Error: {str(e)}", parse_mode=enums.ParseMode.HTML)
+        await message.edit(format_exc(e))
         return
 
     await message.edit(f"Message Delivered to {x}")
