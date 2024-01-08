@@ -65,5 +65,5 @@ async def say(c: Cl, message: Message):
         await message.edit_text(f"An error occurred: {format_exc(e)}")
 
 modules_help["sdxl"] = {
-    "sdxl [reply to image]*": "Get details of image with Ai",
+    "sdxl [prompt]*": "text to image sdxl",
 }
