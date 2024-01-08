@@ -20,7 +20,7 @@ def parse_limit(limit):
 @Client.on_message(filters.command("shift", prefix) & filters.me)
 async def shift(client, message):
     lol = await edit_or_reply(message, "Processing please wait")
-    x = get_text(message)
+    x = message.text.split(None, 1)[1]
     x = x.replace(" ", "")
     try:
         fromchat, tochat, limit, reverse = x.split("|")
