@@ -46,7 +46,7 @@ async def neko(_, message: Message):
 
 @Client.on_message(filters.command(["nekotypes", "neko_types"], prefix) & filters.me)
 async def neko_types_func(_, message: Message):
-    neko_types = """femdom tickle classic ngif erofeet meow erok poke les hololewd lewdk keta feetg nsfw_neko_gif eroyuri kiss 8ball kuni tits pussy_jpg cum_jpg pussy lewdkemo lizard slap lewd cum cuddle spank smallboobs goose Random_hentai_gif avatar fox_girl nsfw_avatar hug gecg boobs pat feet smug kemonomimi solog holo wallpaper bj woof yuri trap anal baka blowjob holoero feed neko gasm hentai futanari ero solo waifu pwankg eron erokemo"""
+    neko_types = """hug kiss tickle lewd neko pat lizard 8ball cat chat fact smug woof gasm goose cuddle avatar slap gecg feed fox_girl meow wallpaper spank waifu ngif name owoify spoiler why"""
     await message.edit(" ".join(f"<code>{n}</code>" for n in neko_types.split()))
 
 
