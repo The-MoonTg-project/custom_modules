@@ -43,5 +43,5 @@ async def example_edit(client: Client, message: Message):
 
 
 modules_help["rename"] = {
-    "rename [reply]*": "rename to given name and upload",
+    "rename [reply]*": "rename file/media to given name and upload",
 }
