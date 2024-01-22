@@ -25,13 +25,13 @@ from utils.scripts import format_exc
 @Client.on_message(filters.command("rename", prefix) & filters.me)
 async def example_edit(client: Client, message: Message):
     try:
-        i = await message.edit("<code>Renaming</code>")
+        i = await message.edit("<code>Renaming...</code>")
         if len(message.command) > 1:
             r_fname = message.text.split(maxsplit=1)[1]
             o_f = await message.reply_to_message.download()
             r_f = os.rename(o_f, r_fname)
-            # await message.delete()
-            await client.send_document(message.chat.id, r_fname,reply_to_message_id=message.id)
+            await i.edit_text("<code>Done, Uploading...</code>")
+            await client.send_document(message.chat.id, r_fname,reply_to_message_id=message.id, thumb="thumb.jpg", caption=r_fname)
             await i.delete()
         else:
            await message.edit_text("lOl, Atleast reply to file and give new name (with extension ofc) to rename to -_-")
