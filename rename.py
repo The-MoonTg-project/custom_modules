@@ -35,7 +35,7 @@ async def example_edit(client: Client, message: Message):
             t = time.time()
             o_f = await message.reply_to_message.download(
                 progress=progress,
-                progress_args=(i, t, "<code>Renaming...</code>"),
+                progress_args=(i, t, "`Renaming...`"),
             )
             r_f = os.rename(o_f, r_fname)
             await i.edit_text("<code>Done, Uploading...</code>")
@@ -46,7 +46,7 @@ async def example_edit(client: Client, message: Message):
                 thumb=thumb,
                 caption=r_fname,
                 progress=progress,
-                progress_args=(i, t, "<code>Done, Uploading...</code>"),
+                progress_args=(i, t, "`Done, Uploading...`"),
             )
             await i.delete()
         else:
