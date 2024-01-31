@@ -15,23 +15,39 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import time
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc
+from utils.scripts import format_exc, progress
 
 @Client.on_message(filters.command("rename", prefix) & filters.me)
 async def example_edit(client: Client, message: Message):
     try:
+        thumb = "thumb.jpg"
+        if not os.path.isfile(thumb):
+            thumb = None
         i = await message.edit("<code>Renaming...</code>")
         if len(message.command) > 1:
             r_fname = message.text.split(maxsplit=1)[1]
-            o_f = await message.reply_to_message.download()
+            t = time.time()
+            o_f = await message.reply_to_message.download(
+                progress=progress,
+                progress_args=(i, t, "<code>Renaming...</code>"),
+            )
             r_f = os.rename(o_f, r_fname)
             await i.edit_text("<code>Done, Uploading...</code>")
-            await client.send_document(message.chat.id, r_fname,reply_to_message_id=message.id, thumb="thumb.jpg", caption=r_fname)
+            await client.send_document(
+                message.chat.id,
+                r_fname,
+                reply_to_message_id=message.id,
+                thumb=thumb,
+                caption=r_fname,
+                progress=progress,
+                progress_args=(i, t, "<code>Done, Uploading...</code>"),
+            )
             await i.delete()
         else:
            await message.edit_text("lOl, Atleast reply to file and give new name (with extension ofc) to rename to -_-")
