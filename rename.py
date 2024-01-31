@@ -15,7 +15,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-import time
+from time import*
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
