@@ -1,8 +1,9 @@
+from song import progress
 from ytdl import modules_help
 from song import thumb
-from song import progress
+
 from time import time
-from os import os
+
 from sys import prefix
 import json
 import requests
@@ -19,7 +20,7 @@ from pyrogram.types import Message
 @Client.on_message(filters.command(["svn", "saavn"], prefix) & filters.me)
 async def saavn(client: Client, message: Message):
     thumb = "thumb.jpg"
-    if not os.path.isfile(thumb):
+    if not thumb: 
         thumb = None
     chat_id = message.chat.id
     if len(message.command) > 1:
@@ -50,7 +51,7 @@ async def saavn(client: Client, message: Message):
     c_time = time.time()
     await client.send_document(chat_id, f"{song_name}.mp3", caption=f"Song Name: {song_name}", progress=progress, progress_args=(ms, c_time, f'`Uploading {song_name}...`'), thumb=thumb)
     await ms.delete()
-    os.remove(f"{song_name}.mp3")
+    
     
 @Client.on_message(filters.command("wynk", prefix) & filters.me)
 async def saavn(client: Client, message: Message):
@@ -83,7 +84,7 @@ async def saavn(client: Client, message: Message):
     c_time = time.time()
     await client.send_document(chat_id, f"{song_name}.mp3", caption=f"Song Name: {song_name}", progress=progress, progress_args=(ms, c_time, f'`Uploading {song_name}...`'), thumb=thumb)
     await ms.delete()
-    os.remove(f"{song_name}.mp3")
+    
 
 
 modules_help["song"] = {
