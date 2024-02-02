@@ -47,7 +47,7 @@ async def saavn(client: Client, message: Message):
     os.remove(f"{song_name}.mp3")
     
 @Client.on_message(filters.command("wynk", prefix) & filters.me)
-async def saavn(client: Client, message: Message):
+async def wynk(client: Client, message: Message):
     chat_id = message.chat.id
     if len(message.command) > 1:
         query = message.text.split(maxsplit=1)[1]
