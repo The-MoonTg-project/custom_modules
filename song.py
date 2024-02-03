@@ -49,6 +49,9 @@ async def saavn(client: Client, message: Message):
 @Client.on_message(filters.command("wynk", prefix) & filters.me)
 async def wynk(client: Client, message: Message):
     chat_id = message.chat.id
+    thumb = "thumb.jpg"
+    if not os.path.isfile(thumb):
+        thumb = None
     if len(message.command) > 1:
         query = message.text.split(maxsplit=1)[1]
     elif message.reply_to_message:
@@ -58,8 +61,8 @@ async def wynk(client: Client, message: Message):
             f"<b>Usage: </b><code>{prefix}svn [song name to search & download|upload]</code>"
         )
         return
-    ms = await message.edit_text(f"<code>Searching for {query} on saavn</code>")
-    response = requests.get(f"https://musicapi.x007.workers.dev/search?q={query}&searchEngine=seevn")
+    ms = await message.edit_text(f"<code>Searching for {query} on wynk</code>")
+    response = requests.get(f"https://musicapi.x007.workers.dev/search?q={query}&searchEngine=wunk")
 
     result = json.loads(response.text)
 
