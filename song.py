@@ -4,7 +4,7 @@ import time
 import os
 
 from pyrogram import Client, filters
-from pyrogram.types import Message
+from pyrogram.types import Message, InlineQuery
 
 from utils.misc import modules_help, prefix
 from utils.scripts import progress
