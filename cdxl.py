@@ -30,7 +30,7 @@ async def cdxl(c: Client, message: Message):
 
         output_base64 = model_prediction.outputs[0].data.image.base64
         
-        print(model_prediction.outputs[0].data.image.image_info)
+        
         
         with open('sdxl_out.png', 'wb') as f:
         f.write(output_base64)
