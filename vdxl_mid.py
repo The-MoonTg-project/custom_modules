@@ -41,7 +41,7 @@ async def vdxl_mid(c: Client, message: Message):
         }
         
         # Send the request to generate images
-          response = requests.post(f"{api_url}/premium/generate-xl", json=data)
+        response = requests.post(f"{api_url}/premium/generate-xl", json=data)
         
         # Extract the image URLs from the response
         image_url = response.json()["images"][0]
