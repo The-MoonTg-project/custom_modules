@@ -5,14 +5,14 @@ from pyrogram.types import Message
 
 from utils.config import vca_api_key
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc, edit_or_reply, import_library
+from utils.scripts import format_exc, edit_or_reply
 
 
 # Define the API endpoint
 api_url = "https://visioncraft-rs24.koyeb.app"
 
 @Client.on_message(filters.command("midxl", prefix) & filters.me)
-async def vdxl(c: Client, message: Message):
+async def vdxl_mid(c: Client, message: Message):
     try:
         chat_id = message.chat.id
         await message.edit_text("<code>Please Wait...</code>")
