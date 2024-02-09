@@ -26,8 +26,8 @@ async def cdxl(c: Client, message: Message):
         )
          return
 
-        inference_params = dict(width= 1024, height= 1024, steps=50, cfg_scale = 8.0)
-        
+        inference_params = dict(width= 1024, height= 1024, steps=50, cfg_scale = 9.0)
+
         model_prediction = Model("https://clarifai.com/stability-ai/stable-diffusion-2/models/stable-diffusion-xl").predict_by_bytes(prompt.encode(), input_type="text", inference_params=inference_params)
 
         output_base64 = model_prediction.outputs[0].data.image.base64
