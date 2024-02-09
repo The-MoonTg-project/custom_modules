@@ -33,7 +33,7 @@ async def cdxl(c: Client, message: Message):
         
         
         with open('sdxl_out.png', 'wb') as f:
-        f.write(output_base64)
+            f.write(output_base64)
 
             await message.delete()
             await c.send_photo(chat_id, photo=f"sdxl_out.png", caption=f"<b>Prompt:</b><code>{prompt}</code>")
