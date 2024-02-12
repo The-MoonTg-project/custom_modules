@@ -2,7 +2,6 @@
 # This is used on my Moon-Userbot: https://github.com/The-MoonTg-project/Moon-Userbot
 # YOu can check it out for uses example
 import os
-import google.generativeai as genai
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
@@ -10,6 +9,9 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc, import_library
 from utils.config import gemini_key
+
+google = import_library("google", "google-generativeai")
+import google.generativeai as genai
 
 genai.configure(api_key=gemini_key)
 
