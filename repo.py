@@ -6,7 +6,7 @@ import requests
 
 from utils.misc import modules_help, prefix
 
-@Client.on_message(filters.command(["repo", "rp"], prefix) & filters.me)
+@Client.on_message(filters.command(["repo", "rp"]))
 async def github_repo(client: Client, message: Message):
     try:
         if len(message.command) > 1:
