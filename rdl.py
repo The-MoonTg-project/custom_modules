@@ -30,11 +30,11 @@ async def dl(client: Client, message: Message):
             file_text = selected_message.caption
             file = await client.download_media(selected_message, progress=progress, progress_args=(ms, c_time, f'`Trying to download...`'))
             await client.send_document(chat_id, file, caption=file_text, progress=progress, progress_args=(ms, c_time, f'`Uploading...`'))
-            ms.delete()
+            await ms.delete()
             os.remove(file)
         except ValueError:
             await client.copy_message(chat_id, from_chat, selected_id)
-            ms.delete()
+            await ms.delete()
     else:
         await message.edit_text("Kindly use `.dl channel_link message_id")
 
