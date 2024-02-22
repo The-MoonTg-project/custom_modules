@@ -20,7 +20,6 @@ async def banall(client: Client, message: Message):
             message.edit_text("kicked lol, I'm the Devil 😈")
         except FloodWait as e:
             await asyncio.sleep(e.x)
-            print(e)
         except Exception as e:
             message.edit_text(" failed af 😭")
     print("process completed")
