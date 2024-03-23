@@ -61,7 +61,7 @@ async def dl(client: app, message: Message):
                 pass
         except Exception as e:
             await message.edit_text(format_exc(e))
-    await ms.delete()
+        await ms.delete()
     else:
         await message.edit_text("Kindly use `.dl channel_link message_id [number_of_messages]`")
 
