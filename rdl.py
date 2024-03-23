@@ -9,7 +9,7 @@ from pyrogram.errors import UserAlreadyParticipant, ChatForwardsRestricted
 from utils.misc import modules_help, prefix
 from utils.scripts import progress, format_exc
 
-async def dl(client: app, message: Message):
+async def dl(client: Client, message: Message):
     chat_id = message.chat.id
     c_time = time.time()
     if len(message.command) > 2:
