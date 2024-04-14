@@ -41,5 +41,5 @@ async def say(_, message: Message):
 
 
 modules_help["gemini"] = {
-    "gemini [prompt]*": "Ask questions with Ai",
+    "gemini [prompt]*": "Ask questions with Gemini Ai",
 }
