@@ -20,6 +20,8 @@ async def cohere(c: Client, message: Message):
     try:
         chat_history = db.get_chat_history()
 
+        await message.edit_text("<code>Please Wait...</code>")
+
         if len(message.command) > 1:
             prompt = message.text.split(maxsplit=1)[1]
         elif message.reply_to_message:
