@@ -6,7 +6,6 @@ import os
 import time
 import datetime
 import subprocess
-import asyncio
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
