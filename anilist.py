@@ -1,614 +1,202 @@
-# Copyright (C) 2020-2022 by UsergeTeam@Github, < https://github.com/UsergeTeam >.
-#
-# This file is part of < https://github.com/UsergeTeam/Userge > project,
-# and is released under the "GNU v3.0 License Agreement".
-# Please see < https://github.com/UsergeTeam/Userge/blob/master/LICENSE >
-#
-# Module Capable of fetching Anime, Airing, Character Info &
-# Anime Reverse Search made for UserGe.
-# AniList Api (GitHub: https://github.com/AniList/ApiV2-GraphQL-Docs)
-# Anime Reverse Search Powered by tracemoepy.
-# TraceMoePy (GitHub: https://github.com/DragSama/tracemoepy)
-# (C) Author: Phyco-Ninja (https://github.com/Phyco-Ninja) (@PhycoNinja13b)
-#
-# All rights reserved.
-
 import os
-from datetime import datetime
+import requests
+import aiofiles
 
-from utils.scripts import import_library
-from utils.misc import modules_help, prefix
 from pyrogram import Client, filters, enums
-from pyrogram.types import Message
-from utils import config
-from utils.scripts import with_reply
+from pyrogram.types import Message, InputMediaPhoto
+from pyrogram.errors import MediaCaptionTooLong
 
-tracemoepy = import_library("tracemoepy")
-humanize = import_library("humanize")
-html_telegraph_poster = import_library("html_telegraph_poster")
-motor = import_library("motor")
+from utils.misc import prefix, modules_help
+from utils.scripts import format_exc
 
-import flag as cflag
-import tracemoepy
-import humanize
-from aiohttp import ClientSession
-from html_telegraph_poster import TelegraphPoster
-from tracemoepy.errors import ServerError
+url = 'https://api.safone.dev'
 
-
-from motor.motor_asyncio import AsyncIOMotorClient
-from motor.core import AgnosticDatabase, AgnosticCollection
-
-
-class Dynamic:
-
-    MSG_DELETE_TIMEOUT = 120
-    EDIT_SLEEP_TIMEOUT = 10
-
-    USER_IS_PREFERRED = False
-
-
-# Default templates for Query Formatting
-ANIME_TEMPLATE = """[{c_flag}]**{romaji}**
-
-**ID | MAL ID:** `{idm}` | `{idmal}`
-➤ **SOURCE:** `{source}`
-➤ **TYPE:** `{formats}`
-➤ **GENRES:** `{genre}`
-➤ **SEASON:** `{season}`
-➤ **EPISODES:** `{episodes}`
-➤ **STATUS:** `{status}`
-➤ **NEXT AIRING:** `{air_on}`
-➤ **SCORE:** `{score}%` 🌟
-➤ **ADULT RATED:** `{adult}`
-🎬 {trailer_link}
-📖 [Synopsis & More]({synopsis_link})"""
-
-SAVED = "TEMPLATES"
-
-# GraphQL Queries.
-ANIME_QUERY = """
-query ($id: Int, $idMal:Int, $search: String, $type: MediaType, $asHtml: Boolean) {
-  Media (id: $id, idMal: $idMal, search: $search, type: $type) {
-    id
-    idMal
-    title {
-      romaji
-      english
-      native
-    }
-    format
-    status
-    description (asHtml: $asHtml)
-    startDate {
-      year
-      month
-      day
-    }
-    season
-    episodes
-    duration
-    countryOfOrigin
-    source (version: 2)
-    trailer {
-      id
-      site
-      thumbnail
-    }
-    coverImage {
-      extraLarge
-    }
-    bannerImage
-    genres
-    averageScore
-    nextAiringEpisode {
-      airingAt
-      timeUntilAiring
-      episode
-    }
-    isAdult
-    characters (role: MAIN, page: 1, perPage: 10) {
-      nodes {
-        id
-        name {
-          full
-          native
-        }
-        image {
-          large
-        }
-        description (asHtml: $asHtml)
-        siteUrl
-      }
-    }
-    studios (isMain: true) {
-      nodes {
-        name
-        siteUrl
-      }
-    }
-    siteUrl
-  }
+headers = {
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Connection': 'keep-alive',
+    'DNT': '1',
+    'Referer': 'https://api.safone.dev/docs',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'accept': 'application/json',
+    'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Linux"'
 }
-"""
 
-AIRING_QUERY = """
-query ($id: Int, $mediaId: Int, $notYetAired: Boolean) {
-  Page(page: 1, perPage: 50) {
-    airingSchedules (id: $id, mediaId: $mediaId, notYetAired: $notYetAired) {
-      id
-      airingAt
-      timeUntilAiring
-      episode
-      mediaId
-      media {
-        title {
-          romaji
-          english
-          native
-        }
-        duration
-        coverImage {
-          extraLarge
-        }
-        nextAiringEpisode {
-          airingAt
-          timeUntilAiring
-          episode
-        }
-        bannerImage
-        averageScore
-        siteUrl
-      }
-    }
-  }
-}
-"""
-
-CHARACTER_QUERY = """
-query ($search: String, $asHtml: Boolean) {
-  Character (search: $search) {
-    id
-    name {
-      full
-      native
-    }
-    image {
-      large
-    }
-    description (asHtml: $asHtml)
-    siteUrl
-    media (page: 1, perPage: 25) {
-      nodes {
-        id
-        idMal
-        title {
-          romaji
-          english
-          native
-        }
-        type
-        siteUrl
-        coverImage {
-          extraLarge
-        }
-        bannerImage
-        averageScore
-        description (asHtml: $asHtml)
-      }
-    }
-  }
-}
-"""
-
-
-async def _init():
-    global ANIME_TEMPLATE  # pylint: disable=global-statement
-    template = await SAVED.find_one({'_id': "ANIME_TEMPLATE"})
-    if template:
-        ANIME_TEMPLATE = template['anime_data']
-
-
-async def return_json_senpai(query, vars_):
-    """ Makes a Post to https://graphql.anilist.co. """
-    url_ = "https://graphql.anilist.co"
-    async with ClientSession() as api_:
-        post_con = await api_.post(url_, json={'query': query, 'variables': vars_})
-        json_data = await post_con.json()
-        return json_data
-
-
-def post_to_tp(a_title, content):
-    """ Create a Telegram Post using HTML Content """
-    post_client = TelegraphPoster(use_api=True)
-    auth_name = "@@Qbtaumai"
-    post_client.create_api_token(auth_name)
-    post_page = post_client.post(
-        title=a_title,
-        author=auth_name,
-        author_url="https://t.me/Qbtaumai",
-        text=content
-    )
-    return post_page['url']
-
-
-def make_it_rw(time_stamp, as_countdown=False):
-    """ Converting Time Stamp to Readable Format """
-    if as_countdown:
-        now = datetime.now()
-        air_time = datetime.fromtimestamp(time_stamp)
-        return str(humanize.naturaltime(now - air_time))
-    return str(humanize.naturaldate(datetime.fromtimestamp(time_stamp)))
-
-
-@Client.on_message(filters.command(["anime"], prefix) & filters.me)
-async def anim_arch(message: Message):
-    """ Search Anime Info """
-    query = message.filtered_input_str
-    if not query:
-        await message.err("NameError: 'query' not defined")
-        return
-    vars_ = {
-        'search': query,
-        'asHtml': True,
-        'type': "ANIME"
-    }
-    if query.isdigit():
-        vars_ = {
-            'id': int(query),
-            'asHtml': True,
-            'type': "ANIME"
-        }
-        if '-mid' in message.flags:
-            vars_ = {
-                'idMal': int(query),
-                'asHtml': True,
-                'type': "ANIME"
-            }
-
-    result = await return_json_senpai(ANIME_QUERY, vars_)
-    error = result.get('errors')
-    if error:
-        error_sts = error[0].get('message')
-        await message.err(f"[{error_sts}]")
-        return
-
-    data = result['data']['Media']
-
-    # Data of all fields in returned json
-    # pylint: disable=possibly-unused-variable
-    idm = data.get('id')
-    idmal = data.get('idMal')
-    romaji = data['title']['romaji']
-    english = data['title']['english']
-    native = data['title']['native']
-    formats = data.get('format')
-    status = data.get('status')
-    synopsis = data.get('description')
-    season = data.get('season')
-    episodes = data.get('episodes')
-    duration = data.get('duration')
-    country = data.get('countryOfOrigin')
-    c_flag = cflag.flag(country)
-    source = data.get('source')
-    coverImg = data.get('coverImage')['extraLarge']
-    bannerImg = data.get('bannerImage')
-    genres = data.get('genres')
-    genre = genres[0]
-    if len(genres) != 1:
-        genre = ", ".join(genres)
-    score = data.get('averageScore')
-    air_on = None
-    if data['nextAiringEpisode']:
-        nextAir = data['nextAiringEpisode']['airingAt']
-        air_on = make_it_rw(nextAir)
-    s_date = data.get('startDate')
-    adult = data.get('isAdult')
-    trailer_link = "N/A"
-
-    if data['trailer'] and data['trailer']['site'] == 'youtube':
-        trailer_link = f"[Trailer](https://youtu.be/{data['trailer']['id']})"
-    html_char = ""
-    for character in data['characters']['nodes']:
-        html_ = ""
-        html_ += "<br>"
-        html_ += f"""<a href="{character['siteUrl']}">"""
-        html_ += f"""<img src="{character['image']['large']}"/></a>"""
-        html_ += "<br>"
-        html_ += f"<h3>{character['name']['full']}</h3>"
-        html_ += f"<em>{c_flag} {character['name']['native']}</em><br>"
-        html_ += f"<b>Character ID</b>: {character['id']}<br>"
-        html_ += f"<h4>About Character and Role:</h4>{character.get('description', 'N/A')}"
-        html_char += f"{html_}<br><br>"
-
-    studios = ""
-    for studio in data['studios']['nodes']:
-        studios += "<a href='{}'>• {}</a> ".format(studio['siteUrl'], studio['name'])
-    url = data.get('siteUrl')
-
-    title_img = coverImg or bannerImg
-    # Telegraph Post mejik
-    html_pc = ""
-    html_pc += f"<img src='{title_img}' title={romaji}/>"
-    html_pc += f"<h1>[{c_flag}] {native}</h1>"
-    html_pc += "<h3>Synopsis:</h3>"
-    html_pc += synopsis
-    html_pc += "<br>"
-    if html_char:
-        html_pc += "<h2>Main Characters:</h2>"
-        html_pc += html_char
-        html_pc += "<br><br>"
-        html_pc += "<h3>More Info:</h3>"
-        html_pc += f"<b>Started On:</b> {s_date['day']}/{s_date['month']}/{s_date['year']}"
-        html_pc += f"<br><b>Studios:</b> {studios}<br>"
-        html_pc += f"<a href='https://myanimelist.net/anime/{idmal}'>View on MAL</a>"
-        html_pc += f"<a href='{url}'> View on anilist.co</a>"
-        html_pc += f"<img src='{bannerImg}'/>"
-
-    title_h = english or romaji
-    synopsis_link = post_to_tp(title_h, html_pc, parse_mode=enums.ParseMode.HTML)
+@Client.on_message(filters.command("anime_search", prefix) & filters.me)
+async def anime_search(client: Client, message: Message):
     try:
-        finals_ = ANIME_TEMPLATE.format(**locals())
-    except KeyError as kys:
-        await message.err(kys)
-        return
-
-    if '-wp' in message.flags:
-        finals_ = f"[\u200b]({title_img}) {finals_}"
-        await message.edit(finals_)
-        return
-    await message.reply_photo(title_img, caption=finals_)
-    await message.delete()
-
-
-@Client.on_message(filters.command(["airing"], prefix) & filters.me)
-async def airing_anim(message: Message):
-    """ Get Airing Detail of Anime """
-    query = message.input_str
-    if not query:
-        await message.err("NameError: 'query' not defined")
-        return
-    vars_ = {
-        'search': query,
-        'asHtml': True,
-        'type': "ANIME"
-    }
-    if query.isdigit():
-        vars_ = {
-            'id': int(query),
-            'asHtml': True,
-            'type': "ANIME"
-        }
-    result = await return_json_senpai(ANIME_QUERY, vars_)
-    error = result.get('errors')
-    if error:
-        error_sts = error[0].get('message')
-        await message.err(f"[{error_sts}]")
-        return
-
-    data = result['data']['Media']
-
-    # Airing Details
-    mid = data.get('id')
-    romaji = data['title']['romaji']
-    english = data['title']['english']
-    native = data['title']['native']
-    status = data.get('status')
-    episodes = data.get('episodes')
-    country = data.get('countryOfOrigin')
-    c_flag = cflag.flag(country)
-    source = data.get('source')
-    coverImg = data.get('coverImage')['extraLarge']
-    genres = data.get('genres')
-    genre = genres[0]
-    if len(genres) != 1:
-        genre = ", ".join(genres)
-    score = data.get('averageScore')
-    air_on = None
-    if data['nextAiringEpisode']:
-        nextAir = data['nextAiringEpisode']['airingAt']
-        episode = data['nextAiringEpisode']['episode']
-        air_on = make_it_rw(nextAir, True)
-
-    title_ = english or romaji
-    out = f"[{c_flag}] **{native}** \n   (`{title_}`)"
-    out += f"\n\n**ID:** `{mid}`"
-    out += f"\n**Status:** `{status}`\n"
-    out += f"**Source:** `{source}`\n"
-    out += f"**Score:** `{score}`\n"
-    out += f"**Genres:** `{genre}`\n"
-    if air_on:
-        out += f"**Airing Episode:** `[{episode}/{episodes}]`\n"
-        out += f"\n`{air_on}`"
-    if len(out) > 1024:
-        await message.edit(out, parse_mode=enums.ParseMode.HTML)
-        return
-    await message.reply_photo(coverImg, caption=out)
-    await message.delete()
-
-
-@Client.on_message(filters.command(["scheduled"], prefix) & filters.me)
-async def get_schuled(message: Message):
-    """ Get List of Scheduled Anime """
-    var = {'notYetAired': True}
-    await message.edit("`Fetching Scheduled Animes`", parse_mode=enums.ParseMode.HTML)
-    result = await return_json_senpai(AIRING_QUERY, var)
-    error = result.get('errors')
-    if error:
-        await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n{error}")
-        error_sts = error[0].get('message')
-        await message.err(f"[{error_sts}]")
-        return
-
-    data = result['data']['Page']['airingSchedules']
-    c = 0
-    totl_schld = len(data)
-    out = ""
-    for air in data:
-        romaji = air['media']['title']['romaji']
-        english = air['media']['title']['english']
-        mid = air['mediaId']
-        epi_air = air['episode']
-        air_at = make_it_rw(air['airingAt'], True)
-        site = air['media']['siteUrl']
-        title_ = english or romaji
-        out += f"<h3>[🇯🇵]{title_}</h3>"
-        out += f" • <b>ID:</b> {mid}<br>"
-        out += f" • <b>Airing Episode:</b> {epi_air}<br>"
-        out += f" • <b>Next Airing:</b> {air_at}<br>"
-        out += f" • <a href='{site}'>[Visit on anilist.co]</a><br><br>"
-        c += 1
-    if out:
-        out_p = f"<h1>Showing [{c}/{totl_schld}] Scheduled Animes:</h1><br><br>{out}"
-        link = post_to_tp("Scheduled Animes", out_p, parse_mode=enums.ParseMode.HTML)
-        await message.edit(f"[Open in Telegraph]({link})", parse_mode=enums.ParseMode.HTML)
-
-
-@Client.on_message(filters.command(["character"], prefix) & filters.me)
-async def character_search(message: Message):
-    """ Get Info about a Character """
-    query = message.input_str
-    if not query:
-        await message.err("NameError: 'query' not defined")
-        return
-    var = {
-        'search': query,
-        'asHtml': True
-    }
-    result = await return_json_senpai(CHARACTER_QUERY, var)
-    error = result.get('errors')
-    if error:
-        await CLOG.log(f"**ANILIST RETURNED FOLLOWING ERROR:**\n\n`{error}`")
-        error_sts = error[0].get('message')
-        await message.err(f"[{error_sts}]")
-        return
-
-    data = result['data']['Character']
-
-    # Character Data
-    id_ = data['id']
-    name = data['name']['full']
-    native = data['name']['native']
-    img = data['image']['large']
-    site_url = data['siteUrl']
-    description = data['description']
-    featured = data['media']['nodes']
-
-    sp = 0
-    cntnt = ""
-    for cf in featured:
-        out = "<br>"
-        out += f'''<img src="{cf['coverImage']['extraLarge']}"/>'''
-        out += "<br>"
-        title = cf['title']['english'] if cf['title']['english'] else cf['title']['romaji']
-        out += f"<h3>{title}</h3>"
-        out += f"<em>[🇯🇵] {cf['title']['native']}</em><br>"
-        out += f'''<a href="{cf['siteUrl']}>{cf['type']}</a><br>'''
-        out += f"<b>Media ID:</b> {cf['id']}<br>"
-        out += f"<b>SCORE:</b> {cf['averageScore']}/100<br>"
-        out += cf.get('description', "N/A") + "<br>"
-        cntnt += out
-        sp += 1
-        if sp > 5:
-            break
-
-    html_cntnt = f"<img src='{img}' title={name}/>"
-    html_cntnt += f"<h1>[🇯🇵] {native}</h1>"
-    html_cntnt += "<h3>About Character:</h3>"
-    html_cntnt += description
-    html_cntnt += "<br>"
-    if cntnt:
-        html_cntnt += "<h2>Top Featured Anime</h2>"
-        html_cntnt += cntnt
-        html_cntnt += "<br><br>"
-    url_ = post_to_tp(name, html_cntnt, parse_mode=enums.ParseMode.HTML)
-    cap_text = f"""[🇯🇵] __{native}__
-    (`{name}`)
-**ID:** {id_}
-[About Character]({url_})
-
-[Visit Website]({site_url})"""
-
-    await message.reply_photo(img, caption=cap_text)
-    await message.delete()
-
-
-@Client.on_message(filters.command(["ars"], prefix) & filters.me)
-async def trace_bek(message: Message):
-    """ Reverse Search Anime Clips/Photos """
-    replied = message.reply_to_message
-    if not replied:
-        await message.edit("Ara Ara... Reply to a Media Senpai")
-        return
-    if not (replied.photo or replied.video or replied.animation):
-        await message.err("Nani, reply to gif/photo/video")
-        return
-    if not os.path.isdir(Dynamic.DOWN_PATH):
-        os.makedirs(Dynamic.DOWN_PATH)
-    await message.edit("He he, let me use my skills")
-    dls = await message.client.download_media(
-        message=message.reply_to_message,
-        file_name=Dynamic.DOWN_PATH,
-        progress=progress,
-        progress_args=(message, "Downloading Media")
-    )
-    dls_loc = os.path.join(Dynamic.DOWN_PATH, os.path.basename(dls))
-    if replied.animation or replied.video:
-        img_loc = os.path.join(Dynamic.DOWN_PATH, "trace.png")
-        await take_screen_shot(dls_loc, 0, img_loc)
-        if not os.path.lexists(img_loc):
-            await message.err("Media not found...", del_in=5)
+        chat_id = message.chat.id
+        await message.edit_text("Processing...")
+        if len(message.command) > 1:
+            query = message.text.split(maxsplit=1)[1]
+        else:
+            message.edit_text("What should i search? You didn't provided me with any value to search")
+        
+        response = requests.get(url=f"{url}/anime/search?query={query}", headers=headers, timeout=5)
+        if response.status_code != 200:
+            await message.edit_text("Something went wrong")
             return
-        os.remove(dls_loc)
-        dls_loc = img_loc
-    if dls_loc:
-        async with ClientSession() as session:
-            tracemoe = tracemoepy.AsyncTrace(session=session)
-            try:
-                search = await tracemoe.search(dls_loc, upload_file=True)
-            except ServerError:
-                try:
-                    search = await tracemoe.search(dls_loc, upload_file=True)
-                except ServerError:
-                    await message.reply('Couldnt parse results!!!')
-                    return
-            result = search["result"][0]
-            caption_ = (
-                f"**Title**: {result['anilist']['title']['english']}"
-                f" (`{result['anilist']['title']['native']}`)\n"
-                f"\n**Anilist ID:** `{result['anilist']['id']}`"
-                f"\n**Similarity**: `{(str(result['similarity']*100))[:5]}`"
-                f"\n**Episode**: `{result['episode']}`",
-                parse_mode=enums.ParseMode.HTML
-            )
-            preview = result['video']
-        await message.reply_video(preview, caption=caption_)
+        
+        result = response.json()
+
+        averageScore = result['averageScore']
+        try:
+            coverImage_url = result['imageUrl']
+            coverImage = requests.get(url=coverImage_url).content
+            async with aiofiles.open('coverImage.jpg', mode='wb') as f:
+                await f.write(coverImage)
+
+        except Exception:
+            coverImage = None
+
+        title = result['title']['english']
+        trailer = result['trailer']['id']
+        description = result['description']
+        episodes = result['episodes']
+        genres = ', '.join(result['genres'])
+        isAdult = result['isAdult']
+        status = result['status']
+        studios = ', '.join(result['studios'])
+
         await message.delete()
+        await client.send_media_group(
+            chat_id,
+            [
+                InputMediaPhoto('coverImage.jpg', caption=f"<b>Title:</b> <code>{title}</code>\n<b>Average Score:</b> <code>{averageScore}</code>\n<b>Status:</b> <code>{status}</code>\n<b>Genres:</b> <code>{genres}</code>\n<b>Episodes:</b> <code>{episodes}</code>\n<b>Is Adult:</b> <code>{isAdult}</code>\n<b>Studios:</b> <code>{studios}</code>\n<b>Description:</b> <code>{description}</code>\n<b>Trailer:</b> <a href='https://youtu.be/{trailer}'>Click Here</a>")
+            ])
+    
+    except MediaCaptionTooLong:
+        description = description[:850]
+        await message.delete()
+        await client.send_media_group(
+            chat_id,
+            [
+                InputMediaPhoto('coverImage.jpg', caption=f"<b>Title:</b> <code>{title}</code>\n<b>Average Score:</b> <code>{averageScore}</code>\n<b>Status:</b> <code>{status}</code>\n<b>Genres:</b> <code>{genres}</code>\n<b>Episodes:</b> <code>{episodes}</code>\n<b>Is Adult:</b> <code>{isAdult}</code>\n<b>Studios:</b> <code>{studios}</code>\n<b>Description:</b> <code>{description}</code>\n<b>Trailer:</b> <a href='https://youtu.be/{trailer}'>Click Here</a>")
+            ])
+    except Exception as e:
+        await message.edit_text(format_exc(e))
+    finally:
+        if os.path.exists('coverImage.jpg'):
+            os.remove('coverImage.jpg')
+
+@Client.on_message(filters.command("manga_search", prefix) & filters.me)
+async def manga_search(client: Client, message: Message):
+    try:
+        chat_id = message.chat.id
+        await message.edit_text("Processing...")
+        if len(message.command) > 1:
+            query = message.text.split(maxsplit=1)[1]
+        else:
+            message.edit_text("What should i search? You didn't provided me with any value to search")
+        
+        response = requests.get(url=f"{url}/anime/manga?query={query}", headers=headers, timeout=5)
+        if response.status_code != 200:
+            await message.edit_text("Something went wrong")
+            return
+        
+        result = response.json()
+
+        averageScore = result['averageScore']
+        try:
+            coverImage_url = result['imageUrl']
+            coverImage = requests.get(url=coverImage_url).content
+            async with aiofiles.open('coverImage.jpg', mode='wb') as f:
+                await f.write(coverImage)
+
+        except Exception:
+            coverImage = None
+
+        title = result['title']['english']
+        trailer = result['trailer']['id']
+        description = result['description']
+        chapters = result['chapters']
+        genres = ', '.join(result['genres'])
+        isAdult = result['isAdult']
+        status = result['status']
+        studios = ', '.join(result['studios'])
+
+        await message.delete()
+        await client.send_media_group(
+            chat_id,
+            [
+                InputMediaPhoto('coverImage.jpg', caption=f"<b>Title:</b> <code>{title}</code>\n<b>Average Score:</b> <code>{averageScore}</code>\n<b>Status:</b> <code>{status}</code>\n<b>Genres:</b> <code>{genres}</code>\n<b>Chapters:</b> <code>{chapters}</code>\n<b>Is Adult:</b> <code>{isAdult}</code>\n<b>Studios:</b> <code>{studios}</code>\n<b>Description:</b> <code>{description}</code>\n<b>Trailer:</b> <a href='https://youtu.be/{trailer}'>Click Here</a>")
+            ])
+
+    except MediaCaptionTooLong:
+        description = description[:850]
+        await message.delete()
+        await client.send_media_group(
+            chat_id,
+            [
+                InputMediaPhoto('coverImage.jpg', caption=f"<b>Title:</b> <code>{title}</code>\n<b>Average Score:</b> <code>{averageScore}</code>\n<b>Status:</b> <code>{status}</code>\n<b>Genres:</b> <code>{genres}</code>\n<b>Chapters:</b> <code>{chapters}</code>\n<b>Is Adult:</b> <code>{isAdult}</code>\n<b>Studios:</b> <code>{studios}</code>\n<b>Description:</b> <code>{description}</code>\n<b>Trailer:</b> <a href='https://youtu.be/{trailer}'>Click Here</a>")
+            ])
+    except Exception as e:
+        await message.edit_text(format_exc(e))
+    finally:
+        if os.path.exists('coverImage.jpg'):
+            os.remove('coverImage.jpg')
+
+@Client.on_message(filters.command("character", prefix) & filters.me)
+async def character(client: Client, message: Message):
+    try:
+        chat_id = message.chat.id
+        await message.edit_text("Processing...")
+        if len(message.command) > 1:
+            query = message.text.split(maxsplit=1)[1]
+        else:
+            message.edit_text("What should i search? You didn't provided me with any value to search")
+        
+        response = requests.get(url=f"{url}/anime/character?query={query}", headers=headers, timeout=5)
+        if response.status_code != 200:
+            await message.edit_text("Something went wrong")
+            return
+        
+        result = response.json()
+
+        try:
+            coverImage_url = result['image']['large']
+            coverImage = requests.get(url=coverImage_url).content
+            async with aiofiles.open('coverImage.jpg', mode='wb') as f:
+                await f.write(coverImage)
+
+        except Exception:
+            coverImage = None
+
+        age = result['age']
+        description = result['description']
+        height = result['height']
+        name = result['name']['full']
+        native_name = result['name']['native']
+        read_more = result['siteUrl']
+
+        await message.delete()
+        await client.send_media_group(
+            chat_id,
+            [
+                InputMediaPhoto('coverImage.jpg', caption=f"**Name:** `{name}`\n**Native Name:** `{native_name}`\n**Age:** `{age}`\n**Height:** {height}\n**Description:** `{description}`[read more...]({read_more})", parse_mode=enums.ParseMode.MARKDOWN)
+            ])
+
+    except MediaCaptionTooLong:
+        description = description[:850]
+        await message.delete()
+        await client.send_media_group(
+            chat_id,
+            [
+                InputMediaPhoto('coverImage.jpg', caption=f"**Name:** `{name}`\n**Native Name:** `{native_name}`\n**Age:** `{age}`\n**Height:** {height}\n**Description:** `{description}`[read more...]({read_more})", parse_mode=enums.ParseMode.MARKDOWN)
+            ])
+    except Exception as e:
+        await message.edit_text(format_exc(e))
+    finally:
+        if os.path.exists('coverImage.jpg'):
+            os.remove('coverImage.jpg')
 
 
-@Client.on_message(filters.command(["setemp"], prefix) & filters.me)
-async def ani_save_template(message: Message):
-    """ Set Custom Template for .anime """
-    text = message.input_or_reply_str
-    if not text:
-        await message.err("Invalid Syntax")
-        return
-    await SAVED.update_one({'_id': "ANIME_TEMPLATE"}, {"$set": {'anime_data': text}}, upsert=True)
-    await message.edit("Custom Anime Template Saved")
-
-
-@Client.on_message(filters.command(["anitemp"], prefix) & filters.me)
-async def view_del_ani(message: Message):
-    """ View or Delete .anime Template """
-    if not message.flags:
-        await message.err("Flag Required")
-        return
-    template = await SAVED.find_one({'_id': "ANIME_TEMPLATE"})
-    if not template:
-        await message.err("No Custom Anime Template Saved Peru")
-        return
-    if "-d" in message.flags:
-        await SAVED.delete_one({'_id': "ANIME_TEMPLATE"})
-        await message.edit("Custom Anime Template deleted Successfully")
-    if "-v" in message.flags:
-        await message.edit(template['anime_data'])
+modules_help["anilist"] = {
+    "anime_search": "Search for anime on Anilist",
+    "manga_search": "Search for manga on Anilist",
+    "character": "Search for character on Anilist",
+}
