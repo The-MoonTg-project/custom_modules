@@ -7,6 +7,7 @@ import time
 import datetime
 import subprocess
 import asyncio
+import requests
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
@@ -14,23 +15,40 @@ from pyrogram.types import Message
 from utils.misc import prefix, modules_help
 from utils.scripts import format_exc, progress, edit_or_reply, import_library
 
-telegraph = import_library('telegraph', 'telegraph[aio]')
 
-from telegraph.aio import Telegraph
 
 async def telegraph(user_name, content):
-    telegraph = Telegraph()
+    url = 'https://api.safone.dev'
 
     formatted_content = '<br>'.join(content.split('\n'))
     formatted_content = '<p>' + formatted_content + '</p>'
 
-    await telegraph.create_account(short_name=user_name, author_name=user_name)
+    headers = {
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Connection': 'keep-alive',
+        'DNT': '1',
+        'Referer': 'https://api.safone.dev/docs',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'accept': 'application/json',
+        'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Linux"'
+    }
 
-    response = await telegraph.create_page(
-        'MediaInfo',
-        html_content=formatted_content,
-    )
-    return response['url']
+    data = {
+    "title": "MediaInfo",
+    "content": formatted_content,
+    "author_name": user_name
+    }
+
+    response = requests.post(url=f"{url}/telegraph/text", headers=headers, json=data, timeout=5)
+
+    result = response.json()
+
+    return result['url']
 
 
 
