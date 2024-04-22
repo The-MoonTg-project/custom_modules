@@ -54,3 +54,7 @@ async def cohere(c: Client, message: Message):
 
     except Exception as e:
         await message.edit_text(f"An error occurred: {format_exc(e)}")
+
+modules_help["cohere"] = {
+    "cohere": "Chat with cohere ai"
+}
