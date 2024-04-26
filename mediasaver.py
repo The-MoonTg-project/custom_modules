@@ -17,11 +17,9 @@ async def msave(client: Client, message: Message):
         return
     await message.delete()
 
-    f = message.reply_to_message.media.file_id
-
-    path = await client.download_media(f)
+    path = await message.reply_to_message.download()
     # await getattr(client, "send_" + media)("me", path)
-    await client.send_photo("me", path)
+    await client.send_document("me", path)
     os.remove(path)
 
 
