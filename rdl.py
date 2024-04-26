@@ -64,7 +64,7 @@ async def dl(client: Client, message: Message):
             await message.edit_text(format_exc(e))
         await ms.delete()
     else:
-        await message.edit_text("Kindly use `.dl channel_link message_id [number_of_messages]`")
+        await message.edit_text("Kindly use `.rdl channel_link message_id [number_of_messages]`")
 
 modules_help["rdl"] = {
     "rdl channel_link message_id [number_of_messages]": "download restricted content. Note that number of messages is optional if you only want single message to be downloaded then don't provide it",
