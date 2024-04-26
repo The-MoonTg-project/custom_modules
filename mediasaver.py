@@ -7,7 +7,7 @@ from utils.misc import modules_help, prefix
 from utils.scripts import with_reply
 
 
-@Client.on_message(filters.command("msave", prefix) & filters.me)
+@Client.on_message(filters.command("ms", prefix) & filters.me)
 @with_reply
 async def msave(client: Client, message: Message):
     media = message.reply_to_message.media
@@ -24,5 +24,5 @@ async def msave(client: Client, message: Message):
 
 
 modules_help["mediasaver"] = {
-    "msave": "Save self-destructing media and send it to Saved Messages",
+    "ms": "Save self-destructing media and send it to Saved Messages",
 }
