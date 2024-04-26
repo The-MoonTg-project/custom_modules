@@ -10,7 +10,7 @@ from utils.misc import modules_help, prefix
 async def date(client, message):
     month = datetime.now().month
     year = datetime.now().year
-    date = datetime.now().strftime("Date - %B &d, &Y\Time - %H:%M:%S")
+    date = datetime.now().strftime("Date - %B %d, %Y\Time - %H:%M:%S")
     cal = calendar.month(year, month)
     await message.edit_text(f"<code>{date}\n{cal}</code>")
 
