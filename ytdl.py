@@ -37,7 +37,6 @@ def download_video(url):
         title = info.get('title')
         ext = info.get('ext')
         thumb_url = info.get('thumbnail')
-        print(thumb_url)
         if thumb_url:
             resp = requests.get(thumb_url)
             img_content = resp.content
