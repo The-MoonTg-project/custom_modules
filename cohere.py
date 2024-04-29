@@ -18,7 +18,8 @@ from pyrogram.types import Message
 @Client.on_message(filters.command("cohere", prefix) & filters.me)
 async def cohere(c: Client, message: Message):
     try:
-        chat_history = db.get_chat_history()
+        user_id = message.from_user.id
+        chat_history = db.get_chat_history(user_id)
 
         await message.edit_text("<code>Please Wait...</code>")
 
@@ -32,7 +33,7 @@ async def cohere(c: Client, message: Message):
             )
             return
 
-        db.add_chat_history({"role": "USER", "message": prompt})
+        db.add_chat_history(user_id, {"role": "USER", "message": prompt})
 
         response = co.chat(
             chat_history=chat_history,
@@ -48,7 +49,7 @@ async def cohere(c: Client, message: Message):
             prompt_truncation="AUTO"
         )
 
-        db.add_chat_history({"role": "CHATBOT", "message": response.text})
+        db.add_chat_history(user_id, {"role": "CHATBOT", "message": response.text})
 
         await message.edit_text(f"**Question:**`{prompt}`\n**Answer:** {response.text}", parse_mode=enums.ParseMode.MARKDOWN)
 
