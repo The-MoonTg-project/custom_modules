@@ -1,3 +1,4 @@
+import os
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
@@ -26,6 +27,4 @@ async def killme_cmd(client, message: Message):
     await message.edit("Killed myself! Closing session...")
 
 
-modules_help["killme"] = {
-	"killme": "STop UB"
-}
+modules_help["killme"] = {"killme": "STop UB"}
