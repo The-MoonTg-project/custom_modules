@@ -54,7 +54,6 @@ async def gpt3(client: Client, message: Message):
         if response.status_code == 200:
             # Manually parse the response content as a string
             response_content = response.text
-            print(response_content)
 
             # Split the response content into separate JSON objects
             json_objects = response_content.split("\n")
