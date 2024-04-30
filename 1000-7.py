@@ -26,7 +26,7 @@ async def ghoul_counter(_, message: Message):
     else:
         counter = 1000
 
-    msg = await message.reply(prettify(counter), quote=False, parse_mode=enums.ParseMode.HTML)
+    msg = await message.reply(prettify(counter), quote=False)
 
     await sleep(1)
 
@@ -35,7 +35,7 @@ async def ghoul_counter(_, message: Message):
         await msg.edit(prettify(counter))
         await sleep(1)
 
-    await msg.edit("<b>🤡 GHOUL 🤡</b>", parse_mode=enums.ParseMode.HTML)
+    await msg.edit("<b>🤡 GHOUL 🤡</b>")
 
 
 modules_help["1000-7"] = {
