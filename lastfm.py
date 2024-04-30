@@ -4,7 +4,7 @@
 # THIS MODULE IS INCOMPATIBLE WITH LAST Moon VERSION
 # SINCE IT USE OUTDATED PACKAGE WITH BROKEN DEPENDENCIES
 # IT NEEDS TO BE REWRITED
-from pyrogram import Client, filters, enums
+from pyrogram import Client, filters
 from pyrogram.types import Message, Document
 
 from utils.misc import modules_help, prefix
@@ -23,8 +23,7 @@ def auth_required(function):
         if db.get("custom.lastfm", "session_key", None) is None:
             await message.edit(
                 f"<b>⚠️To use this module auth is required\n"
-                f"ℹ️Run <code>{prefix}lfauth</code> to authorize.</b>",
-                parse_mode=enums.ParseMode.HTML
+                f"ℹ️Run <code>{prefix}lfauth</code> to authorize.</b>"
             )
         else:
             return await function(client, message)
@@ -46,7 +45,6 @@ async def lfauth(client: Client, message: Message):
         f"<b>ℹ️Go to {url} and grant access.\n"
         f"After this, run <code>{prefix}lfconfirm</code> command</b>",
         disable_web_page_preview=True,
-        parse_mode=enums.ParseMode.HTML
     )
     db.set("custom.lastfm", "request_url", url)
     db.set("custom.lastfm", "request_token", token)
@@ -73,10 +71,9 @@ async def lfconfirmauth(client: Client, message: Message):
         await message.edit(
             "<b>⚠️Something went wrong.\nInfo about error: </b>"
             f"<code>{format_exc(e)}</code></b>",
-            parse_mode=enums.ParseMode.HTML
         )
         return
-    await message.edit("<b>✅Authorized.</b>", parse_mode=enums.ParseMode.HTML)
+    await message.edit("<b>✅Authorized.</b>")
 
 
 @Client.on_message(filters.command("lfnow", prefix) & filters.me)
@@ -92,7 +89,7 @@ async def example_edit(client: Client, message: Message):
         try:
             track = nw.get_user(message.text.split()[1]).get_now_playing()
         except:
-            await message.edit(f"<b>User not found.</b>", parse_mode=enums.ParseMode.HTML)
+            await message.edit("<b>User not found.</b>")
             return
         if track is None:
             try:
@@ -100,7 +97,7 @@ async def example_edit(client: Client, message: Message):
                     nw.get_user(message.text.split()[1]).get_recent_tracks(1)[0].track
                 )
             except:
-                await message.edit(f"<b>Nothing is playing.</b>", parse_mode=enums.ParseMode.HTML)
+                await message.edit("<b>Nothing is playing.</b>")
                 return
     else:
         track = nw.get_user(db.get("custom.lastfm", "username")).get_now_playing()
@@ -112,7 +109,7 @@ async def example_edit(client: Client, message: Message):
                     .track
                 )
             except:
-                await message.edit(f"<b>Nothing is playing.</b>", parse_mode=enums.ParseMode.HTML)
+                await message.edit("<b>Nothing is playing.</b>")
                 return
     try:
         link = f"https://song.link/i/{requests.get(f'https://itunes.apple.com/search?term={track}&country=RU&entity=song&limit=1').json()['results'][0]['trackId']}"
