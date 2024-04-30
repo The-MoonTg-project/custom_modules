@@ -15,7 +15,11 @@ async def joindate(client: Client, message: Message):
     cgetmsg = await client.get_messages(message.chat.id, 1)
 
     async for m in client.get_chat_members(message.chat.id):
-        joined_date = m.joined_date.timestamp() if m.joined_date else cgetmsg.date.timestamp() if cgetmsg.date else 0
+        joined_date = (
+            m.joined_date.timestamp()
+            if m.joined_date
+            else cgetmsg.date.timestamp() if cgetmsg.date else 0
+        )
         members.append(
             (
                 m.user.first_name,
