@@ -4,8 +4,8 @@
 # THIS MODULE IS INCOMPATIBLE WITH LAST Moon VERSION
 # SINCE IT USE OUTDATED PACKAGE WITH BROKEN DEPENDENCIES
 # IT NEEDS TO BE REWRITED
-# from pyrogram import Client, filters
-# from pyrogram.types import Message, Document
+from pyrogram import Client, filters, enums
+from pyrogram.types import Message, Document
 
 from utils.misc import modules_help, prefix
 from utils.scripts import import_library, format_exc
