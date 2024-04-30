@@ -22,7 +22,7 @@ async def haste(client: Client, message: Message):
 
     try:
         response = requests.post(
-            "{}/documents".format(BASE), data=reply.text.encode("UTF-8"). headers=headers
+            "{}/documents".format(BASE), data=reply.text.encode("UTF-8"), headers=headers
         )
         response.raise_for_status() # Raises an HTTPError if the response was unsuccessful
         result = response.json()
