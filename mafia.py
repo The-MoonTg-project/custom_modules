@@ -9,7 +9,7 @@ from utils.scripts import format_exc
 from utils.db import db
 
 
-now_status = db.get('lordcodes.mafia', 'status', False)
+now_status = db.get('custom.mafia', 'status', False)
 
 
 async def status_filter(_, __, m):
@@ -38,7 +38,7 @@ async def mafia_basic_lovler(client: Client, message: Message):
 async def mafia_handler(client: Client, message: Message):
     global now_status
     now = not now_status
-    db.set('lordcodes.mafia', 'status', now)
+    db.set('custom.mafia', 'status', now)
     now_status = now
     return await message.edit('<b><i>🧛 MafiaDrawing is now</i> ' + ('enabled</b>' if now else 'disabled</b>'), parse_mode=enums.ParseMode.HTML)
 
