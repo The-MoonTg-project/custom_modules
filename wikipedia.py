@@ -12,11 +12,11 @@ async def wiki(_, message: Message):
     lang = message.command[1]
     user_request = " ".join(message.command[2:])
     if user_request == "":
-        wikipedia.set_lang("ru")
+        wikipedia.set_lang("en")
         user_request = " ".join(message.command[1:])
     try:
-        if lang == "en":
-            wikipedia.set_lang("en")
+        if lang == "ru":
+            wikipedia.set_lang("ru")
 
         result = wikipedia.summary(user_request)
         await message.edit(
@@ -31,5 +31,5 @@ parse_mode=enums.ParseMode.HTML
 
 
 modules_help["wikipedia"] = {
-    "wiki [lang]* [request]*": "Search in Russian Wikipedia",
+    "wiki [lang]* [request]*": "Search in RU/EN(default:en) Wikipedia",
 }
