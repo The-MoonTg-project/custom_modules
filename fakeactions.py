@@ -2,23 +2,24 @@ from asyncio import sleep
 
 from pyrogram import Client, filters, enums
 from pyrogram.raw import functions
-from pyrogram.types import Message
+from pyrogram.types import Message, InputReplyToMessage
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc
 
 commands = {
-    'ftype': 'typing',
-    'faudio': 'upload_audio',
-    'fvideo': 'upload_video',
-    'fphoto': 'upload_photo',
-    'fdocument': 'upload_document',
-    'flocation': 'find_location',
-    'frvideo': 'record_video',
-    'fvoice': 'record_audio',
-    'frvideor': 'record_video_note',
-    'fgame': 'playing',
-    'fcontact': 'choose_contact',
-    'fstop': 'cancel',
+    'ftype': enums.ChatAction.TYPING,
+    'faudio': enums.ChatAction.UPLOAD_AUDIO,
+    'fvideo': enums.ChatAction.UPLOAD_VIDEO,
+    'fphoto': enums.ChatAction.UPLOAD_PHOTO,
+    'fdocument': enums.ChatAction.UPLOAD_DOCUMENT,
+    'flocation': enums.ChatAction.FIND_LOCATION,
+    'frvideo': enums.ChatAction.RECORD_VIDEO,
+    'frvoice': enums.ChatAction.RECORD_AUDIO,
+    'frvideor': enums.ChatAction.RECORD_VIDEO_NOTE,
+    'fvideor': enums.ChatAction.UPLOAD_VIDEO_NOTE,
+    'fgame': enums.ChatAction.PLAYING,
+    'fcontact': enums.ChatAction.CHOOSE_CONTACT,
+    'fstop': enums.ChatAction.CANCEL,
     'fscrn': 'screenshot'
 }
 
@@ -41,7 +42,7 @@ async def fakeactions_handler(client: Client, message: Message):
 
     try:
         if action != 'screenshot':
-            if sec and action != 'cancel':
+            if sec and action != enums.ChatAction.CANCEL:
                 await client.send_chat_action(chat_id=message.chat.id, action=action)
                 await sleep(sec)
             else:
@@ -51,15 +52,17 @@ async def fakeactions_handler(client: Client, message: Message):
                 await client.invoke(
                     functions.messages.SendScreenshotNotification(
                         peer=await client.resolve_peer(message.chat.id),
-                        reply_to_msg_id=0,
+                        reply_to=InputReplyToMessage(reply_to_message_id=message.reply_to_message.id),
                         random_id=client.rnd_id(),
                     )
                 )
                 await sleep(0.1)
+    except AttributeError:
+        return await client.send_message('me', f'Error in <b>fakeactions</b>'
+                                               'reply to message is required')
     except Exception as e:
         return await client.send_message('me', f'Error in <b>fakeactions</b>'
-                                               f' module:\n' + format_exc(e),
-                                               parse_mode=enums.ParseMode.HTML)
+                                               f' module:\n' + format_exc(e))
 
 
 modules_help['fakeactions'] = {
@@ -73,7 +76,8 @@ modules_help['fakeactions'] = {
     'frvideo [sec]': 'Recording video... action',
     'frvoice [sec]': 'Recording voice... action',
     'frvideor [sec]': 'Recording round video... action',
+    'fvideor [sec]': 'Uploading round video... action',
     'fgame [sec]': 'Playing game... action',
     'fstop': 'Stop actions',
-    'fscrn [amount]': 'Make screenshot action',
+    'fscrn [amount] [reply_to_message]*': 'Make screenshot action',
 }
