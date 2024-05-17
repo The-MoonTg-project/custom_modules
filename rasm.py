@@ -59,7 +59,7 @@ async def asm(_, message: Message):
             if result == "":
                 await message.edit_text("<b>ERROR:</b> <code>Invalid mnemonic</code>")
             else:
-                await message.edit_text(f"<code>{result}</code>")
+                await message.edit_text(f"<b>INPUT:</b> <code>{asm_code}</code>\n<b>OUTPUT:</b> \n<code>{result}</code>")
         else:
             await message.edit_text(
                 f"Request failed with status code {response.status_code}"
@@ -100,7 +100,7 @@ async def disasm(_, message: Message):
             if result == "":
                 await message.edit_text("<b>ERROR:</b> <code>Invalid mnemonic</code>")
             else:
-                await message.edit_text(f"<code>{result}</code>")
+                await message.edit_text(f"<b>INPUT:</b> <code>{hex_code}</code>\n</b>OUTPUT:</b> \n<code>{result}</code>")
         else:
             await message.edit_text(
                 f"Request failed with status code {response.status_code}"
