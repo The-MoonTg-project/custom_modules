@@ -60,10 +60,32 @@ async def start_ytplayout(_, message: Message):
             f"<b>You are not joined [type <code>{prefix}join</code>]</b>"
         )
         return
+
     if len(message.command) > 1:
         yt_link = message.text.split(maxsplit=1)[1]
+
     input_filename = "input.raw"
     await message.edit_text("<b>Downloading...</b>")
+
+    title = ""
+    try:
+        if yt_link.startswith("https://"):
+            cmd = f'yt-dlp --get-title "{yt_link}"'
+        else:
+            cmd = f'yt-dlp --get-title --default-search "ytsearch" "{yt_link}"'
+        process = await asyncio.create_subprocess_shell(
+            cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+        stdout, stderr = await process.communicate()
+        if process.returncode != 0:
+            raise Exception(f"yt-dlp failed: {stderr.decode()}")
+        title = stdout.decode().strip()
+    except Exception as e:
+        await message.edit_text(format_exc(e))
+        return
+
     if yt_link.startswith("https://"):
         try:
             yt = await asyncio.create_subprocess_shell(
@@ -90,8 +112,10 @@ async def start_ytplayout(_, message: Message):
         except Exception as e:
             await message.edit_text(format_exc(e))
             return
-    await message.edit_text("<b>Playing</b>...")
+
+    await message.edit_text(f"<b>Playing Your Song:</b> \n<code>{title}</code>")
     GROUP_CALL.input_filename = input_filename
+
 
 
 @Client.on_message(filters.command("volume", prefix) & filters.me)
