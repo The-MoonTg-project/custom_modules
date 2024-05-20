@@ -4,16 +4,16 @@
 
 import os
 import time
+import urllib3
 import datetime
 import subprocess
-import asyncio
 import requests
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import prefix, modules_help
-from utils.scripts import format_exc, progress, edit_or_reply, import_library
+from utils.scripts import format_exc, progress, edit_or_reply
 
 
 
@@ -43,12 +43,16 @@ async def telegraph(user_name, content):
     "content": formatted_content,
     "author_name": user_name
     }
+    try:
+        response = requests.post(url=f"{url}/telegraph/text", headers=headers, json=data, timeout=5)
+        result = response.json()
+        result = result['url']
+    except (TimeoutError, urllib3.exceptions.ConnectTimeoutError, requests.exceptions.ConnectTimeout, urllib3.exceptions.MaxRetryError):
+        result = None
+        with open("mdf.txt", "w", encoding="utf-8") as f:
+            f.write(content)
 
-    response = requests.post(url=f"{url}/telegraph/text", headers=headers, json=data, timeout=5)
-
-    result = response.json()
-
-    return result['url']
+    return result
 
 
 
@@ -62,18 +66,23 @@ async def mediainfo(client: Client, message: Message):
         ms = await edit_or_reply(message, '<code>Downloading...</code>')
         ct = time.time()
         file_path = await message.reply_to_message.download(progress=progress, progress_args=(ms, ct, 'Downloading...'))
-        await ms.edit_text(f"<code>Trying to open file...</code>")
+        await ms.edit_text("<code>Trying to open file...</code>")
         file_info = os.stat(file_path)
         file_name = file_path.split('/')[-1:]
         file_size = file_info.st_size
         last_modified = datetime.datetime.fromtimestamp(file_info.st_mtime).strftime('%Y-%m-%d %H:%M:%S')
-        paste = subprocess.run(['mediainfo', '-f', file_path], capture_output=True, text=True)
+        paste = subprocess.run(['mediainfo', file_path], capture_output=True, text=True)
         result = paste.stdout
         content = await telegraph(user_name=user_name, content=result)
-        await ms.edit_text(
-            f"**File Name:** `{file_name[0]}`\n**Size:** `{file_size} bytes`\n**Last Modified:** `{last_modified}`\n**Result:** {content}",
-            parse_mode=enums.ParseMode.MARKDOWN)
-
+        if content is not None:
+            await ms.edit_text(
+                f"**File Name:** `{file_name[0]}`\n**Size:** `{file_size} bytes`\n**Last Modified:** `{last_modified}`\n**Result:** {content}",
+                parse_mode=enums.ParseMode.MARKDOWN)
+        else:
+            await ms.delete()
+            await client.send_document(chat_id=message.chat.id, document="mdf.txt", reply_to_message_id=message.reply_to_message.id, caption=f"**File Name:** `{file_name[0]}`\n**Size:** `{file_size} bytes`\n**Last Modified:** `{last_modified}`",parse_mode=enums.ParseMode.MARKDOWN)
+            if os.path.exists("mdf.txt"):
+                os.remove("mdf.txt")
     except Exception as e:
         await ms.edit_text(format_exc(e))
 
