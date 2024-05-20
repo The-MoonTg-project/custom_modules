@@ -59,7 +59,7 @@ async def mediainfo(client: Client, message: Message):
     
     try:
         user_name = message.from_user.id
-        ms = await edit_or_reply(message, '`Downloading...')
+        ms = await edit_or_reply(message, '<code>Downloading...</code>')
         ct = time.time()
         file_path = await message.reply_to_message.download(progress=progress, progress_args=(ms, ct, 'Downloading...'))
         await ms.edit_text(f"<code>Trying to open file...</code>")
