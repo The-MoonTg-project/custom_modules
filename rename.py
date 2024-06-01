@@ -23,10 +23,13 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc, progress
 
+
 @Client.on_message(filters.command("rename", prefix) & filters.me)
 async def example_edit(client: Client, message: Message):
     try:
-        thumb = "thumb.jpg"
+        thumb = "downloads/thumb/thumb.jpg"
+        if not os.path.exists(thumb):
+            thumb = "thumb.jpg"
         if not os.path.isfile(thumb):
             thumb = None
         i = await message.edit("<code>Renaming...</code>")
@@ -37,7 +40,7 @@ async def example_edit(client: Client, message: Message):
                 progress=progress,
                 progress_args=(i, t, "`Renaming...`"),
             )
-            r_f = os.rename(o_f, r_fname)
+            os.rename(o_f, r_fname)
             await i.edit_text("<code>Done, Uploading...</code>")
             await client.send_document(
                 message.chat.id,
@@ -50,12 +53,11 @@ async def example_edit(client: Client, message: Message):
             )
             await i.delete()
         else:
-           await message.edit_text("lOl, Atleast reply to file and give new name (with extension ofc) to rename to -_-")
+            await message.edit_text("lOl, Atleast reply to file and give new name (with extension ofc) to rename to -_-")
     except Exception as e:
         await message.edit(format_exc(e))
     finally:
-         os.remove(r_fname)
-
+        os.remove(r_fname)
 
 
 modules_help["rename"] = {
