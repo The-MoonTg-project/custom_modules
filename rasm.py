@@ -51,15 +51,15 @@ async def asm(_, message: Message):
         # Check if the request was successful
         if response.status_code == 200:
             response_data = response.json()
-            print(response_data)
+            # print(response_data)
             result = ""
             for arch, hex_data in response_data["hex"].items():
                 if hex_data[0]:
-                    result += f"{arch}: {hex_data[1]}\n"
+                    result += f"{arch}: <code>{hex_data[1]}</code>\n"
             if result == "":
                 await message.edit_text("<b>ERROR:</b> <code>Invalid mnemonic</code>")
             else:
-                await message.edit_text(f"<b>INPUT:</b> <code>{asm_code}</code>\n<b>OUTPUT:</b> \n<code>{result}</code>")
+                await message.edit_text(f"<b>INPUT:</b> <code>{asm_code}</code>\n<b>OUTPUT:</b> \n{result}")
         else:
             await message.edit_text(
                 f"Request failed with status code {response.status_code}"
@@ -91,15 +91,15 @@ async def disasm(_, message: Message):
         # Check if the request was successful
         if response.status_code == 200:
             response_data = response.json()
-            print(response_data)
+            # print(response_data)
             result = ""
             for arch, asm_data in response_data["asm"].items():
                 if asm_data[0]:
-                    result += f"{arch}: {asm_data[1]}\n"
+                    result += f"{arch}: <code>{asm_data[1]}</code>\n"
             if result == "":
                 await message.edit_text("<b>ERROR:</b> <code>Invalid mnemonic</code>")
             else:
-                await message.edit_text(f"<b>INPUT:</b> <code>{hex_code}</code>\n</b>OUTPUT:</b> \n<code>{result}</code>")
+                await message.edit_text(f"<b>INPUT:</b> <code>{hex_code}</code>\n</b>OUTPUT:</b> \n{result}")
         else:
             await message.edit_text(
                 f"Request failed with status code {response.status_code}"
