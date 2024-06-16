@@ -55,9 +55,11 @@ async def asm(_, message: Message):
             result = ""
             for arch, hex_data in response_data["hex"].items():
                 if hex_data[0]:
+                    if hex_data[1] == "":
+                        return await message.edit_text("<b>ERROR:</b> <code>Invalid operand/mnemonic</code>")
                     result += f"{arch}: <code>{hex_data[1]}</code>\n"
             if result == "":
-                await message.edit_text("<b>ERROR:</b> <code>Invalid mnemonic</code>")
+                await message.edit_text("<b>ERROR:</b> <code>Invalid operand/mnemonic</code>")
             else:
                 await message.edit_text(f"<b>INPUT:</b> <code>{asm_code}</code>\n<b>OUTPUT:</b> \n{result}")
         else:
@@ -97,7 +99,7 @@ async def disasm(_, message: Message):
                 if asm_data[0]:
                     result += f"{arch}: <code>{asm_data[1]}</code>\n"
             if result == "":
-                await message.edit_text("<b>ERROR:</b> <code>Invalid mnemonic</code>")
+                await message.edit_text("<b>ERROR:</b> <code>Invalid operand/mnemonic</code>")
             else:
                 await message.edit_text(f"<b>INPUT:</b> <code>{hex_code}</code>\n</b>OUTPUT:</b> \n{result}")
         else:
