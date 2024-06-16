@@ -73,7 +73,7 @@ async def disasm(_, message: Message):
     if len(message.command) > 1:
         hex_code = message.text.split(maxsplit=1)[1]
     else:
-        await message.edit_text("Please provide an ASM code!")
+        await message.edit_text("Please provide a hex value!")
         return
 
     try:
@@ -95,7 +95,6 @@ async def disasm(_, message: Message):
             result = ""
             for arch, asm_data in response_data["asm"].items():
                 if asm_data[0]:
-                    result += f"{arch}: {asm_data[1]}\n"
                     result += f"{arch}: {asm_data[1]}\n"
             if result == "":
                 await message.edit_text("<b>ERROR:</b> <code>Invalid mnemonic</code>")
