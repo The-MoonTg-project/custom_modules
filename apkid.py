@@ -14,10 +14,10 @@ from apkid.apkid import Options, Scanner, OutputFormatter, RulesManager
 
 
 class CustomOutputFormatter(OutputFormatter):
-    def init(self, *args, **kwargs):
-        super().init(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def write(self, results):
+    def write(self, results): 
         if self.json:
             return self._build_json_output(results)
         else:
@@ -36,7 +36,7 @@ class CustomOutputFormatter(OutputFormatter):
                     tags_str = self._colorize_tags(tags)
                 else:
                     tags_str = tags
-                output += f" |-> {tags_str} : {descriptions}\n\n"
+                output += f" |-> **{tags_str}** : `{descriptions}`\n\n"
         return output
 
 
