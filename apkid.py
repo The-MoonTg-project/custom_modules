@@ -52,7 +52,7 @@ async def apkid(_, message: Message):
         text += "\nFile Downloaded."
         text += "\nScanning File..."
         await message.edit(text)
-        rules_file_path = os.path.join(os.path.dirname(ap.file), "rules", "rules.yarc")
+        rules_file_path = os.path.join(os.path.dirname(ap.__file__), "rules", "rules.yarc")
         rules = yara.load(filepath=rules_file_path)
         options = Options()
         result = Scanner(rules=rules, options=options).scan_file(apk)
