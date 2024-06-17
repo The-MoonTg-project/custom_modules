@@ -1,5 +1,6 @@
 import os
 import time
+import yara
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
@@ -8,8 +9,6 @@ from utils.misc import modules_help, prefix
 from utils.scripts import progress, import_library
 
 import_library("apkid", "apkid")
-import_library("yara")
-import yara
 import apkid as ap
 from apkid.apkid import Options, Scanner, OutputFormatter, RulesManager
 
