@@ -50,6 +50,12 @@ def rmsrc(channel_id):
         db.set("custom.autofwd", "chatsrc", channel_ids)
 
 
+def getfwd_data():
+    source_chats = db.get("custom.autofwd", "chatsrc")
+    target_chats = db.get("custom.autofwd", "chatto")
+    return source_chats, target_chats
+
+
 @Client.on_message(filters.command(["addfwd_src", "addfwd_to"], prefix) & filters.me)
 async def addfwd(_, message: Message):
     if message.command[0] == "addfwd_src":
@@ -130,6 +136,12 @@ async def delfwd(_, message: Message):
             return
 
 
+@Client.on_message(filters.command("autofwd", prefix) & filters.me)
+async def autofwd(_, message: Message):
+    source_chats, target_chats = getfwd_data()
+    return await message.edit_text(f"Source Chats: {source_chats}\nTarget Chats: {target_chats}")
+
+
 @Client.on_message(filters.text & filters.channel)
 async def autofwd_main(client: Client, message: Message):
     chat_id = message.chat.id
@@ -155,6 +167,7 @@ async def autofwd_main(client: Client, message: Message):
 
 
 modules_help["autofwd"] = {
+    "autofwd": "Retrieve Data of auto fwd",
     "addfwd_src [channel_id]*": "Enable auto forwarding for a channel",
     "addfwd_to [channel_id]*": "Enable auto forwarding to a channel",
     "delfwd_src [channel_id]*": "Disable auto forwarding for a channel",
