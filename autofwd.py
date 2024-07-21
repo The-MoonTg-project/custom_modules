@@ -142,7 +142,7 @@ async def autofwd(_, message: Message):
     return await message.edit_text(f"Source Chats: {source_chats}\nTarget Chats: {target_chats}")
 
 
-@Client.on_message(filters.text & filters.channel)
+@Client.on_message(filters.channel | filters.group)
 async def autofwd_main(client: Client, message: Message):
     chat_id = message.chat.id
     source_chats = db.get("custom.autofwd", "chatsrc")
@@ -152,7 +152,7 @@ async def autofwd_main(client: Client, message: Message):
         if target_chats is not None:
             for chat in target_chats:
                 try:
-                    await message.copy(chat, chat_id)
+                    await message.copy(chat)
                 except Exception as e:
                     try:
                         await client.send_message(
