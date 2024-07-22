@@ -42,6 +42,8 @@ async def musicbot(client: Client, message: Message):
         return await message.edit("<code>Termux is not supported.</code>")
 
     try:
+        await message.edit("Setting up musicbot")
+
         if os.path.exists("musicbot"):
             pass
         else:
@@ -51,7 +53,7 @@ async def musicbot(client: Client, message: Message):
             f.write(f"API_ID: int = {config.api_id}\n")
             f.write(f"API_HASH: str = '{config.api_hash}'\n")
             f.write(f"SESSION_STRING: str = '{config.second_session}'\n")
-            f.write(f"PREFIX: str = str('{music_handler}')\n")
+            f.write(f"PREFIX: str = str('{config.music_handler}')\n")
             f.write("RPREFIX: str = str('$')\n")
             f.write(f"OWNER_ID: list[int] = [int('{user_id}')]\n")
             f.write("LOG_FILE_NAME: str = 'musicbot.txt'\n")
