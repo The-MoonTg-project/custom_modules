@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import asyncio
 import os
 import shutil
 import subprocess
@@ -26,8 +27,10 @@ from utils.scripts import format_exc
 
 music_bot_process = None
 
+
 @Client.on_message(filters.command("musicbot", prefix) & filters.me)
 async def musicbot(client: Client, message: Message):
+    global music_bot_process
     user = await client.get_me()
     user_id = user.id
     allowed_handlers = [".", ",", "!", ";", "@"]
@@ -36,51 +39,57 @@ async def musicbot(client: Client, message: Message):
     if config.music_handler == "":
         return await message.edit("<code>Music handler is not set.</code>")
     if config.music_handler not in allowed_handlers:
-        return await message.edit("<code>Invalid music handler in config, please update.</code>")
+        return await message.edit(
+            "<code>Invalid music handler in config, please update.</code>"
+        )
     if config.music_handler == str(prefix):
-        return await message.edit("<code>Music handler cannot be the same as main prefix.</code>")
-    if shutil.which('termux-setup-storage'):
+        return await message.edit(
+            "<code>Music handler cannot be the same as main prefix.</code>"
+        )
+    if shutil.which("termux-setup-storage"):
         return await message.edit("<code>Termux is not supported.</code>")
 
     try:
-        await message.edit("Processing...")
-
-        if os.path.exists("musicbot"):
-            pass
-        else:
-            await message.edit("Setting up musicbot...")
-            subprocess.run(["git", "clone", "https://github.com/The-MoonTg-project/musicbot.git"])
+        await message.edit("<code>Processing...</code>")
+        if (
+            not os.path.exists("musicbot")
+            or len(message.command) > 1
+            and message.command[1] == "re"
+        ):
+            await message.edit("Setting up music bot...")
+            subprocess.run(
+                ["git", "clone", "https://github.com/The-MoonTg-project/musicbot.git"]
+            )
             subprocess.run(["pip", "install", "-r", "musicbot/requirements.txt"])
+            with open("musicbot/config/config.py", "w") as f:
+                f.write(f"API_ID: int = {config.api_id}\n")
+                f.write(f"API_HASH: str = '{config.api_hash}'\n")
+                f.write(f"SESSION_STRING: str = '{config.second_session}'\n")
+                f.write(f"PREFIX: str = str('{config.music_handler}')\n")
+                f.write("RPREFIX: str = str('$')\n")
+                f.write(f"OWNER_ID: list[int] = [int('{user_id}')]\n")
+                f.write("LOG_FILE_NAME: str = 'musicbot.txt'\n")
+            return await message.edit("Music bot setup completed.")
 
-        with open("musicbot/config/config.py", "w") as f:
-            f.write(f"API_ID: int = {config.api_id}\n")
-            f.write(f"API_HASH: str = '{config.api_hash}'\n")
-            f.write(f"SESSION_STRING: str = '{config.second_session}'\n")
-            f.write(f"PREFIX: str = str('{config.music_handler}')\n")
-            f.write("RPREFIX: str = str('$')\n")
-            f.write(f"OWNER_ID: list[int] = [int('{user_id}')]\n")
-            f.write("LOG_FILE_NAME: str = 'musicbot.txt'\n")
+        if len(message.command) == 1:
+            return await message.edit("Music bot is already set up.")
 
-        await message.edit("Music bot setup completed.")
-
-        global music_bot_process
-
-        if len(message.command) > 1 and message.command[1] == "on":
-            music_bot_process = subprocess.Popen(["python", "-m", "YMusic"], cwd="musicbot")
+        if len(message.command) > 1 and message.command[1] in ["on", "start"]:
+            music_bot_process = subprocess.Popen(
+                ["python", "-m", "YMusic"], cwd="musicbot"
+            )
+            await asyncio.sleep(3)
             await message.edit("Music bot started in the background.")
-        elif len(message.command) > 1 and message.command[1] == "off":
-            if music_bot_process:
-                music_bot_process.terminate()
-                return await message.edit("Music bot stopped.")
-            else:
-                return await message.edit("Music bot is not running.")
+        elif len(message.command) > 1 and message.command[1] in ["off", "stop"]:
+            music_bot_process.terminate()
+            await message.edit("Music bot stopped.")
 
     except Exception as e:
-        await message.edit(format_exc(e))
+        return await message.edit(format_exc(e))
 
 
 modules_help["musicbot"] = {
     "musicbot": "Setup music bot",
-    "musicbot on": "Start the music bot in the background.",
-    "musicbot off": "Stop the music bot running in the background.",
+    "musicbot [on|start]": "Start the music bot in the background.",
+    "musicbot [off|stop]": "Stop the music bot running in the background.",
 }
