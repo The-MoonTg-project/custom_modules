@@ -53,6 +53,7 @@ async def telegraph(user_name, content):
         urllib3.exceptions.ConnectTimeoutError,
         requests.exceptions.ConnectTimeout,
         urllib3.exceptions.MaxRetryError,
+        requests.exceptions.JSONDecodeError,
     ):
         result = None
         with open("mdf.txt", "w", encoding="utf-8") as f:
