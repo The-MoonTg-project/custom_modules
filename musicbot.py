@@ -24,6 +24,7 @@ from utils import config
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc
 
+music_bot_process = None
 
 @Client.on_message(filters.command("musicbot", prefix) & filters.me)
 async def musicbot(client: Client, message: Message):
@@ -42,12 +43,14 @@ async def musicbot(client: Client, message: Message):
         return await message.edit("<code>Termux is not supported.</code>")
 
     try:
-        await message.edit("Setting up musicbot")
+        await message.edit("Processing...")
 
         if os.path.exists("musicbot"):
             pass
         else:
+            await message.edit("Setting up musicbot...")
             subprocess.run(["git", "clone", "https://github.com/The-MoonTg-project/musicbot.git"])
+            subprocess.run(["pip", "install", "-r", "musicbot/requirements.txt"])
 
         with open("musicbot/config/config.py", "w") as f:
             f.write(f"API_ID: int = {config.api_id}\n")
@@ -58,15 +61,19 @@ async def musicbot(client: Client, message: Message):
             f.write(f"OWNER_ID: list[int] = [int('{user_id}')]\n")
             f.write("LOG_FILE_NAME: str = 'musicbot.txt'\n")
 
-        subprocess.run(["pip", "install", "-r", "musicbot/requirements.txt"])
         await message.edit("Music bot setup completed.")
+
+        global music_bot_process
 
         if len(message.command) > 1 and message.command[1] == "on":
             music_bot_process = subprocess.Popen(["python", "-m", "YMusic"], cwd="musicbot")
             await message.edit("Music bot started in the background.")
         elif len(message.command) > 1 and message.command[1] == "off":
-            music_bot_process.terminate()
-            await message.edit("Music bot stopped.")
+            if music_bot_process:
+                music_bot_process.terminate()
+                return await message.edit("Music bot stopped.")
+            else:
+                return await message.edit("Music bot is not running.")
 
     except Exception as e:
         await message.edit(format_exc(e))
