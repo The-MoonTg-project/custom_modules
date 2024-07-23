@@ -23,7 +23,7 @@ from pyrogram.types import Message
 from utils import config
 
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc
+from utils.scripts import format_exc, run_cmd
 
 music_bot_process = None
 
@@ -51,6 +51,10 @@ async def musicbot(client: Client, message: Message):
 
     try:
         await message.edit("<code>Processing...</code>")
+        update_check, _, _, _ = await run_cmd("git pull")
+        if "Already up to date" not in update_check:
+            shutil.rmtree("musicbot", ignore_errors=True)
+            return await message.edit("<code>Updating music bot...</code>")
         if (
             not os.path.exists("musicbot")
             or len(message.command) > 1
