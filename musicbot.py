@@ -23,14 +23,15 @@ from pyrogram.types import Message
 from utils import config
 
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc, run_cmd
+from utils.scripts import format_exc, run_cmd, import_library
+from utils.db import db
 
-music_bot_process = None
+import_library("psutil")
+import psutil
 
 
 @Client.on_message(filters.command("musicbot", prefix) & filters.me)
 async def musicbot(client: Client, message: Message):
-    global music_bot_process
     user = await client.get_me()
     user_id = user.id
     allowed_handlers = [".", ",", "!", ";", "@"]
@@ -54,7 +55,7 @@ async def musicbot(client: Client, message: Message):
         update_check, _, _, _ = await run_cmd("git pull")
         if "Already up to date" not in update_check:
             shutil.rmtree("musicbot", ignore_errors=True)
-            return await message.edit("<code>Updating music bot...</code>")
+            await message.edit("<code>Updating music bot...</code>")
         if (
             not os.path.exists("musicbot")
             or len(message.command) > 1
@@ -79,14 +80,34 @@ async def musicbot(client: Client, message: Message):
             return await message.edit("Music bot is already set up.")
 
         if len(message.command) > 1 and message.command[1] in ["on", "start"]:
-            music_bot_process = subprocess.Popen(
-                ["python", "-m", "YMusic"], cwd="musicbot"
-            )
+            music_bot_process = subprocess.Popen(["python", "-m", "YMusic"], cwd="musicbot")
             await asyncio.sleep(3)
-            await message.edit("Music bot started in the background.")
+            db.set("custom.musicbot", "music_bot_pid", music_bot_process.pid)
+            return await message.edit("Music bot started in the background.")
         elif len(message.command) > 1 and message.command[1] in ["off", "stop"]:
-            music_bot_process.terminate()
-            await message.edit("Music bot stopped.")
+            music_bot_pid = db.get("custom.musicbot", "music_bot_pid", None)
+            if music_bot_pid is None:
+                return await message.edit("Music bot is not running.")
+            try:
+                music_bot_process = psutil.Process(music_bot_pid)
+                music_bot_process.terminate()
+            except psutil.NoSuchProcess:
+                return await message.edit("Music bot is not running. Please turn on musicbot first.")
+            return await message.edit("Music bot stopped.")
+        elif len(message.command) > 1 and message.command[1] == "restart":
+            music_bot_pid = db.get("custom.musicbot", "music_bot_pid", None)
+            if music_bot_pid is None:
+                return await message.edit("Music bot is not running. Please turn on musicbot first.")
+            try:
+                music_bot_process = psutil.Process(music_bot_pid)
+                music_bot_process.terminate()
+            except psutil.NoSuchProcess:
+                pass
+            music_bot_process = subprocess.Popen(["python", "-m", "YMusic"], cwd="musicbot")
+            await asyncio.sleep(3)
+            db.set("custom.musicbot", "music_bot_pid", music_bot_process.pid)
+            return await message.edit("Music bot restarted in the background.")
+
 
     except Exception as e:
         return await message.edit(format_exc(e))
@@ -96,4 +117,6 @@ modules_help["musicbot"] = {
     "musicbot": "Setup music bot",
     "musicbot [on|start]": "Start the music bot in the background.",
     "musicbot [off|stop]": "Stop the music bot running in the background.",
+    "musicbot restart": "Restart the music bot in the background.",
+    "musicbot re": "Update the music bot code and restart it."
 }
