@@ -13,8 +13,8 @@ from utils.scripts import progress
 @Client.on_message(filters.command(["svn", "saavn"], prefix) & filters.me)
 async def saavn(client: Client, message: Message):
     thumb = "downloads/thumb/thumb.jpg"
-        if not os.path.exists(thumb):
-            thumb = "thumb.jpg"
+    if not os.path.exists(thumb):
+        thumb = "thumb.jpg"
     if not os.path.isfile(thumb):
         thumb = None
     chat_id = message.chat.id
@@ -52,8 +52,8 @@ async def saavn(client: Client, message: Message):
 async def wynk(client: Client, message: Message):
     chat_id = message.chat.id
     thumb = "downloads/thumb/thumb.jpg"
-        if not os.path.exists(thumb):
-            thumb = "thumb.jpg"
+    if not os.path.exists(thumb):
+        thumb = "thumb.jpg"
     if not os.path.isfile(thumb):
         thumb = None
     if len(message.command) > 1:
