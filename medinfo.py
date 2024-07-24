@@ -62,6 +62,24 @@ def get_ingredient_info(drug, api_key):
     return ingredient_info
 
 
+def get_nutrition_info(food_item, api_key):
+    url = f"https://api.nal.usda.gov/fdc/v1/foods/search?query={food_item}&api_key={api_key}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        if data["foods"]:
+            food = data["foods"][0]
+            nutrients = {
+                nutrient["nutrientName"]: nutrient["value"]
+                for nutrient in food["foodNutrients"]
+            }
+            return nutrients
+        else:
+            return "No information found for the specified food item."
+    else:
+        return "Failed to fetch information from the USDA API."
+
+
 @Client.on_message(filters.command("setmedapi", prefix) & filters.me)
 async def setmedapi(_, message: Message):
     if len(message.command) < 2:
@@ -116,11 +134,15 @@ async def medinfo(_, message: Message):
             for key, value in drug_info.items()
             if key in ["Indications & Use", "Dosage & Administration"] and value.strip()
         )
-        warnings = "\n\n".join(
-            f"<b>{key}:</b> {value}"
-            for key, value in drug_info.items()
-            if key in ["Warnings"] and value.strip()
-        ).replace("Warnings:", "\n").replace(" ", '', 1)
+        warnings = (
+            "\n\n".join(
+                f"<b>{key}:</b> {value}"
+                for key, value in drug_info.items()
+                if key in ["Warnings"] and value.strip()
+            )
+            .replace("Warnings:", "\n")
+            .replace(" ", "", 1)
+        )
         response = f"<u><b>General Details</b></u>:\n{general_details}\n\n<u><b>Detailed Information</b></u>:\n{detailed_info}\n\n<u><b>Warnings</b></u>:{warnings}"
         try:
             await message.edit_text(response)
@@ -182,11 +204,15 @@ async def druginfo(_, message: Message):
             ]
             and value.strip()
         )
-        warnings = "\n\n".join(
-            f"<b>{key}:</b> {value}"
-            for key, value in drug_info.items()
-            if key in ["Warnings"] and value.strip()
-        ).replace("Warnings:", "\n").replace(" ", '', 1)
+        warnings = (
+            "\n\n".join(
+                f"<b>{key}:</b> {value}"
+                for key, value in drug_info.items()
+                if key in ["Warnings"] and value.strip()
+            )
+            .replace("Warnings:", "\n")
+            .replace(" ", "", 1)
+        )
         response = f"<u><b>General Details</b></u>:\n{general_details.split('TAMPER EVIDENT')[0]}\n\n<u><b>Detailed Information</b></u>:\n{detailed_info}\n\n<u><b>Warnings</b></u>:{warnings}"
         try:
             await message.edit_text(response)
@@ -204,8 +230,38 @@ async def druginfo(_, message: Message):
         await message.edit_text(format_exc(e))
 
 
+@Client.on_message(filters.command("foodinfo", prefix) & filters.me)
+async def nutrition_info(_, message: Message):
+    if len(message.command) < 2:
+        return await message.reply(format_module_help("medinfo"))
+    api = db.get("custom.medapi", "api", None)
+    food_item = message.text.split(maxsplit=1)[1]
+    await message.edit_text(
+        f"__Searching >> `{food_item}`__", parse_mode=enums.ParseMode.MARKDOWN
+    )
+    try:
+        if food_item:
+            info = get_nutrition_info(food_item, api)
+            if isinstance(info, dict):
+                response = f"<u><b>Nutrition information for {food_item}:</b></u>\n"
+                for nutrient, value in info.items():
+                    response += f"<b>{nutrient}:</b> {value}\n"
+                await message.edit_text(response)
+            else:
+                await message.edit_text(info)
+        else:
+            await message.edit_text(
+                "Please provide the name of the food item. For example, {prefix}foodinfo apple"
+            )
+    except IndexError:
+        await message.edit_text(
+            f"Please provide the name of the food item. For example, {prefix}foodinfo apple"
+        )
+
+
 modules_help["medinfo"] = {
     "medinfo [drug name]": "Search for medical information about a drug",
     "druginfo [drug name]": "Search for information about an active ingredient",
+    "foodinfo [food name]": "Search for nutrition information about a food item",
     "setmedapi [api]": "Set the medicine API key",
 }
