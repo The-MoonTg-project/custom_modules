@@ -4,7 +4,6 @@ import shutil
 from subprocess import STDOUT, check_call, CalledProcessError
 from urllib.parse import parse_qs, urlparse
 
-from click import command
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
