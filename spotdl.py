@@ -92,5 +92,5 @@ async def spotdl(_, message: Message):
 
 modules_help["spotdl"] = {
     "spotdl [link/query]*": "Download spotify music by link",
-    "sdl [link/query]*": "Download spotify music through api",
+    "sdl [query]*": "Download spotify music through api",
 }
