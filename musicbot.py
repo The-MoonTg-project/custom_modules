@@ -30,20 +30,23 @@ import_library("psutil")
 import psutil
 
 
+ALLOWED_HANDLERS = [".", ",", "!", ";", "@", "#"]
+
+
 @Client.on_message(filters.command("musicbot", prefix) & filters.me)
 async def musicbot(client: Client, message: Message):
     user = await client.get_me()
     user_id = user.id
-    allowed_handlers = [".", ",", "!", ";", "@"]
+    music_handler = db.get("custom.musicbot", "music_handler", "")
     if config.second_session == "":
         return await message.edit("<code>Second session string is not set.</code>")
-    if config.music_handler == "":
-        return await message.edit("<code>Music handler is not set.</code>")
-    if config.music_handler not in allowed_handlers:
+    if music_handler == "":
+        return await message.edit("<b>Music handler is not set.</b>\nYou can set it using <code>.set_mhandler [your handler]</code> command.\nAllowed handlers sre <code>. , ! ; @ #</code>")
+    if music_handler not in ALLOWED_HANDLERS:
         return await message.edit(
             "<code>Invalid music handler in config, please update.</code>"
         )
-    if config.music_handler == str(prefix):
+    if music_handler == str(prefix):
         return await message.edit(
             "<code>Music handler cannot be the same as main prefix.</code>"
         )
@@ -70,7 +73,7 @@ async def musicbot(client: Client, message: Message):
                 f.write(f"API_ID: int = {config.api_id}\n")
                 f.write(f"API_HASH: str = '{config.api_hash}'\n")
                 f.write(f"SESSION_STRING: str = '{config.second_session}'\n")
-                f.write(f"PREFIX: str = str('{config.music_handler}')\n")
+                f.write(f"PREFIX: str = str('{music_handler}')\n")
                 f.write("RPREFIX: str = str('$')\n")
                 f.write(f"OWNER_ID: list[int] = [int('{user_id}')]\n")
                 f.write("LOG_FILE_NAME: str = 'musicbot.txt'\n")
@@ -107,10 +110,19 @@ async def musicbot(client: Client, message: Message):
             await asyncio.sleep(3)
             db.set("custom.musicbot", "music_bot_pid", music_bot_process.pid)
             return await message.edit("Music bot restarted in the background.")
-
-
     except Exception as e:
         return await message.edit(format_exc(e))
+
+
+@Client.on_message(filters.command("set_mhandler", prefix) & filters.me)
+async def set_mhandler(_, message: Message):
+    if len(message.command) < 2:
+        return await message.edit("Please provide a new music handler.")
+    new_handler = message.command[1]
+    if new_handler not in ALLOWED_HANDLERS:
+        return await message.edit("Invalid music handler provided! \n Allowed handlers: <code>.</code> <code>,</code> <code>!</code> <code>;</code> <code>@</code> <code>#</code>")
+    db.set("custom.musicbot", "music_handler", new_handler)
+    return await message.edit(f"Music handler set to {new_handler}")
 
 
 modules_help["musicbot"] = {
@@ -118,5 +130,6 @@ modules_help["musicbot"] = {
     "musicbot [on|start]": "Start the music bot in the background.",
     "musicbot [off|stop]": "Stop the music bot running in the background.",
     "musicbot restart": "Restart the music bot in the background.",
-    "musicbot re": "Update the music bot code and restart it."
+    "musicbot re": "Update the music bot code and restart it.",
+    "set_mhandler": "Set the music handler for the bot."
 }
