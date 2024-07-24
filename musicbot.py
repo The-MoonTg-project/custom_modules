@@ -18,6 +18,7 @@ import asyncio
 import os
 import shutil
 import subprocess
+import sys
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from utils import config
@@ -68,7 +69,7 @@ async def musicbot(client: Client, message: Message):
             subprocess.run(
                 ["git", "clone", "https://github.com/The-MoonTg-project/musicbot.git"]
             )
-            subprocess.run(["pip", "install", "-r", "musicbot/requirements.txt"])
+            subprocess.run([sys.executable, "-m", "pip", "install", "-r", "musicbot/requirements.txt"])
             with open("musicbot/config/config.py", "w") as f:
                 f.write(f"API_ID: int = {config.api_id}\n")
                 f.write(f"API_HASH: str = '{config.api_hash}'\n")
@@ -83,7 +84,7 @@ async def musicbot(client: Client, message: Message):
             return await message.edit("Music bot is already set up.")
 
         if len(message.command) > 1 and message.command[1] in ["on", "start"]:
-            music_bot_process = subprocess.Popen(["python", "-m", "YMusic"], cwd="musicbot")
+            music_bot_process = subprocess.Popen([sys.executable, "-m", "YMusic"], cwd="musicbot")
             await asyncio.sleep(3)
             db.set("custom.musicbot", "music_bot_pid", music_bot_process.pid)
             return await message.edit("Music bot started in the background.")
@@ -106,7 +107,7 @@ async def musicbot(client: Client, message: Message):
                 music_bot_process.terminate()
             except psutil.NoSuchProcess:
                 pass
-            music_bot_process = subprocess.Popen(["python", "-m", "YMusic"], cwd="musicbot")
+            music_bot_process = subprocess.Popen([sys.executable, "-m", "YMusic"], cwd="musicbot")
             await asyncio.sleep(3)
             db.set("custom.musicbot", "music_bot_pid", music_bot_process.pid)
             return await message.edit("Music bot restarted in the background.")
