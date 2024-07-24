@@ -78,7 +78,7 @@ async def spotdl(_, message: Message):
                 f"downloads/{name}.mp3",
                 caption=f"<b>{name}</b>",
             )
-        except IndexError:
+        except (IndexError, ValueError):
             return await message.edit("Error: File not found")
 
         os.remove(f"downloads/{name}.mp3")
