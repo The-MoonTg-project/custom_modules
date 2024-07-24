@@ -92,7 +92,7 @@ async def spotdl(_, message: Message):
                         caption=f"<b>{os.path.splitext(filename)[0]}</b>",
                         thumb=thumb,
                         progress=progress,
-                        progress_args=(m, ct, "<b>Uploading...</b>"),
+                        progress_args=(m, ct, f"Uploading {filename}..."),
                         reply_to_message_id=(
                             message.reply_to_message.id
                             if message.reply_to_message
