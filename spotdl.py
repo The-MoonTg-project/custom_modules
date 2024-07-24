@@ -4,11 +4,12 @@ import shutil
 from subprocess import STDOUT, check_call, CalledProcessError
 from urllib.parse import parse_qs, urlparse
 
+from click import command
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
-from utils.scripts import import_library, format_exc
+from utils.scripts import format_module_help, import_library, format_exc
 import requests
 
 spotdl = import_library("spotdl")
@@ -26,7 +27,7 @@ async def spotdl(_, message: Message):
     try:
         if not len(message.command) > 1 and not message.reply_to_message:
             await message.edit(
-                "<b>Please use:</b> <code>.spotdl [link]</code>",
+                format_module_help("spotdl"),
                 parse_mode=enums.ParseMode.HTML,
             )
             return
