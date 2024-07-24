@@ -86,7 +86,11 @@ async def spotdl(_, message: Message):
         if "Skipping" or "Downloaded" in logs:
             for filename in os.listdir("spotdl/"):
                 if filename.endswith(".mp3"):
-                    thumb = get_thumb("spotdl/" + filename)
+                    try:
+                        check_call("exiftool", f"shutil/{filename}")
+                        thumb = get_thumb(filename) 
+                    except CalledProcessError:
+                        thumb = None
                     await message.reply_audio(
                         audio=f"spotdl/{filename}",
                         caption=f"<b>{os.path.splitext(filename)[0]}</b>",
