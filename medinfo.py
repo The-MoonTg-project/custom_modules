@@ -10,14 +10,17 @@ import asyncio
 import requests
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+from pyrogram.errors import MessageTooLong
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc, format_module_help
+from utils.db import db
+import os
 
 BASE_URL = "https://api.fda.gov/drug/label.json"
 
 
-def get_drug_info(drug):
-    url = f"{BASE_URL}?search={drug}&limit=1"
+def get_drug_info(drug, api_key):
+    url = f"{BASE_URL}?api_key={api_key}&search={drug}&limit=1"
     response = requests.get(url)
     data = response.json()["results"][0]
 
@@ -39,8 +42,8 @@ def get_drug_info(drug):
     return drug_info
 
 
-def get_ingredient_info(drug):
-    url = f"{BASE_URL}?search=active_ingredient:{drug}&limit=1"
+def get_ingredient_info(drug, api_key):
+    url = f"{BASE_URL}?api_key={api_key}&search=active_ingredient:{drug}&limit=1"
     response = requests.get(url)
     data = response.json()["results"][0]
 
@@ -59,18 +62,31 @@ def get_ingredient_info(drug):
     return ingredient_info
 
 
+@Client.on_message(filters.command("setmedapi", prefix) & filters.me)
+async def setmedapi(_, message: Message):
+    if len(message.command) < 2:
+        return await message.edit_text(format_module_help("medinfo"))
+    api = message.text.split(maxsplit=1)[1]
+    db.set("custom.medapi", "api", api)
+    await message.edit_text(f"Medicine API set to `{api}`")
+
+
 @Client.on_message(filters.command("medinfo", prefix) & filters.me)
 async def medinfo(_, message: Message):
     if len(message.command) < 2:
         return await message.edit_text(format_module_help("medinfo"))
-
+    api = db.get("custom.medapi", "api", None)
+    if api is None:
+        return await message.edit_text(
+            f"Please set the medicine API first using {prefix}setmedapi <api>!"
+        )
     drug = message.text.split(maxsplit=1)[1]
     await message.edit_text(
         f"__Searching >> `{drug}`__", parse_mode=enums.ParseMode.MARKDOWN
     )
 
     try:
-        drug_info = get_drug_info(drug)
+        drug_info = get_drug_info(drug, api)
         if not drug_info:
             return await message.edit_text("No information found for the given drug.")
 
@@ -103,7 +119,17 @@ async def medinfo(_, message: Message):
             f"{key}: {value}" for key, value in drug_info.items() if key in ["Warnings"]
         ).replace("Warnings:", "")
         response = f"<b>General Details</b>:\n{general_details}\n\n<b>Detailed Information</b>:\n{detailed_info}\n\n<b>Warnings</b>:{warnings}"
-        await message.edit_text(response)
+        try:
+            await message.edit_text(response)
+        except MessageTooLong:
+            with open("med_info.txt", "w") as f:
+                f.write(response)
+            await message.reply_document(
+                "med_info.txt", caption=f"<b>General Details</b>:\n{general_details}"
+            )
+            os.remove("med_info.txt")
+    except KeyError:
+        return await message.edit_text("No information found for the given medicine.")
     except Exception as e:
         await message.edit_text(format_exc(e))
 
@@ -112,6 +138,11 @@ async def medinfo(_, message: Message):
 async def druginfo(_, message: Message):
     if len(message.command) < 2:
         return await message.edit_text(format_module_help("medinfo"))
+    api = db.get("custom.medapi", "api", None)
+    if api is None:
+        return await message.edit_text(
+            f"Please set the medicine API first using {prefix}setmedapi <api>!"
+        )
 
     drug = message.text.split(maxsplit=1)[1]
     await message.edit_text(
@@ -119,7 +150,7 @@ async def druginfo(_, message: Message):
     )
 
     try:
-        drug_info = get_ingredient_info(drug)
+        drug_info = get_ingredient_info(drug, api)
         if not drug_info:
             return await message.edit_text("No information found for the given drug.")
 
@@ -150,7 +181,17 @@ async def druginfo(_, message: Message):
             f"{key}: {value}" for key, value in drug_info.items() if key in ["Warnings"]
         ).replace("Warnings:", "")
         response = f"<b>General Details</b>:\n{general_details}\n\n<b>Detailed Information</b>:\n{detailed_info}\n\n<b>Warnings</b>:{warnings}"
-        await message.edit_text(response)
+        try:
+            await message.edit_text(response)
+        except MessageTooLong:
+            with open("drug_info.txt", "w") as f:
+                f.write(response)
+            await message.reply_document(
+                "drug_info.txt", caption=f"<b>General Details</b>:\n{general_details}"
+            )
+            os.remove("drug_info.txt")
+    except KeyError:
+        return await message.edit_text("No information found for the given drug.")
     except Exception as e:
         await message.edit_text(format_exc(e))
 
@@ -158,4 +199,5 @@ async def druginfo(_, message: Message):
 modules_help["medinfo"] = {
     "medinfo [drug name]": "Search for medical information about a drug",
     "druginfo [drug name]": "Search for information about an active ingredient",
+    "setmedapi [api]": "Set the medicine API key",
 }
