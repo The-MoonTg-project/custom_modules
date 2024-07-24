@@ -4,6 +4,7 @@ import shutil
 from subprocess import STDOUT, check_call, CalledProcessError
 from urllib.parse import parse_qs, urlparse
 
+from click import command
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
@@ -72,11 +73,13 @@ async def spotdl(_, message: Message):
                 f"<b>Spotify-Download error:</b>\n<code>{logs}</code>",
             )
             return
-
-        await message.reply_audio(
-            f"downloads/{name}.mp3",
-            caption=f"<b>{name}</b>",
-        )
+        try:
+            await message.reply_audio(
+                f"downloads/{name}.mp3",
+                caption=f"<b>{name}</b>",
+            )
+        except IndexError:
+            return await message.edit("Error: File not found")
 
         os.remove(f"downloads/{name}.mp3")
 
