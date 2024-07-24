@@ -96,7 +96,7 @@ async def medinfo(_, message: Message):
         await asyncio.sleep(3)
 
         general_details = "\n\n".join(
-            f"{key}: {value}"
+            f"<b>{key}:</b> {value}"
             for key, value in drug_info.items()
             if key
             in [
@@ -109,23 +109,27 @@ async def medinfo(_, message: Message):
                 "NDC",
                 "Package Label",
             ]
+            and value.strip()
         )
         detailed_info = "\n\n".join(
-            f"{key}: {value}"
+            f"<b>{key}:</b> {value}"
             for key, value in drug_info.items()
-            if key in ["Indications & Use", "Dosage & Administration"]
+            if key in ["Indications & Use", "Dosage & Administration"] and value.strip()
         )
         warnings = "\n\n".join(
-            f"{key}: {value}" for key, value in drug_info.items() if key in ["Warnings"]
+            f"<b>{key}:</b> {value}"
+            for key, value in drug_info.items()
+            if key in ["Warnings"] and value.strip()
         ).replace("Warnings:", "")
-        response = f"<b>General Details</b>:\n{general_details}\n\n<b>Detailed Information</b>:\n{detailed_info}\n\n<b>Warnings</b>:{warnings}"
+        response = f"<u><b>General Details</b></u>:\n{general_details}\n\n<u><b>Detailed Information</b></u>:\n{detailed_info}\n\n<u><b>Warnings</b></u>:{warnings}"
         try:
             await message.edit_text(response)
         except MessageTooLong:
             with open("med_info.txt", "w") as f:
                 f.write(response)
             await message.reply_document(
-                "med_info.txt", caption=f"<b>General Details</b>:\n{general_details}"
+                "med_info.txt",
+                caption=f"<u><b>General Details</b></u>:\n{general_details}",
             )
             os.remove("med_info.txt")
     except KeyError:
@@ -160,12 +164,12 @@ async def druginfo(_, message: Message):
         await asyncio.sleep(3)
 
         general_details = "\n\n".join(
-            f"{key}: {value}"
+            f"<b>{key}:</b> {value}"
             for key, value in drug_info.items()
-            if key in ["Package Label"]
+            if key in ["Package Label"] and value.strip()
         )
         detailed_info = "\n\n".join(
-            f"{key}: {value}"
+            f"<b>{key}:</b> {value}"
             for key, value in drug_info.items()
             if key
             in [
@@ -176,18 +180,22 @@ async def druginfo(_, message: Message):
                 "Dosage & Administration",
                 "Storage & Handling",
             ]
+            and value.strip()
         )
         warnings = "\n\n".join(
-            f"{key}: {value}" for key, value in drug_info.items() if key in ["Warnings"]
-        ).replace("Warnings:", "")
-        response = f"<b>General Details</b>:\n{general_details}\n\n<b>Detailed Information</b>:\n{detailed_info}\n\n<b>Warnings</b>:{warnings}"
+            f"<b>{key}:</b> {value}"
+            for key, value in drug_info.items()
+            if key in ["Warnings"] and value.strip()
+        ).replace("Warnings:", "\n")
+        response = f"<u><b>General Details</b></u>:\n{general_details.split('TAMPER EVIDENT')[0]}\n\n<u><b>Detailed Information</b></u>:\n{detailed_info}\n\n<u><b>Warnings</b></u>:{warnings}"
         try:
             await message.edit_text(response)
         except MessageTooLong:
             with open("drug_info.txt", "w") as f:
                 f.write(response)
             await message.reply_document(
-                "drug_info.txt", caption=f"<b>General Details</b>:\n{general_details}"
+                "drug_info.txt",
+                caption=f"<u><b>General Details</b></u>:\n{general_details.split('TAMPER EVIDENT')[0]}",
             )
             os.remove("drug_info.txt")
     except KeyError:
