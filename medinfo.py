@@ -120,7 +120,7 @@ async def medinfo(_, message: Message):
             f"<b>{key}:</b> {value}"
             for key, value in drug_info.items()
             if key in ["Warnings"] and value.strip()
-        ).replace("Warnings:", "")
+        ).replace("Warnings:", "\n").replace(" ", '', 1)
         response = f"<u><b>General Details</b></u>:\n{general_details}\n\n<u><b>Detailed Information</b></u>:\n{detailed_info}\n\n<u><b>Warnings</b></u>:{warnings}"
         try:
             await message.edit_text(response)
@@ -186,7 +186,7 @@ async def druginfo(_, message: Message):
             f"<b>{key}:</b> {value}"
             for key, value in drug_info.items()
             if key in ["Warnings"] and value.strip()
-        ).replace("Warnings:", "\n")
+        ).replace("Warnings:", "\n").replace(" ", '', 1)
         response = f"<u><b>General Details</b></u>:\n{general_details.split('TAMPER EVIDENT')[0]}\n\n<u><b>Detailed Information</b></u>:\n{detailed_info}\n\n<u><b>Warnings</b></u>:{warnings}"
         try:
             await message.edit_text(response)
