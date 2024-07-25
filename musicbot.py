@@ -42,7 +42,7 @@ async def musicbot(client: Client, message: Message):
     if config.second_session == "":
         return await message.edit("<code>Second session string is not set.</code>")
     if music_handler == "":
-        return await message.edit("<b>Music handler is not set.</b>\nYou can set it using <code>.set_mhandler [your handler]</code> command.\nAllowed handlers sre <code>. , ! ; @ #</code>")
+        return await message.edit("<b>Music handler is not set.</b>\nYou can set it using <code>.set_mhandler [your handler]</code> command.\nAllowed handlers are <code>. , ! ; @ #</code>")
     if music_handler not in ALLOWED_HANDLERS:
         return await message.edit(
             "<code>Invalid music handler in config, please update.</code>"
