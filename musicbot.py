@@ -30,7 +30,7 @@ from utils.db import db
 import_library("psutil")
 import psutil
 
-
+# db.remove("custom.musicbot", "music_bot_pid")
 ALLOWED_HANDLERS = [".", ",", "!", ";", "@", "#"]
 
 
@@ -42,7 +42,9 @@ async def musicbot(client: Client, message: Message):
     if config.second_session == "":
         return await message.edit("<code>Second session string is not set.</code>")
     if music_handler == "":
-        return await message.edit("<b>Music handler is not set.</b>\nYou can set it using <code>.set_mhandler [your handler]</code> command.\nAllowed handlers are <code>. , ! ; @ #</code>")
+        return await message.edit(
+            "<b>Music handler is not set.</b>\nYou can set it using <code>.set_mhandler [your handler]</code> command.\nAllowed handlers are <code>. , ! ; @ #</code>"
+        )
     if music_handler not in ALLOWED_HANDLERS:
         return await message.edit(
             "<code>Invalid music handler in config, please update.</code>"
@@ -56,20 +58,28 @@ async def musicbot(client: Client, message: Message):
 
     try:
         await message.edit("<code>Processing...</code>")
-        update_check, _, _, _ = await run_cmd("git pull")
-        if "Already up to date" not in update_check:
-            shutil.rmtree("musicbot", ignore_errors=True)
-            await message.edit("<code>Updating music bot...</code>")
         if (
             not os.path.exists("musicbot")
             or len(message.command) > 1
             and message.command[1] == "re"
         ):
             await message.edit("Setting up music bot...")
+            if os.path.exists("musicbot"):
+                shutil.rmtree("musicbot")
             subprocess.run(
                 ["git", "clone", "https://github.com/The-MoonTg-project/musicbot.git"]
             )
-            subprocess.run([sys.executable, "-m", "pip", "install", "-r", "musicbot/requirements.txt"])
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "-r",
+                    "requirements.txt",
+                ],
+                cwd="musicbot",
+            )
             with open("musicbot/config/config.py", "w") as f:
                 f.write(f"API_ID: int = {config.api_id}\n")
                 f.write(f"API_HASH: str = '{config.api_hash}'\n")
@@ -84,30 +94,55 @@ async def musicbot(client: Client, message: Message):
             return await message.edit("Music bot is already set up.")
 
         if len(message.command) > 1 and message.command[1] in ["on", "start"]:
-            music_bot_process = subprocess.Popen([sys.executable, "-m", "YMusic"], cwd="musicbot")
-            await asyncio.sleep(3)
-            db.set("custom.musicbot", "music_bot_pid", music_bot_process.pid)
-            return await message.edit("Music bot started in the background.")
+            music_bot_pid = db.get("custom.musicbot", "music_bot_pid", None)
+            if music_bot_pid is None:
+                await message.edit("Starting music bot...")
+                subprocess.run(
+                    [
+                        sys.executable,
+                        "-m",
+                        "pip",
+                        "install",
+                        "-r",
+                        "requirements.txt",
+                    ],
+                    cwd="musicbot",
+                )
+                music_bot_process = subprocess.Popen(
+                    [sys.executable, "-m", "YMusic"], cwd="musicbot"
+                )
+                await asyncio.sleep(3)
+                db.set("custom.musicbot", "music_bot_pid", music_bot_process.pid)
+                return await message.edit("Music bot started in the background.")
+            return await message.edit("Music bot is already running.")
         elif len(message.command) > 1 and message.command[1] in ["off", "stop"]:
             music_bot_pid = db.get("custom.musicbot", "music_bot_pid", None)
             if music_bot_pid is None:
-                return await message.edit("Music bot is not running.")
+                return await message.edit(
+                    "Music bot is not running. Please turn on musicbot first."
+                )
             try:
                 music_bot_process = psutil.Process(music_bot_pid)
                 music_bot_process.terminate()
             except psutil.NoSuchProcess:
-                return await message.edit("Music bot is not running. Please turn on musicbot first.")
+                return await message.edit(
+                    "Music bot is not running. Please turn on musicbot first."
+                )
             return await message.edit("Music bot stopped.")
         elif len(message.command) > 1 and message.command[1] == "restart":
             music_bot_pid = db.get("custom.musicbot", "music_bot_pid", None)
             if music_bot_pid is None:
-                return await message.edit("Music bot is not running. Please turn on musicbot first.")
+                return await message.edit(
+                    "Music bot is not running. Please turn on musicbot first."
+                )
             try:
                 music_bot_process = psutil.Process(music_bot_pid)
                 music_bot_process.terminate()
             except psutil.NoSuchProcess:
                 pass
-            music_bot_process = subprocess.Popen([sys.executable, "-m", "YMusic"], cwd="musicbot")
+            music_bot_process = subprocess.Popen(
+                [sys.executable, "-m", "YMusic"], cwd="musicbot"
+            )
             await asyncio.sleep(3)
             db.set("custom.musicbot", "music_bot_pid", music_bot_process.pid)
             return await message.edit("Music bot restarted in the background.")
@@ -121,7 +156,9 @@ async def set_mhandler(_, message: Message):
         return await message.edit("Please provide a new music handler.")
     new_handler = message.command[1]
     if new_handler not in ALLOWED_HANDLERS:
-        return await message.edit("Invalid music handler provided! \n Allowed handlers: <code>.</code> <code>,</code> <code>!</code> <code>;</code> <code>@</code> <code>#</code>")
+        return await message.edit(
+            "Invalid music handler provided! \n Allowed handlers: <code>.</code> <code>,</code> <code>!</code> <code>;</code> <code>@</code> <code>#</code>"
+        )
     db.set("custom.musicbot", "music_handler", new_handler)
     return await message.edit(f"Music handler set to {new_handler}")
 
@@ -132,5 +169,5 @@ modules_help["musicbot"] = {
     "musicbot [off|stop]": "Stop the music bot running in the background.",
     "musicbot restart": "Restart the music bot in the background.",
     "musicbot re": "Update the music bot code and restart it.",
-    "set_mhandler": "Set the music handler for the bot."
+    "set_mhandler": "Set the music handler for the bot.",
 }
