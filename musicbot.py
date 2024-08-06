@@ -30,7 +30,7 @@ from utils.db import db
 import_library("psutil")
 import psutil
 
-db.remove("custom.musicbot", "music_bot_pid")
+
 ALLOWED_HANDLERS = [".", ",", "!", ";", "@", "#"]
 
 
@@ -124,7 +124,9 @@ async def musicbot(client: Client, message: Message):
             try:
                 music_bot_process = psutil.Process(music_bot_pid)
                 music_bot_process.terminate()
+                db.remove("custom.musicbot", "music_bot_pid")
             except psutil.NoSuchProcess:
+                db.remove("custom.musicbot", "music_bot_pid")
                 return await message.edit(
                     "Music bot is not running. Please turn on musicbot first."
                 )
