@@ -1,45 +1,61 @@
-# This scripts contains use cases for userbots
-# This is used on my Moon-Userbot: https://github.com/The-MoonTg-project/Moon-Userbot
-# YOu can check it out for uses example
-import os
-import PIL.Image
-import google.generativeai as genai
-
-from pyrogram import Client, filters, enums
+import requests
+from pyrogram import Client, filters
 from pyrogram.types import Message
-
+import os
+from utils.db import db
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc, import_library
-from utils.config import gemini_key
 
-genai.configure(api_key=gemini_key)
-
-model = genai.GenerativeModel("gemini-pro-vision")
+OCR_SPACE_API_KEY = db.get("custom.ocr", "ocr_api", None)
+OCR_SPACE_URL = "https://api.ocr.space/parse/image"
 
 
-@Client.on_message(filters.command("ocrai", prefix) & filters.me)
-async def ocrai(_, message: Message):
+@Client.on_message(filters.command(["set_ocrapi"], prefix) & filters.me)
+async def ocr_space_api(_, message: Message):
+    if OCR_SPACE_API_KEY is not None:
+        return await message.edit_text(f"OCRSPACE API key is already set")
+    if len(message.command) > 1:
+        api_key = message.text.split(maxsplit=1)[1]
+        db.get("custom.ocr", "ocr_api", api_key)
+        return await message.edit_text(f"OCRSPACE API key set success")
+
+
+@Client.on_message(filters.command(["ocr"], prefix) & filters.me)
+async def ocr_space(_, message: Message):
+    if OCR_SPACE_API_KEY is None:
+        return await message.edit_text(f"OCRSPACE API key isn't set, please set it using `<code>{prefix}set_ocrapi <your_api></code> command")
+    if not message.reply_to_message or not message.reply_to_message.photo:
+        await message.edit(f"Reply to an image with <code>{prefix}ocr</code> command to extract text.")
+        return
+
+    await message.edit("Processing image...")
+
+    photo = await message.reply_to_message.download()
     try:
-        await message.edit_text("<code>Please Wait...</code>")
-        base_img = await message.reply_to_message.download()
+        with open(photo, 'rb') as image_file:
+            response = requests.post(
+                OCR_SPACE_URL,
+                files={"file": image_file},
+                data={"apikey": OCR_SPACE_API_KEY},
+                timeout=10  # Optional timeout
+            )
 
-        img = PIL.Image.open(base_img)
-        ocr = [
-        "OCR the given image with precison and accuracy",
-        img,
-        ]
-
-        response = model.generate_content(ocr)
-
-        await message.edit_text(
-            f"**Detail Of Image:** {response.text}", parse_mode=enums.ParseMode.MARKDOWN
-        )
+        if response.status_code == 200:
+            result = response.json()
+            if result["IsErroredOnProcessing"]:
+                await message.edit("Error occurred during OCR processing. Please try again.")
+            else:
+                parsed_text = result["ParsedResults"][0]["ParsedText"]
+                await message.edit(f"Extracted Text:\n{parsed_text}")
+        else:
+            await message.edit("An error occurred, please try again later.")
     except Exception as e:
-        await message.edit_text(f"An error occurred: {format_exc(e)}")
+        await message.edit("An unexpected error occurred.")
+        print(f"Error: {e}")
     finally:
-        os.remove(base_img)
+        if os.path.exists(photo):
+            os.remove(photo)  # Clean up the downloaded file
 
 
-modules_help["ocrai"] = {
-    "ocrai [reply to image]*": "OCR Ai with gemini",
+modules_help["ocr"] = {
+    "ocr [reply to image]*": "Reply to an image with this command to extract text from it using OCR.Space API."
 }
