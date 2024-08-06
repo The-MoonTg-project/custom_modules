@@ -77,8 +77,8 @@ async def imgsearch(client: Client, message: Message):
                     "Uploading pictures...", parse_mode=enums.ParseMode.MARKDOWN
                 )
                 while media:
-                    batch = media[:num_pics]
-                    media = media[num_pics:]
+                    batch = media[:10]
+                    media = media[10:]
                     await message.reply_media_group(batch)
                 await status_message.delete()  # Delete status message after uploading
             else:
@@ -98,6 +98,6 @@ async def imgsearch(client: Client, message: Message):
 
 
 modules_help["unsplash2"] = {
-    "unsplash2 [query] [number]*": "Get HD images. Default number of images is 10",
-    "usp2 [query] [number]*": "Get HD images. Default number of images is 10",
+    "unsplash2 [number]* [query]": "Get HD images. Default number of images is 10",
+    "usp2 [number]* [query]": "Get HD images. Default number of images is 10",
 }
