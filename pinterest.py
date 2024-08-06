@@ -39,11 +39,11 @@ async def download_image(url):
 @Client.on_message(filters.command("pinterest", prefix) & filters.me)
 async def pinterest_search(client: Client, message: Message):
     if len(message.command) < 2:
-        await message.edit("Usage: `pinterest <query> [number]`", parse_mode=enums.ParseMode.MARKDOWN)
+        await message.edit("Usage: `pinterest [number] <query>`", parse_mode=enums.ParseMode.MARKDOWN)
         return
 
-    query = message.command[1]
-    num_pics = int(message.command[2]) if len(message.command) > 2 and message.command[2].isdigit() else 10
+    num_pics = int(message.command[1]) if message.command[1].isdigit() else 10
+    query = " ".join(message.command[2:])
 
     # Update status
     status_message = await message.edit("Searching for images...", parse_mode=enums.ParseMode.MARKDOWN)
@@ -77,5 +77,5 @@ async def pinterest_search(client: Client, message: Message):
         await status_message.edit("An error occurred, please try again later.", parse_mode=enums.ParseMode.MARKDOWN)
 
 modules_help["pinterest"] = {
-    "pinterest [query] [number]*": "Get images from Pinterest.",
+    "pinterest [number]* [query]": "Get images from Pinterest. Default number of images is 10",
           }
