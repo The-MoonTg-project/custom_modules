@@ -30,7 +30,7 @@ from utils.db import db
 import_library("psutil")
 import psutil
 
-# db.remove("custom.musicbot", "music_bot_pid")
+db.remove("custom.musicbot", "music_bot_pid")
 ALLOWED_HANDLERS = [".", ",", "!", ";", "@", "#"]
 
 
