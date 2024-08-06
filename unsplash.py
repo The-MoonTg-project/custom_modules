@@ -16,11 +16,6 @@ class AioHttp:
             async with session.get(link) as resp:
                 return await resp.json()
 
-    async def get_json(link):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(link) as resp:
-                return await resp.json()
-
     async def get_url(self, link):
         async with aiohttp.ClientSession() as session:
             async with session.get(link) as resp:
