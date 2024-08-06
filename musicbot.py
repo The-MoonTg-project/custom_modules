@@ -128,6 +128,7 @@ async def musicbot(client: Client, message: Message):
                 return await message.edit(
                     "Music bot is not running. Please turn on musicbot first."
                 )
+            db.remove("custom.musicbot", "music_bot_pid")
             return await message.edit("Music bot stopped.")
         elif len(message.command) > 1 and message.command[1] == "restart":
             music_bot_pid = db.get("custom.musicbot", "music_bot_pid", None)
