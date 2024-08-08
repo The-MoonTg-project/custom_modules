@@ -15,7 +15,7 @@ async def ocr_space_api(_, message: Message):
         return await message.edit_text(f"OCRSPACE API key is already set")
     if len(message.command) > 1:
         api_key = message.text.split(maxsplit=1)[1]
-        db.get("custom.ocr", "ocr_api", api_key)
+        db.set("custom.ocr", "ocr_api", api_key)
         return await message.edit_text(f"OCRSPACE API key set success")
 
 
