@@ -18,8 +18,10 @@ ydv_opts = {
     "nocheckcertificate": True,
     "addmetadata": True,
     "noplaylist": True,
-    'outtmpl': 'videos/%(id)s.%(ext)s'
+    'outtmpl': 'videos/%(id)s.%(ext)s',
+    'cookiefile': 'www.youtube.com_cookies.txt' if os.path.exists('www.youtube.com_cookies.txt') else None
 }
+
 ydm_opts = {
     'format': 'm4a',
     "geo_bypass": True,
@@ -28,7 +30,9 @@ ydm_opts = {
     "addmetadata": True,
     "noplaylist": True,
     'outtmpl': 'audios/%(id)s.%(ext)s',
+    'cookiefile': 'www.youtube.com_cookies.txt' if os.path.exists('www.youtube.com_cookies.txt') else None
 }
+
 
 def download_video(url):
     with YoutubeDL(ydv_opts) as ydl:
