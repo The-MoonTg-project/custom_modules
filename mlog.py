@@ -21,6 +21,7 @@ from pyrogram.types import Message
 from utils.db import db
 from utils.misc import modules_help, prefix
 
+
 mlog_enabled = filters.create(lambda _, __, ___: db.get("custom.mlog", "status", False))
 
 
@@ -56,15 +57,15 @@ async def set_chat(_, message: Message):
 
 @Client.on_message(
     filters.media
-    & filters.incoming
     & ~filters.channel
     & ~filters.group
     & ~filters.bot
+    & ~filters.chat("me")
     & mlog_enabled
 )
 async def media_log(client: Client, message: Message):
     chat_id = db.get("custom.mlog", "chat")
-    chat_name = message.chat.full_name
+    chat_name = str(message.chat.full_name + str(message.chat.id))
     user_id = message.chat.id
     user_name = message.chat.username
     user = await client.get_users(user_id)
@@ -79,16 +80,9 @@ async def media_log(client: Client, message: Message):
     async for topic in client.get_forum_topics(chat_id):
         # Save topic id and title into topics dict
         topics[topic.id] = topic.title
+        break
         # Check if chat_name is present in topics
-    if chat_name in topics.values():
-        # Get the corresponding id for chat_name
-        topic_id = [k for k, v in topics.items() if v == chat_name][0]
-        try:
-            await message.copy(chat_id=chat_id, message_thread_id=topic_id)
-        except (FileReferenceExpired, FileReferenceInvalid):
-            pass
-    else:
-        # Create a topic with chat_name as title
+    if chat_name not in topics.values():
         new_topic = await client.create_forum_topic(chat_id, chat_name)
         # Save the new topic id and title into topics dict
         topics[new_topic.id] = new_topic.title
@@ -98,10 +92,12 @@ async def media_log(client: Client, message: Message):
             text=f"Chat Name: {chat_name}\nUser ID: {user_id}\nUsername: {user_name}\nPhone num: {user_num}",
         )
         await m.pin()
-        try:
-            await message.copy(chat_id=chat_id, message_thread_id=new_topic.id)
-        except (FileReferenceExpired, FileReferenceInvalid):
-            pass
+    # Get the corresponding id for chat_name
+    topic_id = [k for k, v in topics.items() if v == chat_name][0]
+    try:
+        await message.copy(chat_id=chat_id, message_thread_id=topic_id)
+    except (FileReferenceExpired, FileReferenceInvalid):
+        pass
 
 
 modules_help["mlog"] = {
