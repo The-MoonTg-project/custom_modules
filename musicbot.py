@@ -88,6 +88,8 @@ async def musicbot(client: Client, message: Message):
                 f.write("RPREFIX: str = str('$')\n")
                 f.write(f"OWNER_ID: list[int] = [int('{user_id}')]\n")
                 f.write("LOG_FILE_NAME: str = 'musicbot.txt'\n")
+            if os.path.exists('www.youtube.com_cookies.txt'):
+                shutil.copy('www.youtube.com_cookies.txt', 'musicbot/www.youtube.com_cookies.txt')
             return await message.edit("Music bot setup completed.")
 
         if len(message.command) == 1:
