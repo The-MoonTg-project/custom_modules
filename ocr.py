@@ -5,22 +5,23 @@ import os
 from utils.db import db
 from utils.misc import modules_help, prefix
 
-OCR_SPACE_API_KEY = db.get("custom.ocr", "ocr_api", None)
 OCR_SPACE_URL = "https://api.ocr.space/parse/image"
 
 
 @Client.on_message(filters.command(["set_ocrapi"], prefix) & filters.me)
 async def ocr_space_api(_, message: Message):
+    OCR_SPACE_API_KEY = db.get("custom.ocr", "ocr_api", None)
     if OCR_SPACE_API_KEY is not None:
         return await message.edit_text(f"OCRSPACE API key is already set")
     if len(message.command) > 1:
         api_key = message.text.split(maxsplit=1)[1]
-        db.get("custom.ocr", "ocr_api", api_key)
+        db.set("custom.ocr", "ocr_api", api_key)
         return await message.edit_text(f"OCRSPACE API key set success")
 
 
 @Client.on_message(filters.command(["ocr"], prefix) & filters.me)
 async def ocr_space(_, message: Message):
+    OCR_SPACE_API_KEY = db.get("custom.ocr", "ocr_api", None)
     if OCR_SPACE_API_KEY is None:
         return await message.edit_text(f"OCRSPACE API key isn't set, please set it using `<code>{prefix}set_ocrapi <your_api></code> command")
     if not message.reply_to_message or not message.reply_to_message.photo:

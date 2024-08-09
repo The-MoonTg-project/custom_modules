@@ -5,8 +5,7 @@ import requests
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from utils.scripts import import_library, uninstall_library
-uninstall_library('yt-dlp')
+from utils.scripts import import_library
 yt_dlp = import_library('yt_dlp', 'yt-dlp')
 from yt_dlp import YoutubeDL
 
@@ -19,8 +18,10 @@ ydv_opts = {
     "nocheckcertificate": True,
     "addmetadata": True,
     "noplaylist": True,
-    'outtmpl': 'videos/%(id)s.%(ext)s'
+    'outtmpl': 'videos/%(id)s.%(ext)s',
+    'cookiefile': 'www.youtube.com_cookies.txt' if os.path.exists('www.youtube.com_cookies.txt') else None
 }
+
 ydm_opts = {
     'format': 'm4a',
     "geo_bypass": True,
@@ -29,7 +30,9 @@ ydm_opts = {
     "addmetadata": True,
     "noplaylist": True,
     'outtmpl': 'audios/%(id)s.%(ext)s',
+    'cookiefile': 'www.youtube.com_cookies.txt' if os.path.exists('www.youtube.com_cookies.txt') else None
 }
+
 
 def download_video(url):
     with YoutubeDL(ydv_opts) as ydl:
@@ -72,7 +75,7 @@ async def upload_video(client: Client, message: Message):
     if message.command[0] == 'ytv':
         await message.edit_text("Starting Download...")
         try:
-            url = message.text.split(None, 1)[1]
+            url = message.text.split(maxsplit=1)[1]
             # await message.edit_text("Starting Download...")
             file_path, title, img = download_video(url)
 
