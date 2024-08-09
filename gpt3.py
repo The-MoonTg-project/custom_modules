@@ -5,7 +5,7 @@ from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc
+from utils.scripts import format_exc, import_library
 
 import_library("RyuzakiLib")
 from RyuzakiLib import RendyDevChat
