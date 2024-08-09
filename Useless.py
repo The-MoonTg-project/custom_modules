@@ -24,7 +24,7 @@ async def enews(_, message):
 
         if "error" in news_data:
             error_message = news_data["error"]
-            await message.reply_text(f"Error: {error_message}")
+            await message.edit_text(f"Error: {error_message}")
         else:
             if len(news_data) > 0:
                 news_item = random.choice(news_data)
@@ -36,9 +36,9 @@ async def enews(_, message):
                 news_url = news_item["url"]
 
                 message_text = f"𝗧𝗜𝗧𝗟𝗘: {title}\n𝗦𝗢𝗨𝗥𝗖𝗘: {source}\n𝗧𝗜𝗠𝗘: {relative_time}\n𝗘𝗫𝗖𝗘𝗥𝗣𝗧: {excerpt}\n𝗨𝗥𝗟: {news_url}"
-                await message.reply_text(message_text)
+                await message.edit_text(message_text)
             else:
-                await message.reply_text("No news found.")
+                await message.edit_text("No news found.")
 
     except Exception as e:  # Replace with specific exception type if possible
         await message.reply_text(f"Error: {str(e)}")
@@ -143,10 +143,10 @@ async def hastag(bot, message):
 
         content = BSP(res, 'html.parser').find("div", {"class":"copy-hashtags"}).string
     except IndexError:
-        return await message.reply_text("✦ Example ➠ /hastag python")
+        return await message.edit_text("✦ Example ➠ /hastag python")
         
     
-    await message.reply_text(f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ  ʜᴀsᴛᴀɢ ➠\n\n<pre>{content}</pre>", quote=True)
+    await message.edit_text(f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ  ʜᴀsᴛᴀɢ ➠\n\n<pre>{content}</pre>", quote=True)
 
 
 
@@ -162,7 +162,7 @@ modules_help["hastag"] = {
 @Client.on_message(filters.command("coub"))
 async def coub(c: Client, m: Message):
     if len(m.command) == 1:
-        await m.reply_text((" /coub search query — Sends a random Coub (short video) from search results."))
+        await m.edit_text((" /coub search query — Sends a random Coub (short video) from search results."))
         return
 
     text = m.text.split(maxsplit=1)[1]
@@ -173,9 +173,9 @@ async def coub(c: Client, m: Message):
         links = content["permalink"]
         title = content["title"]
     except IndexError:
-        await m.reply_text("nothing found")
+        await m.edit_text("nothing found")
     else:
-        await m.reply_text(f'<b><a href="https://coub.com/v/{links}">{title}</a></b>')
+        await m.edit_text(f'<b><a href="https://coub.com/v/{links}">{title}</a></b>')
 
 
 modules_help["coub"] = {
