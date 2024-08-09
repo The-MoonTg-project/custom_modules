@@ -1,12 +1,12 @@
-from utils.misc import prefix, modules_help
-from pyrogram.errors import RPCError
 import requests
 from bs4 import BeautifulSoup
 
 import random
-import requests
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from utils.scripts import get_text, format_exc
+from utils.misc import prefix, modules_help
+
 
 NEWS_URL = "https://sugoi-api.vercel.app/news?keyword={}"
 
@@ -41,65 +41,10 @@ async def enews(_, message):
                 await message.edit_text("No news found.")
 
     except Exception as e:  # Replace with specific exception type if possible
-        await message.reply_text(f"Error: {str(e)}")
-
-
-modules_help["news"] = {
-    "news": "Gets the news of a  catagory."
-    + "\n\nUsage: `.news <catagory> `"
-    + "\n\nExample: `.news political`"
-}
-
-
-from pyrogram import Client
-from pyrogram.errors import FloodWait, MessageNotModified
-from pyrogram.types import Chat, Message, User
-
-
-def get_text(message: Message) -> [None, str]:
-    text_to_return = message.text
-    if message.text is None:
-        return None
-    if " " in text_to_return:
-        try:
-            return message.text.split(None, 1)[1]
-        except IndexError:
-            return None
-    else:
-        return None
-
-
-@Client.on_message(filters.command("cedit"))
-async def loltime(client, message):
-    lol = await message.reply("Processing please wait")
-    cap = get_text(message)
-    if not message.reply_to_message:
-        await lol.edit("reply to any message to edit caption")
-    reply = message.reply_to_message
-    try:
-        await reply.copy(message.chat.id, caption=cap)
-        await lol.delete()
-    except RPCError as i:
-        await lol.edit(i)
-        return
-      
-modules_help["cedit"] = {
-    "cedit": "Gets edit caption."
-    + "\n\nUsage: `.cedit <reply caption> `"
-    + "\n\nExample: `.cedit reply caption`"
-}
-
-
-
-
-
-async def eod(message, error):
-    await message.reply_text(f"An error occurred: {error}")
+        return await message.edit_text(format_exc(e))
     
 
-
-
-@Client.on_message(filters.command("nasa"))
+@Client.on_message(filters.command("nasa", prefix) & filters.me)
 async def aposj(client, message):
     link = "https://apod.nasa.gov/apod/"
     C = requests.get(link).content
@@ -119,22 +64,13 @@ async def aposj(client, message):
         if message.outgoing:
             await message.delete()
     except Exception as e:
-        return await eod(message, str(e))
+        return await message.edit_text(format_exc(e))
 
 
-modules_help["nasa"] = {
-    "nasa": "Gets the daily  nasa  news ."
-    + "\n\nUsage: `.nasa`"
-    + "\n\nExample: `.nasa `"
-}
-
-
-
-url = "https://all-hashtag.com/library/contents/ajax_generator.php"
-
-@Client.on_message(filters.command("hastag"))
-async def hastag(bot, message):
+@Client.on_message(filters.command("hastag", prefix) & filters.me)
+async def hastag(bot: Client, message: Message):
     global content
+    url = "https://all-hashtag.com/library/contents/ajax_generator.php"
     try:
         text = message.text.split(' ',1)[1]
         data = dict(keyword=text, filter="top")
@@ -149,17 +85,7 @@ async def hastag(bot, message):
     await message.edit_text(f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ  ʜᴀsᴛᴀɢ ➠\n\n<pre>{content}</pre>", quote=True)
 
 
-
-modules_help["hastag"] = {
-    "hastag": "genarate  #hastag  ."
-    + "\n\nUsage: `.hastag <keywords>`"
-    + "\n\nExample: `.hastag technology `"
-}
-
-
-
-
-@Client.on_message(filters.command("coub"))
+@Client.on_message(filters.command("coub", prefix) & filters.me)
 async def coub(c: Client, m: Message):
     if len(m.command) == 1:
         await m.edit_text((" /coub search query — Sends a random Coub (short video) from search results."))
@@ -181,5 +107,14 @@ async def coub(c: Client, m: Message):
 modules_help["coub"] = {
     "coub": "Gets the short video ."
     + "\n\nUsage: `.coub <keywords>`"
-    + "\n\nExample: `.coub technology `"
+    + "\n\nExample: `.coub technology `",
+    "news": "Gets the news of a  catagory."
+    + "\n\nUsage: `.news <catagory> `"
+    + "\n\nExample: `.news political`",
+    "hastag": "genarate  #hastag  ."
+    + "\n\nUsage: `.hastag <keywords>`"
+    + "\n\nExample: `.hastag technology `",
+    "nasa": "Gets the daily  nasa  news ."
+    + "\n\nUsage: `.nasa`"
+    + "\n\nExample: `.nasa `"
 }
