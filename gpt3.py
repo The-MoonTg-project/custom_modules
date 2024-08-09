@@ -88,7 +88,7 @@ async def gpt3(client: Client, message: Message):
                 )
                     return await message.edit_text(response)
             except Exception as e:
-                await message.edit_text(str(e))
+                await message.edit_text(format_exc(e))
     except Exception as e:
         await message.edit_text(format_exc(e))
 
