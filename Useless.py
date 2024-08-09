@@ -45,7 +45,7 @@ async def enews(_, message):
 
 
 modules_help["news"] = {
-    "specs": "Gets the news of a  catagory."
+    "news": "Gets the news of a  catagory."
     + "\n\nUsage: `.news <catagory> `"
     + "\n\nExample: `.news political`"
 }
@@ -84,7 +84,7 @@ async def loltime(client, message):
         return
       
 modules_help["cedit"] = {
-    "specs": "Gets edit caption."
+    "cedit": "Gets edit caption."
     + "\n\nUsage: `.cedit <reply caption> `"
     + "\n\nExample: `.cedit reply caption`"
 }
@@ -123,7 +123,63 @@ async def aposj(client, message):
 
 
 modules_help["nasa"] = {
-    "specs": "Gets the daily  nasa  news ."
+    "nasa": "Gets the daily  nasa  news ."
     + "\n\nUsage: `.nasa`"
     + "\n\nExample: `.nasa `"
+}
+
+
+
+url = "https://all-hashtag.com/library/contents/ajax_generator.php"
+
+@Client.on_message(filters.command("hastag"))
+async def hastag(bot, message):
+    global content
+    try:
+        text = message.text.split(' ',1)[1]
+        data = dict(keyword=text, filter="top")
+
+        res = requests.post(url, data).text
+
+        content = BSP(res, 'html.parser').find("div", {"class":"copy-hashtags"}).string
+    except IndexError:
+        return await message.reply_text("✦ Example ➠ /hastag python")
+        
+    
+    await message.reply_text(f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ  ʜᴀsᴛᴀɢ ➠\n\n<pre>{content}</pre>", quote=True)
+
+
+
+modules_help["hastag"] = {
+    "hastag": "genarate  #hastag  ."
+    + "\n\nUsage: `.hastag <keywords>`"
+    + "\n\nExample: `.hastag technology `"
+}
+
+
+
+
+@Client.on_message(filters.command("coub"))
+async def coub(c: Client, m: Message):
+    if len(m.command) == 1:
+        await m.reply_text((" /coub search query — Sends a random Coub (short video) from search results."))
+        return
+
+    text = m.text.split(maxsplit=1)[1]
+    r = await http.get("https://coub.com/api/v2/search/coubs", params={"q": text})
+    rjson = r.json()
+    try:
+        content = random.choice(rjson["coubs"])
+        links = content["permalink"]
+        title = content["title"]
+    except IndexError:
+        await m.reply_text("nothing found")
+    else:
+        await m.reply_text(f'<b><a href="https://coub.com/v/{links}">{title}</a></b>')
+
+
+modules_help["coub"] = {
+    "coub": "Gets the short video ."
+    + "\n\nUsage: `.coub <keywords>`"
+    + "\n\nExample: `.coub technology `"
 }
