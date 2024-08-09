@@ -7,6 +7,9 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc
 
+import_library("RyuzakiLib")
+from RyuzakiLib import RendyDevChat
+
 # Define the URL and headers
 url = "https://abot3.gchk2.skybyte.me/api/chat-process"
 headers = {
@@ -78,11 +81,16 @@ async def gpt3(client: Client, message: Message):
             else:
                 await message.edit_text("No valid 'text' value found in the response.")
         else:
-            await message.edit_text(
-                f"Request failed with status code {response.status_code}"
-            )
+            try:
+                response = await RendyDevChat.chat_hacked(
+                    args=prompt,
+                    latest_model="gpt-4o"
+                )
+                    return await message.edit_text(response)
+            except Exception as e:
+                await message.edit_text(str(e))
     except Exception as e:
         await message.edit_text(format_exc(e))
 
 
-modules_help["gpt3"] = {"gpt3 [prompt*]": "Chat with OpenAI ChatGPT 3 Model"}
+modules_help["gpt3"] = {"gpt3 [prompt*]": "Chat with OpenAI ChatGPT 3 and Chatgpt 4o Model"}
