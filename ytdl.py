@@ -19,7 +19,6 @@ ydv_opts = {
     "addmetadata": True,
     "noplaylist": True,
     'outtmpl': 'videos/%(id)s.%(ext)s',
-    'cookiefile': 'www.youtube.com_cookies.txt' if os.path.exists('www.youtube.com_cookies.txt') else None
 }
 
 ydm_opts = {
@@ -30,7 +29,6 @@ ydm_opts = {
     "addmetadata": True,
     "noplaylist": True,
     'outtmpl': 'audios/%(id)s.%(ext)s',
-    'cookiefile': 'www.youtube.com_cookies.txt' if os.path.exists('www.youtube.com_cookies.txt') else None
 }
 
 
