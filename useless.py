@@ -104,7 +104,7 @@ async def coub(c: Client, m: Message):
         await m.edit_text(f'<b><a href="https://coub.com/v/{links}">{title}</a></b>')
 
 
-modules_help["coub"] = {
+modules_help["useless"] = {
     "coub": "Gets the short video ."
     + "\n\nUsage: `.coub <keywords>`"
     + "\n\nExample: `.coub technology `",
