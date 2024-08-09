@@ -21,7 +21,7 @@ def b2mb(b):
 
 def find_lib(lib: str) -> str:
     try:
-        ver = os.popen(f"python3 -m pip freeze | grep {lib}").read().split("==")[1]
+        ver = os.popen(f"python3 -m pip freeze | awk '/^{lib}==/'").read().split("==")[1]
         if "\n" in ver:
             return ver.split("\n")[0]
         return ver
@@ -101,7 +101,7 @@ async def serverinfo_cmd(_: Client, message: Message):
         inf.append("n/a")
 
     try:
-        inf.append(find_lib("Pyrogram"))
+        inf.append(find_lib("pyrofork"))
     except Exception:
         inf.append("n/a")
 
