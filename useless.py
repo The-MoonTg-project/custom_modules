@@ -1,9 +1,11 @@
+import http
 import requests
 from bs4 import BeautifulSoup
 
 import random
 from pyrogram import Client, filters
 from pyrogram.types import Message
+import urllib3
 from utils.scripts import get_text, format_exc
 from utils.misc import prefix, modules_help
 
@@ -11,15 +13,16 @@ from utils.misc import prefix, modules_help
 NEWS_URL = "https://sugoi-api.vercel.app/news?keyword={}"
 
 
-@app.on_message(filters.command("news"))
+@Client.on_message(filters.command("news", prefix) & filters.me)
 async def enews(_, message):
     keyword = (
         message.text.split(" ", 1)[1].strip() if len(message.text.split()) > 1 else ""
     )
     url = NEWS_URL.format(keyword)
+    await message.edit_text("Fetching news...")
 
     try:
-        response = await state.get(url)  # Assuming state is an asynchronous function
+        response = requests.get(url)
         news_data = response.json()
 
         if "error" in news_data:
@@ -47,6 +50,7 @@ async def enews(_, message):
 @Client.on_message(filters.command("nasa", prefix) & filters.me)
 async def aposj(client, message):
     link = "https://apod.nasa.gov/apod/"
+    await message.edit_text("Fetching nasa's apod...")
     C = requests.get(link).content
     m = BeautifulSoup(C, "html.parser", from_encoding="utf-8")
     try:
@@ -69,30 +73,33 @@ async def aposj(client, message):
 
 @Client.on_message(filters.command("hastag", prefix) & filters.me)
 async def hastag(bot: Client, message: Message):
-    global content
     url = "https://all-hashtag.com/library/contents/ajax_generator.php"
+    await message.edit_text("Generating hashtags for ya...")
     try:
         text = message.text.split(' ',1)[1]
         data = dict(keyword=text, filter="top")
 
         res = requests.post(url, data).text
 
-        content = BSP(res, 'html.parser').find("div", {"class":"copy-hashtags"}).string
+        content = BeautifulSoup(res, 'html.parser').find("div", {"class":"copy-hashtags"}).string
     except IndexError:
         return await message.edit_text("✦ Example ➠ /hastag python")
         
     
-    await message.edit_text(f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ  ʜᴀsᴛᴀɢ ➠\n\n<pre>{content}</pre>", quote=True)
+    await message.edit_text(f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ  ʜᴀsᴛᴀɢ ➠\n\n<pre>{content}</pre>")
 
 
 @Client.on_message(filters.command("coub", prefix) & filters.me)
 async def coub(c: Client, m: Message):
     if len(m.command) == 1:
-        await m.edit_text((" /coub search query — Sends a random Coub (short video) from search results."))
+        await m.edit_text(("<code>coub</code> [search query] — Sends a random Coub (short video) from search results."))
         return
-
+    await m.edit_text(f"<code>Searching Coub for {m.text.split(maxsplit=1)[1]}</code>")
     text = m.text.split(maxsplit=1)[1]
-    r = await http.get("https://coub.com/api/v2/search/coubs", params={"q": text})
+    try:
+        r = requests.get("https://coub.com/api/v2/search/coubs", params={"q": text})
+    except Exception:
+        return await m.edit_text("Failed to fetch Coub.")
     rjson = r.json()
     try:
         content = random.choice(rjson["coubs"])
@@ -106,15 +113,15 @@ async def coub(c: Client, m: Message):
 
 modules_help["useless"] = {
     "coub": "Gets the short video ."
-    + "\n\nUsage: `.coub <keywords>`"
-    + "\n\nExample: `.coub technology `",
+    + f"\n\nUsage: <code>{prefix}coub <keywords></code>"
+    + f"\n\nExample: <code>{prefix}coub technology </code>",
     "news": "Gets the news of a  catagory."
-    + "\n\nUsage: `.news <catagory> `"
-    + "\n\nExample: `.news political`",
+    + f"\n\nUsage: <code>{prefix}news <catagory> </code>"
+    + f"\n\nExample: <code>{prefix}news political</code>",
     "hastag": "genarate  #hastag  ."
-    + "\n\nUsage: `.hastag <keywords>`"
-    + "\n\nExample: `.hastag technology `",
+    + f"\n\nUsage: <code>{prefix}hastag <keywords></code>"
+    + f"\n\nExample: <code>{prefix}hastag technology </code>",
     "nasa": "Gets the daily  nasa  news ."
-    + "\n\nUsage: `.nasa`"
-    + "\n\nExample: `.nasa `"
+    + f"\n\nUsage: <code>{prefix}nasa</code>"
+    + f"\n\nExample: <code>{prefix}nasa </code>"
 }
