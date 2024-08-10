@@ -6,7 +6,7 @@ from pyrogram import filters, Client
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc
+from utils.scripts import format_exc, progress
 
 def schellwithflux(args):
     API_URL = "https://randydev-ryuzaki-api.hf.space/api/v1/akeno/fluxai"
