@@ -106,5 +106,5 @@ async def imgfluxai_(client: Cl, message: Message):
 
 modules_help["sdxl"] = {
     "sdxl [prompt]*": "text to image sdxl",
-    "fluxai2 [prompt]*": "text to image sdxl",
+    "fluxai2 [prompt]*": "text to image fluxai",
 }
