@@ -87,7 +87,7 @@ async def say(c: Cl, message: Message):
         await message.edit_text(f"An error occurred: {format_exc(e)}")
 
 @Cl.on_message(filters.command("fluxai2", prefix) & filters.me)
-async def imgfluxai_(client: Client, message: Message):
+async def imgfluxai_(client: Cl, message: Message):
     question = message.text.split(" ", 1)[1] if len(message.command) > 1 else None
     if not question:
         return await message.reply_text("Please provide a question for Flux.")
