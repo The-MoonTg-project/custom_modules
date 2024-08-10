@@ -45,6 +45,6 @@ async def imgfluxai_(client: Client, message: Message):
         await message.edit_text(format_exc(e))
 
 
-modules_help["sdxl"] = {
+modules_help["fluxai"] = {
     "fluxai [prompt]*": "text to image fluxai",
 }
