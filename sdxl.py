@@ -1,8 +1,8 @@
 import os
 import io
 import warnings
-
-# from PIL import Image
+import requests
+from PIL import Image
 
 from utils.scripts import import_library
 
@@ -30,6 +30,17 @@ stability_api = client.StabilityInference(
     engine="stable-diffusion-xl-1024-v1-0",
 )
 
+async def schellwithflux(args):
+    API_URL = "https://randydev-ryuzaki-api.hf.space/api/v1/akeno/fluxai"
+    payload = {
+        "user_id": 5300558954, # Please don't edit here
+        "args": args
+    }
+    response = requests.post(API_URL, json=payload)
+    if response.status_code != 200:
+        print(f"Error status {response.status_code}")
+        return None
+    return response.content
 
 @Cl.on_message(filters.command("sdxl", prefix) & filters.me)
 async def say(c: Cl, message: Message):
@@ -75,7 +86,25 @@ async def say(c: Cl, message: Message):
     except Exception as e:
         await message.edit_text(f"An error occurred: {format_exc(e)}")
 
+@Cl.on_message(filters.command("fluxai2", prefix) & filters.me)
+async def imgfluxai_(client: Client, message: Message):
+    question = message.text.split(" ", 1)[1] if len(message.command) > 1 else None
+    if not question:
+        return await message.reply_text("Please provide a question for Flux.")
+    try:
+        image_bytes = await schellwithflux(question)
+        if image_bytes is None:
+            return await message.reply_text("Failed to generate an image.")
+        pro = await message.reply_text("Generating image, please wait...")
+        with Image.open(io.BytesIO(image_bytes)) as img:
+            img.save("original.jpg", format="JPEG")
+        ok = await pro.edit_text("Uploading image...")
+        await message.reply_photo("original.jpg")
+        await ok.delete()
+    except Exception as e:
+        await message.edit_text(format_exc(e))
 
 modules_help["sdxl"] = {
     "sdxl [prompt]*": "text to image sdxl",
+    "fluxai2 [prompt]*": "text to image sdxl",
 }
