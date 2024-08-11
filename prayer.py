@@ -1,4 +1,4 @@
-from pyrogram import Client, filters, enums
+from pyrogram import Client, filters
 from pyrogram.types import Message
 import aiohttp
 from datetime import datetime
@@ -10,6 +10,7 @@ ALADHAN_API_URL = "https://api.aladhan.com/v1/timingsByCity"
 DEFAULT_METHOD = 2  # Islamic Society of North America
 DEFAULT_CITY = "Lahore"
 DEFAULT_COUNTRY = "PK"
+
 
 async def fetch_namaz_times(city_name: str, country_name: str) -> dict:
     params = {
@@ -24,6 +25,7 @@ async def fetch_namaz_times(city_name: str, country_name: str) -> dict:
                 return await response.json()
         except Exception as e:
             return {"error": str(e)}
+
 
 def format_time_12hr(time_str: str) -> str:
     try:
@@ -40,6 +42,7 @@ def format_time_12hr(time_str: str) -> str:
         return f"{hours}:{minutes:02d} {period}"
     except Exception as e:
         return f"Error formatting time: {str(e)}"
+
 
 @Client.on_message(filters.command("prayer", prefix) & filters.me)
 async def namaz_times(client: Client, message: Message):
@@ -83,9 +86,9 @@ async def namaz_times(client: Client, message: Message):
     else:
         result = "<b>Error:</b> <i>Unable to get prayer times for the specified location.</i>"
     
-    await message.edit(result, parse_mode=enums.ParseMode.HTML)
+    await message.edit_text(result)
 
-# Module help descriptions
+
 modules_help["namaz"] = {
-    "prayer [city_name] [country_name]": "Shows the prayer times."
+    "prayer [city_name] [country_name]": "Shows the prayer times. Default to Pakistan if no country is provided"
   }
