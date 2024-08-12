@@ -12,7 +12,7 @@ def id_generator() -> str:
     return str(uuid.uuid4())
 
 
-@Client.on_message(filters.command(["bboxai", "blackbox"], prefix) & filters.me)
+@Client.on_message(filters.command(["bbox", "blackbox"], prefix) & filters.me)
 async def blackbox(client, message):
     m = message
     msg = await m.edit_text("🔍")
