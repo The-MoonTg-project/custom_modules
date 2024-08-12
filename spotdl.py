@@ -3,7 +3,7 @@ import os
 import shutil
 import time
 import requests
-from pytube import YouTube
+from pytubefix import YouTube
 
 from subprocess import check_call, CalledProcessError
 from urllib.parse import parse_qs, urlparse
