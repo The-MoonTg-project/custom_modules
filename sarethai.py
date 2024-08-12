@@ -51,26 +51,6 @@ async def gptweb(_, message: Message):
         await message.edit("An error occurred, please try again later.")
 
 
-@Client.on_message(filters.command(["bbox", "blackbox"], prefix) & filters.me)
-async def blackbox(_, message: Message):
-    if len(message.command) < 2:
-        await message.edit("Usage: `bbox <query>`")
-        return
-    await message.edit("Thinking...")
-    query = " ".join(message.command[1:])
-    url = f"{URL}/blackbox?q={query}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        data = data["data"]
-        data = clean_data(data)
-        await message.edit(
-            f"**Question:**\n{query}\n**Answer:**\n{data}",
-            parse_mode=enums.ParseMode.MARKDOWN,
-        )
-    else:
-        await message.edit("An error occurred, please try again later.")
-
 
 @Client.on_message(filters.command(["wgemini"], prefix) & filters.me)
 async def gemini(_, message: Message):
@@ -93,8 +73,6 @@ async def gemini(_, message: Message):
 
 modules_help["sarethai"] = {
     "wgpt [query]*": "Ask anything to GPT-Web",
-    "bbox [query]*": "Ask anything to Blackbox",
-    "gptweb [query]*": "Ask anything to GPT-Web",
-    "blackbox [query]*": "Ask anything to Blackbox",
+    "gptweb [query]*": "Ask anything to GPT-Web"
     "wgemini [query]*": "Ask anything to Gemini",
 }
