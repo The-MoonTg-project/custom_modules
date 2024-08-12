@@ -195,7 +195,7 @@ modules_help["sarethai"] = {
     "wgpt [query]*": "Ask anything to GPT-Web",
     "gptweb [query]*": "Ask anything to GPT-Web",
     "wgemini [query]*": "Ask anything to Gemini",
-    "spotify [query]*": "Search for songs on Spotify",
+    "sputify [query]*": "Search for songs on Spotify",
     "lyrics [song name]*": "Get the lyrics of a song",
     "soundcloud [query]*": "Search for songs on SoundCloud",
     "deezer [query]*": "Search for songs on Deezer",
