@@ -6,13 +6,12 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from functools import partial
 from pyrogram import enums
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from pyrogram import Client as Ntbot
-
-command = partial(filters.command, prefixes=["!", "/", "."])
+from utils.misc import modules_help, prefix
 
 
-@Ntbot.on_message(command("ipinfo"))
+
+
+@Client.on_message(filters.command("ipinfo", prefix) & filters.me)
 async def ipinfo(_, message: Message):
     searchip = message.text.split(" ", 1)
     if len(searchip) == 1:
@@ -51,3 +50,7 @@ Hosting: {response['hosting']}"""
         await m.edit_text(text, parse_mode=enums.ParseMode.HTML)
     except:
         await m.edit_text("Unable To Find Info!")
+
+
+modules_help["ipinfo"] = {"ipinfo": "ip address info"}
+ example. /ipinfo 54.254.162.138
