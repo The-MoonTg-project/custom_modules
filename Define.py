@@ -1,4 +1,6 @@
 import asyncio
+from utils.misc import modules_help, prefix
+
 
 from pyrogram import Client, enums,filters
 from pyrogram.types import Message
@@ -15,8 +17,7 @@ class AioHttp:
 
 
 
-
-@Client.on_message(filters.command(["define", "dict"]))
+@Client.on_message(filters.command("define", prefix) & filters.me)
 async def define( Client,message: Message):
     Message = message.command
 
