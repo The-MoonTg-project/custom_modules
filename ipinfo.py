@@ -48,4 +48,4 @@ async def ipinfo(_, message: Message):
         await m.edit_text("Unable To Find Info!")
 
 
-modules_help["ipinfo"] = {"ipinfo": "ip address info"}
+modules_help["ipinfo"] = {"ipinfo [ip address]*": "ip address info"}
