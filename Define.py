@@ -117,6 +117,62 @@ async def define( Client,message: Message):
             await message.reply("`No result found from the database.`")
 
 
+
+
+import requests
+
+def fetch_word_data(word):
+    url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()[0]  # Assuming the API returns a list of entries
+    else:
+        return None
+
+def format_word_data(data):
+    formatted_data = f"Word: {data['word']}\n"
+    formatted_data += f"Phonetic: {data.get('phonetic', 'N/A')}\n"
+    
+    if 'phonetics' in data:
+        formatted_data += "Phonetics:\n"
+        for phonetic in data['phonetics']:
+            formatted_data += f"  - {phonetic.get('text', 'N/A')}"
+            if 'audio' in phonetic:
+                formatted_data += f" (Audio: {phonetic['audio']})"
+            formatted_data += "\n"
+
+    formatted_data += f"Origin: {data.get('origin', 'N/A')}\n"
+    
+    if 'meanings' in data:
+        formatted_data += "Meanings:\n"
+        for meaning in data['meanings']:
+            formatted_data += f"  Part of Speech: {meaning['partOfSpeech']}\n"
+            for definition in meaning['definitions']:
+                formatted_data += f"    - Definition: {definition['definition']}\n"
+                if 'example' in definition:
+                    formatted_data += f"      Example: {definition['example']}\n"
+                if 'synonyms' in definition and definition['synonyms']:
+                    formatted_data += f"      Synonyms: {', '.join(definition['synonyms'])}\n"
+                if 'antonyms' in definition and definition['antonyms']:
+                    formatted_data += f"      Antonyms: {', '.join(definition['antonyms'])}\n"
+    
+    return formatted_data
+    
+@app.on_message(filters.command("word"))
+async def define_word(client, message):
+    if len(message.command) < 2:
+        await message.reply("Please provide a word to define.")
+        return
+    
+    word = message.command[1]
+    word_data = fetch_word_data(word)
+    
+    if word_data:
+        formatted_data = format_word_data(word_data)
+        await message.reply(formatted_data)
+    else:
+        await message.reply("Sorry, I couldn't find the definition for that word.")
+
 modules_help["define"] = {
     "define *": "Get details of words ",
 
