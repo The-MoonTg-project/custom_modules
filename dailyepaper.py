@@ -53,7 +53,7 @@ async def scrape_data(msg):
                     await msg.edit_text(
                         f"✅ Scraping from <b>{title}</b> was successful."
                     )
-                    text += f"<b>{title}</b> - <pre>{drive_links[0]}</pre>\n"
+                    text += f"<b>{title}</b> - {drive_links[0]}\n"
 
             except Exception as e:
                 await msg.edit_text(f"❌ Scraping from <b>{url}</b> was unsuccessful.")
