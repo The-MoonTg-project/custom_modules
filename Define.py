@@ -117,3 +117,6 @@ async def define( Client,message: Message):
             await message.reply("`No result found from the database.`")
 
 
+modules_help["define"] = {
+    "define *": "Get details of words ",
+
