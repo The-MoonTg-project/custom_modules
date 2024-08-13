@@ -1,6 +1,6 @@
 import asyncio
 from utils.misc import modules_help, prefix
-
+import requests
 
 from pyrogram import Client, enums,filters
 from pyrogram.types import Message
@@ -119,7 +119,7 @@ async def define( Client,message: Message):
 
 
 
-import requests
+
 
 def fetch_word_data(word):
     url = f"https://api.dictionaryapi.dev/api/v2/entries/en/{word}"
@@ -158,7 +158,7 @@ def format_word_data(data):
     
     return formatted_data
     
-@app.on_message(filters.command("word"))
+@Client.on_message(filters.command(["word", "worldid"], prefix) & filters.me)
 async def define_word(client, message):
     if len(message.command) < 2:
         await message.reply("Please provide a word to define.")
@@ -174,5 +174,6 @@ async def define_word(client, message):
         await message.reply("Sorry, I couldn't find the definition for that word.")
 
 modules_help["define"] = {
-    "define *": "Get details of words ",
-
+    "define [query]*": "get definitions of a world",
+    "word [query]*": "get world details",
+}
