@@ -87,11 +87,15 @@ def format_apk_results(results):
     )
 
 
-async def send_screenshot(message, url):
+async def send_screenshot(client, message, url):
     screenshot_data = generate_screenshot(url)
     if screenshot_data:
-        await message.reply_document(screenshot_data)
-        os.remove(screenshot_data)
+        await client.send_photo(
+            message.chat.id,
+            screenshot_data,
+            caption=f"Screenshot of <code>{url}</code>",
+            reply_to_message_id=message.id,
+        )
     else:
         await message.reply("Failed to take screenshot.")
 
@@ -187,7 +191,7 @@ async def search_music(api_url, format_function, message, query):
 
 
 @Client.on_message(filters.command(["gsearch"], prefix) & filters.me)
-async def google_search(client, message: Message):
+async def google_search(client: Client, message: Message):
     if message.reply_to_message:
         query = message.reply_to_message.text.strip()
     elif len(message.command) > 1:
@@ -207,12 +211,13 @@ async def google_search(client, message: Message):
             disable_web_page_preview=True,
         )
         search_key = f"{message.chat.id}_google"
+        global search_results
         search_results[search_key] = {
             "results": results,
             "message_id": search_message.id,
         }
         google_url = f"https://www.google.com/search?q={query}"
-        await send_screenshot(message, google_url)
+        await send_screenshot(client, message, google_url)
         asyncio.create_task(
             delete_search_data(client, message.chat.id, search_message.id)
         )
@@ -221,7 +226,7 @@ async def google_search(client, message: Message):
 
 
 @Client.on_message(filters.command(["ytsearch"], prefix) & filters.me)
-async def youtube_search(client, message: Message):
+async def youtube_search(client: Client, message: Message):
     if message.reply_to_message:
         query = message.reply_to_message.text.strip()
     elif len(message.command) > 1:
@@ -241,12 +246,13 @@ async def youtube_search(client, message: Message):
             disable_web_page_preview=True,
         )
         search_key = f"{message.chat.id}_youtube"
+        global search_results
         search_results[search_key] = {
             "results": results,
             "message_id": search_message.id,
         }
         youtube_url = f"https://www.youtube.com/results?search_query={query}"
-        await send_screenshot(message, youtube_url)
+        await send_screenshot(client, message, youtube_url)
         asyncio.create_task(
             delete_search_data(client, message.chat.id, search_message.id)
         )
@@ -284,6 +290,7 @@ async def movie_search(client, message: Message):
             )
 
         search_key = f"{message.chat.id}_movie"
+        global search_results
         search_results[search_key] = {
             "results": results,
             "message_id": search_message.id,
@@ -315,6 +322,7 @@ async def apk_search(client, message: Message):
             parse_mode=enums.ParseMode.MARKDOWN,
         )
         search_key = f"{message.chat.id}_apk"
+        global search_results
         search_results[search_key] = {
             "results": results,
             "message_id": search_message.id,
@@ -347,93 +355,6 @@ async def apk_search(client, message: Message):
         )
     else:
         await message.edit("An error occurred, please try again later.")
-
-
-@Client.on_message(filters.reply & filters.text & filters.me)
-async def handle_reply(client, message: Message):
-    chat_id = message.chat.id
-    search_keys = [
-        f"{chat_id}_google",
-        f"{chat_id}_youtube",
-        f"{chat_id}_movie",
-        f"{chat_id}_apk",
-    ]
-
-    for search_key in search_keys:
-        if search_key in search_results:
-            try:
-                # Check if the replied-to message is one of the bot's search result messages
-                if message.reply_to_message.from_user.id != (await client.get_me()).id:
-                    return
-
-                index = int(message.text.strip()) - 1
-                results = search_results[search_key]["results"]
-                search_message_id = search_results[search_key]["message_id"]
-                if (
-                    message.reply_to_message.id == search_message_id
-                    and 0 <= index < len(results)
-                ):
-                    await message.edit(
-                        "Please wait..."
-                    )  # Edit the reply message to show "Please wait..."
-
-                    if search_key.endswith("_movie"):
-                        # Send movie details with image
-                        movie = results[index]
-                        caption = (
-                            f"**{movie['title']}** ({movie['release_date']})\n"
-                            f"Original Title: {movie['original_title']}\n"
-                            f"Language: {movie['original_language']}\n"
-                            f"Overview: {movie['overview']}\n"
-                            f"Popularity: {movie['popularity']}\n"
-                            f"Rating: {movie['vote_average']}/10\n"
-                            f"Votes: {movie['vote_count']}"
-                        )
-                        if "image" in movie:
-                            response = requests.get(movie["image"])
-                            if response.status_code == 200:
-                                with open("movie_image.jpg", "wb") as f:
-                                    f.write(response.content)
-                                await message.reply_photo(
-                                    photo="movie_image.jpg",
-                                    caption=caption,
-                                    parse_mode=enums.ParseMode.MARKDOWN,
-                                )
-                                os.remove("movie_image.jpg")
-                            else:
-                                await message.reply(
-                                    caption, parse_mode=enums.ParseMode.MARKDOWN
-                                )
-                        else:
-                            await message.reply(
-                                caption, parse_mode=enums.ParseMode.MARKDOWN
-                            )
-                    elif search_key.endswith("_apk"):
-                        apk_id = results[index]["id"]
-                        download_url = f"{APK_DOWNLOAD_URL}{apk_id}"
-                        response = requests.get(download_url)
-                        if response.status_code == 200:
-                            apk_data = response.json()
-                            apk_name = apk_data["result"]["name"]
-                            apk_link = apk_data["result"]["dllink"]
-                            apk_file = requests.get(apk_link)
-                            if apk_file.status_code == 200:
-                                apk_path = f"{apk_name}.apk"
-                                with open(apk_path, "wb") as f:
-                                    f.write(apk_file.content)
-                                await message.reply_document(apk_path)
-                                os.remove(apk_path)
-                            else:
-                                await message.reply("Failed to download APK.")
-                        else:
-                            await message.reply("Failed to fetch APK download link.")
-                    else:
-                        url = results[index]["url"]
-                        await send_screenshot(message, url)
-                    await message.delete()  # Delete the "Please wait..." message
-                    return
-            except ValueError:
-                pass
 
 
 @Client.on_message(filters.command(["wgpt", "gptweb"], prefix) & filters.me)
@@ -547,6 +468,88 @@ async def applemusic_search(client, message: Message):
     await search_music(
         f"{BASE_URL}/search/applemusic?text=", format_apple_music_result, message, query
     )
+
+
+@Client.on_message(filters.reply & filters.text & filters.me)
+async def handle_reply(client: Client, message: Message):
+    chat_id = message.chat.id
+    search_keys = [f"{chat_id}_google", f"{chat_id}_youtube", f"{chat_id}_movie", f"{chat_id}_apk"]
+
+    for search_key in search_keys:
+        if search_key in search_results:
+            try:
+                # Check if the replied-to message is one of the bot's search result messages
+                if message.reply_to_message.from_user.id != (await client.get_me()).id:
+                    return
+
+                index = int(message.text.strip()) - 1
+                results = search_results[search_key]["results"]
+                search_message_id = search_results[search_key]["message_id"]
+                if (
+                    message.reply_to_message.id == search_message_id
+                    and 0 <= index < len(results)
+                ):
+                    await message.edit(
+                        "Please wait..."
+                    )  # Edit the reply message to show "Please wait..."
+
+                    if search_key.endswith("_movie"):
+                        # Send movie details with image
+                        movie = results[index]
+                        caption = (
+                            f"**{movie['title']}** ({movie['release_date']})\n"
+                            f"Original Title: {movie['original_title']}\n"
+                            f"Language: {movie['original_language']}\n"
+                            f"Overview: {movie['overview']}\n"
+                            f"Popularity: {movie['popularity']}\n"
+                            f"Rating: {movie['vote_average']}/10\n"
+                            f"Votes: {movie['vote_count']}"
+                        )
+                        if "image" in movie:
+                            response = requests.get(movie["image"])
+                            if response.status_code == 200:
+                                with open("movie_image.jpg", "wb") as f:
+                                    f.write(response.content)
+                                await message.reply_photo(
+                                    photo="movie_image.jpg",
+                                    caption=caption,
+                                    parse_mode=enums.ParseMode.MARKDOWN,
+                                )
+                                os.remove("movie_image.jpg")
+                            else:
+                                await message.reply(
+                                    caption, parse_mode=enums.ParseMode.MARKDOWN
+                                )
+                        else:
+                            await message.reply(
+                                caption, parse_mode=enums.ParseMode.MARKDOWN
+                            )
+                    elif search_key.endswith("_apk"):
+                        apk_id = results[index]["id"]
+                        download_url = f"{APK_DOWNLOAD_URL}{apk_id}"
+                        response = requests.get(download_url)
+                        if response.status_code == 200:
+                            apk_data = response.json()
+                            apk_name = apk_data["result"]["name"]
+                            apk_link = apk_data["result"]["dllink"]
+                            apk_file = requests.get(apk_link)
+                            if apk_file.status_code == 200:
+                                apk_path = f"{apk_name}.apk"
+                                with open(apk_path, "wb") as f:
+                                    f.write(apk_file.content)
+                                await message.reply_document(apk_path)
+                                os.remove(apk_path)
+                            else:
+                                await message.reply("Failed to download APK.")
+                        else:
+                            await message.reply("Failed to fetch APK download link.")
+                    else:
+                        url = results[index]["url"]
+                        await send_screenshot(client, message, url)
+                    await message.delete()  # Delete the "Please wait..." message
+                    return
+            except ValueError:
+                pass
 
 
 modules_help["sarethai"] = {
