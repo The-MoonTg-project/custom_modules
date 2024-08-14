@@ -1,54 +1,46 @@
-#  Moon-Userbot - telegram userbot
-#  Copyright (C) 2020-present Moon Userbot Organization
-#
-#  This program is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-
-#  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
+import os
+import asyncio
 from pyrogram import Client, filters
-from pyrogram.errors import FileReferenceExpired, FileReferenceInvalid
+from pyrogram.errors import (
+    FileReferenceExpired,
+    FileReferenceInvalid,
+    TopicDeleted,
+    TopicClosed,
+)
 from pyrogram.types import Message
+from collections import defaultdict
 
 from utils.db import db
 from utils.misc import modules_help, prefix
 
-
 mlog_enabled = filters.create(lambda _, __, ___: db.get("custom.mlog", "status", False))
+
+# Dictionary to store media messages per user temporarily
+user_media_cache = defaultdict(list)
 
 
 @Client.on_message(filters.command(["mlog"], prefix) & filters.me)
 async def mlog(_, message: Message):
-    if len(message.command) < 2:
-        await message.edit(f"<b>Usage:</b> <code>{prefix}mlog [on/off]</code>")
-        return
-    if message.command[1].lower() == "on":
-        db.set("custom.mlog", "status", True)
-        return await message.edit("<b>Media logging is now enabled</b>")
-    elif message.command[1].lower() == "off":
-        db.set("custom.mlog", "status", False)
-        return await message.edit("<b>Media logging is now disabled</b>")
-    return await message.edit(f"<b>Usage:</b> <code>{prefix}mlog [on/off]</code>")
+    if len(message.command) < 2 or message.command[1].lower() not in ["on", "off"]:
+        return await message.edit(f"<b>Usage:</b> <code>{prefix}mlog [on/off]</code>")
+
+    status = message.command[1].lower() == "on"
+    db.set("custom.mlog", "status", status)
+    await message.edit(
+        f"<b>Media logging is now {'enabled' if status else 'disabled'}</b>"
+    )
 
 
 @Client.on_message(filters.command(["msetchat"], prefix) & filters.me)
 async def set_chat(_, message: Message):
     if len(message.command) < 2:
-        await message.edit(f"<b>Usage:</b> <code>{prefix}msetchat [chat_id]</code>")
-        return
+        return await message.edit(
+            f"<b>Usage:</b> <code>{prefix}msetchat [chat_id]</code>"
+        )
+
     try:
         chat_id = message.command[1]
-        if not chat_id.startswith("-100"):
-            chat_id = "-100" + str(chat_id)
-        chat_id = int(chat_id)
+        chat_id = int("-100" + chat_id if not chat_id.startswith("-100") else chat_id)
         db.set("custom.mlog", "chat", chat_id)
         await message.edit(f"<b>Chat ID set to {chat_id}</b>")
     except ValueError:
@@ -56,51 +48,77 @@ async def set_chat(_, message: Message):
 
 
 @Client.on_message(
-    filters.media
-    & ~filters.channel
-    & ~filters.group
+    mlog_enabled
+    & filters.incoming
+    & filters.private
+    & filters.media
+    & ~filters.me
     & ~filters.bot
-    & ~filters.chat("me")
-    & mlog_enabled
 )
 async def media_log(client: Client, message: Message):
-    chat_id = db.get("custom.mlog", "chat")
-    chat_name = str(message.chat.full_name + str(message.chat.id))
-    user_id = message.chat.id
-    user_name = message.chat.username
-    user = await client.get_users(user_id)
-    user_num = user.phone_number
-    if chat_id is None:
-        await client.send_message(
-            "me",
-            f"Your Media Logger is on however you haven't set any Chat ID. Use {prefix}msetchat to set it.",
-        )
+
+    me = await client.get_me()
+    user_name = ("@" + message.from_user.username) if message.from_user.username else message.from_user.first_name
+    chat_name = message.from_user.full_name
+    user_num = message.from_user.phone_number
+    MY_USER_ID = me.id
+
+    # Prevent logging your own media messages
+    if message.from_user.id == MY_USER_ID:
         return
-    topics = {}
-    async for topic in client.get_forum_topics(chat_id):
-        # Save topic id and title into topics dict
-        topics[topic.id] = topic.title
-        break
-        # Check if chat_name is present in topics
-    if chat_name not in topics.values():
-        new_topic = await client.create_forum_topic(chat_id, chat_name)
-        # Save the new topic id and title into topics dict
-        topics[new_topic.id] = new_topic.title
+
+    chat_id = db.get("custom.mlog", "chat")
+    if not chat_id:
+        return await client.send_message(
+            "me",
+            f"Media Logger is on, but no Chat ID is set. Use {prefix}msetchat to set it.",
+        )
+
+    user_id, first_name = message.from_user.id, message.from_user.first_name
+    user_media_cache[user_id].append(message)
+
+    await asyncio.sleep(2)  # Adjust the delay as necessary
+
+    topic_id = db.get(f"custom.mlog.topics.{user_id}", "topic_id")
+
+    if not topic_id:
+        topic_id = await client.create_forum_topic(chat_id, first_name)
+        topic_id = topic_id.id
+        db.set(f"custom.mlog.topics.{user_id}", "topic_id", topic_id)
         m = await client.send_message(
             chat_id=chat_id,
-            message_thread_id=new_topic.id,
+            message_thread_id=topic_id,
             text=f"Chat Name: {chat_name}\nUser ID: {user_id}\nUsername: {user_name}\nPhone num: {user_num}",
         )
         await m.pin()
-    # Get the corresponding id for chat_name
-    topic_id = [k for k, v in topics.items() if v == chat_name][0]
-    try:
-        await message.copy(chat_id=chat_id, message_thread_id=topic_id)
-    except (FileReferenceExpired, FileReferenceInvalid):
-        pass
+
+    if len(user_media_cache[user_id]) != 0:
+        messages_to_process = user_media_cache.pop(user_id, [])
+    else:
+        return
+
+    for media_message in messages_to_process:
+        try:
+            await media_message.copy(chat_id=chat_id, message_thread_id=topic_id)
+        except (FileReferenceExpired, FileReferenceInvalid):
+            pass
+        except TopicDeleted:
+            topic_id = await client.create_forum_topic(chat_id, first_name)
+            topic_id = topic_id.id
+            db.set(f"custom.mlog.topics.{user_id}", "topic_id", topic_id)
+            m = await client.send_message(
+            chat_id=chat_id,
+            message_thread_id=topic_id,
+            text=f"Chat Name: {chat_name}\nUser ID: {user_id}\nUsername: {user_name}\nPhone num: {user_num}",
+        )
+            await m.pin()
+            await media_message.copy(chat_id=chat_id, message_thread_id=topic_id)
+        except TopicClosed:
+            await client.reopen_forum_topic(chat_id=chat_id, topic_id=topic_id)
+            await media_message.copy(chat_id=chat_id, message_thread_id=topic_id)
 
 
 modules_help["mlog"] = {
     "mlog [on/off]": "Enable or disable media logging",
-    "msetchat [chat_id]": "Set the chat where media logging should be done",
+    "msetchat [chat_id]": "Set the chat ID where media logging should be done",
 }
