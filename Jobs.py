@@ -6,7 +6,7 @@ from pyrogram import Client, filters
 import aiohttp
 import httpx
 from bs4 import BeautifulSoup
-
+from utils.misc import modules_help, prefix
 
 
 def getdata(url):
@@ -39,3 +39,7 @@ async def govjob(client: Client, message: Message):
         caption="Information for Jobs Gathered Successfully",
         
     )
+
+modules_help["job"] = {
+    "job"
+}
