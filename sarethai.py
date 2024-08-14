@@ -88,7 +88,7 @@ def format_apk_results(results):
 
 
 async def send_screenshot(message, url):
-    screenshot_data = await generate_screenshot(url)
+    screenshot_data = generate_screenshot(url)
     if screenshot_data:
         await message.reply_document(screenshot_data)
         os.remove(screenshot_data)
