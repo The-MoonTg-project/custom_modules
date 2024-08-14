@@ -17,8 +17,7 @@ def getdata(url):
 
 
 
-
-@Client.on_message(filters.command("job"))
+@Client.on_message(filters.command("job", prefix) & filters.me)
 async def govjob(client: Client, message: Message):
     await message.reply_text("Trying To Fetch Jobs...")
     res = ""
@@ -41,5 +40,5 @@ async def govjob(client: Client, message: Message):
     )
 
 modules_help["job"] = {
-    "job"
+    "job" get gov job information 
 }
