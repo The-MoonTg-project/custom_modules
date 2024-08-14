@@ -1,3 +1,4 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 from pyrogram import Client, filters
@@ -33,6 +34,7 @@ async def gov_job(client: Client, message: Message):
         document="jobs.txt",
         caption="Job information fetched successfully",
     )
+    os.remove("jobs.txt")
 
 
 modules_help["injob"] = {"injob": "Get government job information for IN"}
