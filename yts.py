@@ -1,6 +1,9 @@
 import requests
 from pyrogram import Client, filters, enums
 import os
+from pyrogram import Client, filters
+from pyrogram.types import Message
+from utils.misc import modules_help, prefix
 
 SEARCH_URL = "https://deliriusapi-official.vercel.app/search"
 
@@ -63,3 +66,5 @@ async def ytstorron(client: Client, message: Message):
             await message.reply_text(messager, parse_mode=enums.ParseMode.MARKDOWN)
     except Exception as e:
         await message.reply_text(f"An error occurred: {str(e)}")
+
+modules_help["yts"] = {"yts": "Get yts torrent information "}
