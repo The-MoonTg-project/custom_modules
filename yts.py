@@ -40,8 +40,7 @@ async def torrentyts(query):
             return "No information found for this torrent."
     else:
         return "Failed to fetch torrent information."
-
-@Client.on_message(filters.command("yts"))
+@Client.on_message(filters.command("yts") prefix& filters.me)
 async def ytstorron(client: Client, message: Message):
     query = message.text.split(" ", 1)[1] if len(message.command) > 1 else None
     if not query:
