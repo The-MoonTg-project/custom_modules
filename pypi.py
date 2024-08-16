@@ -1,6 +1,9 @@
 from pyrogram import Client, filters
 import requests
 
+from utils.misc import modules_help, prefix
+
+
 def get_bug_track_info(package_info):
     # Check if a bug tracker URL is available
     bug_tracker_url = package_info.get('bugtrack_url', None)
@@ -13,7 +16,8 @@ def get_requirements(data):
 
 
 
-@app.on_message(filters.command("package"))
+
+@Client.on_message(filters.command(["pypi"], prefix) & filters.me)
 async def pypi_info(client, message):
     if len(message.command) != 2:
         await message.reply_text("Usage: /pypi <package_name>")
@@ -51,3 +55,8 @@ async def pypi_info(client, message):
         await message.reply(reply_message)
     else:
         await message.reply("Package not found. Please check the package name and try again.")
+
+
+modules_help["pypi"] = {
+    "pypi [request]": "To get the pypi package ."
+}
