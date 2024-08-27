@@ -22,7 +22,7 @@ async def saavn(client: Client, message: Message):
         )
         return
     ms = await message.edit_text(f"<code>Searching for {query} on saavn</code>")
-    response = requests.get(f"https://jiosaavn-api-qw5y.onrender.com/api/search/songs?query={query}")
+    response = requests.get(f"https://rsjiprivate-api.vercel.app/api/search/songs?query={query}")
 
     result = json.loads(response.text)
 
