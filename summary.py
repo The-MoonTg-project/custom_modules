@@ -3,6 +3,7 @@
 from pyrogram import Client, filters
 from newspaper import Article
 import nltk
+from utils.scripts import format_exc, import_library
 
 newspaper3k = import_library("newspaper3k")
 
