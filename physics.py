@@ -34,3 +34,61 @@ async def fetch_chemical_data_with_visual(client, message):
 
     except Exception as e:
         await message.reply(f"An error occurred: {str(e)}")
+
+
+
+INATURALIST_API_URL = "https://api.inaturalist.org/v1/observations"
+
+# Create the Pyrogram Client
+
+# Function to get marine life details from iNaturalist API
+def get_marine_life_details(species_name):
+    params = {
+        "taxon_name": species_name,
+        "quality_grade": "research",
+        "iconic_taxa": "Mollusca,Fish,Crustacea",
+        "per_page": 1
+    }
+
+    response = requests.get(INATURALIST_API_URL, params=params)
+    
+    if response.status_code == 200:
+        data = response.json()
+        if data["total_results"] > 0:
+            observation = data["results"][0]
+            species = observation["taxon"]["name"]
+            common_name = observation["taxon"]["preferred_common_name"]
+            photo_url = observation["photos"][0]["url"] if observation["photos"] else "No photo available"
+            description = observation["description"] if "description" in observation else "No description available."
+            return {
+                "species": species,
+                "common_name": common_name,
+                "photo_url": photo_url,
+                "description": description
+            }
+        else:
+            return {"error": "No marine life found for this species."}
+    else:
+        return {"error": f"Error {response.status_code}: Unable to connect to iNaturalist API."}
+
+# Command handler for marine life details
+# Command handler for marine life details
+@app.on_message(filters.command("marine_life"))
+async def marine_life_command(client, message):
+    if len(message.command) < 2:
+        await message.reply_text("Please specify a species name. Example: /marine_life dolphin")
+        return
+
+    species_name = " ".join(message.command[1:])
+    marine_life = get_marine_life_details(species_name)
+
+    if "error" in marine_life:
+        await message.reply_text(marine_life["error"])
+    else:
+        reply_text = (
+            f"**Species**: {marine_life['species']}\n"
+            f"**Common Name**: {marine_life['common_name']}\n"
+            f"**Description**: {marine_life['description']}\n"
+            f"[Photo Link]({marine_life['photo_url']})"
+        )
+        await message.reply_text(reply_text, disable_web_page_preview=False)
