@@ -1,8 +1,14 @@
-import whois
-import dns.resolver
+
 import requests
 from pyrogram import Client, filters
 from utils.misc import modules_help, prefix
+
+dnspython = import_library("dnspython")
+python-whois = import_library("python-whois")
+
+import whois
+import dns.resolver
+
 
 def get_domain_hosting_info(domain_name):
     try:
