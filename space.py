@@ -1,3 +1,11 @@
+
+import os
+import requests
+import asyncio
+from pyrogram import Client, filters, enums
+from pyrogram.types import Message
+
+from utils.misc import modules_help, prefix
 # Space-Track.org credentials
 SPACETRACK_USER = "" # Your Space-Track username
 SPACETRACK_PASS = ""  # Your Space-Track password
@@ -32,7 +40,7 @@ def fetch_satellite_data(satellite_id):
 
 
 # Command to get satellite data (TLE data, launch date, etc.)
-@app.on_message(filters.command("satellite"))
+@Client.on_message(filters.command("satellite", prefix) & filters.me)
 async def get_satellite_info(client, message):
     if len(message.command) < 2:
         await message.reply_text("Please provide a satellite ID.")
@@ -55,3 +63,6 @@ async def get_satellite_info(client, message):
     else:
         await message.reply_text("Satellite data not found.")
       
+modules_help["space"] = {
+    "satellite [id]": "get satellite details like .satellite 60454 "
+}
