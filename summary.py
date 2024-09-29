@@ -1,27 +1,38 @@
-#copyright by https/t.me/shado_hackers
+# copyright by https/t.me/shado_hackers
 
 from pyrogram import Client, filters
+from pyrogram.types import Message
 
 from utils.scripts import format_exc, import_library
 from utils.misc import modules_help, prefix
 
-newspaper3k = import_library("newspaper3k")
+import_library("lxml_html_clean")
+import_library("newspaper", "newspaper3k")
 nltk = import_library("nltk")
 from newspaper import Article
-import nltk
+from newspaper.article import ArticleException
 
-# Download the NLTK data for tokenization
 
-nltk.download('all')
+nltk.download("all")
 
-# Article summary handler
-@Client.on_message(filters.command('summary', prefix) & filters.me)
-async def summarize_article(client, message):
+
+@Client.on_message(filters.command("summary", prefix) & filters.me)
+async def summarize_article(_, message: Message):
+    """
+    Summarize an article from a given URL.
+
+    Args:
+        client (Client): Pyrogram client instance.
+        message (Message): Incoming message.
+
+    Returns:
+        None
+    """
     # Extract the URL from the message text (removing the command part)
     url = message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else None
 
     if not url:
-        await message.reply_text("Please provide a valid URL after the command.")
+        await message.edit_text("Please provide a valid URL after the command.")
         return
 
     try:
@@ -30,22 +41,24 @@ async def summarize_article(client, message):
         article.download()
         article.parse()
         article.nlp()  # Uses NLP to analyze the article
-        
-        # Prepare response
-        title = f"**Title**: {article.title}\n"
-        authors = f"**Authors**: {', '.join(article.authors)}\n" if article.authors else ""
-        summary = f"**Summary**:\n{article.summary}\n"
-        
-        response = title + authors + summary
 
-        # Send the article summary
-        await message.reply_text(response, parse_mode=enums.ParseMode.MARKDOWN)
-        
+        response = f"""
+        <b>Article Summary</b>
+        <b>Title:</b> <code>{article.title}</code>
+        <b>Authors:</b> <code>{', '.join(article.authors) if article.authors else 'N/A'}</code>
+        <b>Summary:</b>
+        <pre>{article.summary}</pre>
+        """
+        await message.edit_text(response)
+    except ArticleException:
+        return await message.edit_text(
+            "Unable to extract information from the provided URL."
+        )
+
     except Exception as e:
-        # Error handling for invalid URL or other issues
-        await message.reply_text(f"An error occurred: {str(e)}")
+        return await message.edit_text(f"An error occurred: {format_exc(e)}")
+
 
 modules_help["summary"] = {
-    "summary [url]": " reply with artical links,getting summary of articles"
-     
+    "summary [url]": "Reply with article links, getting summary of articles"
 }
