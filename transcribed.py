@@ -6,6 +6,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.errors import MessageTooLong
 import os
 import time
+from utils.misc import modules_help, prefix
 
 
 # Replace with your Gladia API key
@@ -23,7 +24,7 @@ def make_fetch_request(url, headers, method='GET', data=None):
 
 
 
-@Client.on_message(filters.command("transcribe"))
+@Client.on_message(filters.command("transcribe", prefix) & filters.me)
 async def transcribe_audio(client, message):
     audio_url = message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else None
 
@@ -86,3 +87,8 @@ async def transcribe_audio(client, message):
             await message.reply(f"Transcription status: {poll_response.get('status')}")
             time.sleep(30)  # Wait for a few seconds before polling again
 
+
+modules_help["transcribe"] = {
+    "transcribe [yt video url]": " reply with yt video link to  getting transcribed "
+     
+}
