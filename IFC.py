@@ -1,5 +1,6 @@
 from pyrogram import Client, filters
 import requests as req
+from utils.misc import modules_help, prefix
 
 API_URL = 'https://ifsc.razorpay.com/'
 
@@ -35,3 +36,6 @@ async def ifsc(client, message):
     except Exception as e:
         await message.reply("Invalid IFSC Code 😕")
       
+modules_help["ifsc"] = {
+    "ifsc [ifsc code ]": " Get the IFSC code with Full details "
+}
