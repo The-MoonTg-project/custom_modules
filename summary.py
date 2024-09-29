@@ -1,14 +1,14 @@
 #copyright by https/t.me/shado_hackers
 
 from pyrogram import Client, filters
-from newspaper import Article
-import nltk
+
 from utils.scripts import format_exc, import_library
 from utils.misc import modules_help, prefix
 
 newspaper3k = import_library("newspaper3k")
-
 nltk = import_library("nltk")
+from newspaper import Article
+import nltk
 
 # Download the NLTK data for tokenization
 
