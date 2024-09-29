@@ -1,12 +1,11 @@
 from pyrogram import Client, filters
-import pubchempy as pcp
+
 from utils.scripts import format_exc, import_library
 
 from utils.misc import modules_help, prefix
 
 pubchempy = import_library("pubchempy")
-
-
+import pubchempy as pcp
 
 @Client.on_message(filters.command("camistry", prefix) & filters.me)
 async def fetch_chemical_data_with_visual(client, message):
