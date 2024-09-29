@@ -2,11 +2,13 @@ from pyrogram import Client, filters
 import pubchempy as pcp
 from utils.scripts import format_exc, import_library
 
+from utils.misc import modules_help, prefix
+
 pubchempy = import_library("pubchempy")
 
 
 
-@Client.on_message(filters.command("camistry"))
+@Client.on_message(filters.command("camistry", prefix) & filters.me)
 async def fetch_chemical_data_with_visual(client, message):
     query = " ".join(message.text.split()[1:])  # Combine query words properly
 
@@ -73,7 +75,7 @@ def get_marine_life_details(species_name):
 
 # Command handler for marine life details
 # Command handler for marine life details
-@app.on_message(filters.command("marine_life"))
+@app.on_message(filters.command("marinelife", prefix) & filters.me)
 async def marine_life_command(client, message):
     if len(message.command) < 2:
         await message.reply_text("Please specify a species name. Example: /marine_life dolphin")
@@ -92,3 +94,11 @@ async def marine_life_command(client, message):
             f"[Photo Link]({marine_life['photo_url']})"
         )
         await message.reply_text(reply_text, disable_web_page_preview=False)
+
+
+
+
+modules_help["science"] = {
+    "camistry [text]": " getting camicale info"
+     "marinelife [text]": " getting marinelife info"
+}
