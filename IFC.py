@@ -4,7 +4,7 @@ from utils.misc import modules_help, prefix
 
 API_URL = 'https://ifsc.razorpay.com/'
 
-@Client.on_message(filters.command('ifsc'))
+@Client.on_message(filters.command('ifsc', prefix) & filters.me)
 async def ifsc(client, message):
     try:
         ifsc_code = message.text.split(' ')[1]
