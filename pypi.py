@@ -20,7 +20,7 @@ def get_requirements(data):
 @Client.on_message(filters.command(["pypi"], prefix) & filters.me)
 async def pypi_info(client, message):
     if len(message.command) != 2:
-        await message.reply_text("Usage: /pypi <package_name>")
+        await message.reply_text(f"Usage: {prefix}pypi <package_name>")
         return
 
     package_name = message.command[1]
