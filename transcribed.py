@@ -50,7 +50,7 @@ async def transcribe_audio(client, message):
         return
 
     result_url = initial_response["result_url"]
-    await message.reply(f"Initial request sent. Polling for transcription results...")
+    await message.edit(f"Initial request sent. Polling for transcription results...")
 
     # Polling for transcription result
     while True:
@@ -81,10 +81,10 @@ async def transcribe_audio(client, message):
                     # Clean up by removing the file
                     os.remove("transcription.txt")
             else:
-                await message.reply("Transcription completed, but no transcript was found.")
+                await message.edit("Transcription completed, but no transcript was found.")
             break
         else:
-            await message.reply(f"Transcription status: {poll_response.get('status')}")
+            await message.edit(f"Transcription status: {poll_response.get('status')}")
             time.sleep(30)  # Wait for a few seconds before polling again
 
 
