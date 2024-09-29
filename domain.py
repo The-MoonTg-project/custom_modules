@@ -2,6 +2,7 @@ import whois
 import dns.resolver
 import requests
 from pyrogram import Client, filters
+from utils.misc import modules_help, prefix
 
 def get_domain_hosting_info(domain_name):
     try:
@@ -37,7 +38,7 @@ def get_ip_geolocation(ip):
         print(f"Failed to get IP geolocation: {e}")
         return None
 
-@Client.on_message(filters.command("domain"))
+@Client.on_message(filters.command("domain", prefix) & filters.me)
 async def get_domain_info(client, message):
     if len(message.command) > 1:
         domain_name = message.text.split("/domain ", 1)[1]
@@ -79,5 +80,9 @@ async def get_domain_info(client, message):
 
         await message.reply(response)
     else:
-        await message.reply("Please provide a domain name after the /domain command.")
-        
+        await message.reply("Please provide a domain name after the .domain Google.com .")
+
+
+modules_help["domain"] = {
+    "domain [url]": "domain google.com"
+}
