@@ -4,6 +4,7 @@ from pyrogram import Client, filters
 from newspaper import Article
 import nltk
 from utils.scripts import format_exc, import_library
+from utils.misc import modules_help, prefix
 
 newspaper3k = import_library("newspaper3k")
 
@@ -14,7 +15,7 @@ nltk = import_library("nltk")
 nltk.download('all')
 
 # Article summary handler
-@Client.on_message(filters.command('summary'))
+@Client.on_message(filters.command('summary', prefix) & filters.me)
 async def summarize_article(client, message):
     # Extract the URL from the message text (removing the command part)
     url = message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else None
@@ -43,3 +44,8 @@ async def summarize_article(client, message):
     except Exception as e:
         # Error handling for invalid URL or other issues
         await message.reply_text(f"An error occurred: {str(e)}")
+
+modules_help["summary"] = {
+    "summary [url]": " reply with artical links,getting summary of articles"
+     
+}
