@@ -47,7 +47,7 @@ def get_ip_geolocation(ip):
 @Client.on_message(filters.command("domain", prefix) & filters.me)
 async def get_domain_info(client, message):
     if len(message.command) > 1:
-        domain_name = message.text.split("/domain ", 1)[1]
+        domain_name = message.text.split(f"{prefix}domain ", 1)[1]
         domain_info = get_domain_hosting_info(domain_name)
         dns_records = get_dns_records(domain_name)
         
