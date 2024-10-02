@@ -1,7 +1,7 @@
 name: Request Module
-about: Request a new module or suggest improvements for a specific module
+about: "Request a new module or suggest improvements for a specific module"
 title: "[Module Name] - Short Description"
-labels: 'enhancement'
+labels: enhancement
 assignees: ''
 body:
 - type: markdown
