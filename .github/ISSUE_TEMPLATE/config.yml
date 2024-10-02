@@ -1,0 +1,7 @@
+blank_issues_enabled: true
+issue_templates:
+  - name: Module Request
+    description: Suggest a new module or enhancement.
+    title: "[Module Request] - Short Description"
+    labels: "enhancement"
+    assignees: ''
