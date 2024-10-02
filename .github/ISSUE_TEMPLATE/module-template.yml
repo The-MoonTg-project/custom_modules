@@ -4,7 +4,7 @@ title: "[Module Name] - Short Description"
 labels: enhancement
 
 body:
-- type: markdown
+- type: textarea
   attributes:
     value: |
       **Module Name**
