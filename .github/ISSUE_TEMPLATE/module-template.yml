@@ -1,6 +1,6 @@
 name: Request Module
 description: "Request a new module or suggest improvements for a specific module"
-title: "[Module Name] - Short Description"
+title: "[Module Name]"
 labels: enhancement
 
 body:
