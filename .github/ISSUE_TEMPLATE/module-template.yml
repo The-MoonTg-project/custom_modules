@@ -5,7 +5,10 @@ labels: enhancement
 
 body:
 - type: textarea
+  id: description
   attributes:
+    label: Details
+    description: "Describe your request"
     value: |
       **Module Name**
       Provide the name of the module involved in the issue.
