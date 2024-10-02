@@ -1,20 +1,20 @@
----
 name: Request Module
 about: Request a new module or suggest improvements for a specific module
 title: "[Module Name] - Short Description"
 labels: 'enhancement'
 assignees: ''
-
----
-
-**Module Name**
-Provide the name of the module involved in the issue.
-
-**Description**
-Provide a clear and concise description of your request. Include any additional information that might help in understanding the request better.
-
-**Related Links (if available)**
-Provide any related links or references (e.g., documentation, StackOverflow questions, PRs, etc.) that might help in understanding the issue.
-
-**Additional Context**
-Add any other context about the issue here (e.g., screenshots, logs, etc.).
+body:
+- type: markdown
+  attributes:
+    value: |
+      **Module Name**
+      Provide the name of the module involved in the issue.
+      
+      **Description**
+      Provide a clear and concise description of your request. Include any additional information that might help in understanding the request better.
+      
+      **Related Links (if available)**
+      Provide any related links or references (e.g., documentation, StackOverflow questions, PRs, etc.) that might help in understanding the issue.
+      
+      **Additional Context**
+      Add any other context about the issue here (e.g., screenshots, logs, etc.).
