@@ -9,7 +9,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc, import_library
+from utils.scripts import format_exc
 from utils.config import gemini_key
 
 genai.configure(api_key=gemini_key)
@@ -34,8 +34,9 @@ async def getai(_, message: Message):
         base_img = await message.reply_to_message.download()
 
         img = PIL.Image.open(base_img)
+        prompt = "Get details of given image, be as accurate as possible."
 
-        response = model.generate_content(img)
+        response = model.generate_content([prompt, img])
 
         await message.edit_text(
             f"**Detail Of Image:** {response.text}", parse_mode=enums.ParseMode.MARKDOWN
