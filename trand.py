@@ -1,7 +1,11 @@
-from pyrogram import Client as app , filters
+from pyrogram import Client, filters
 from bs4 import BeautifulSoup
 import aiohttp
 import random
+
+
+from utils.misc import modules_help, prefix
+
 
 # Function to get a random user agent (optional but recommended)
 def get_ua():
@@ -47,11 +51,11 @@ async def get_trendings(country: str):
 
 
 # Command to get trends based on a given country
-@app.on_message(filters.command("trend"))
+@Client.on_message(filters.command("trand", prefix) & filters.me)
 async def trend_command(client, message):
     # Get the country code from the command arguments
     if len(message.command) < 2:
-        await message.reply("Please specify a country code, e.g., `/trend us`.")
+        await message.reply("Please specify a country code, e.g., `/trend india`.")
         return
     
     country = message.command[1].lower()
@@ -77,3 +81,9 @@ async def trend_command(client, message):
         response += f"- [{tag['title']}]({tag['url']})\n"
 
     await message.reply(response, disable_web_page_preview=True)
+
+
+
+modules_help["trand"] = {
+    "tranf [country]": "get latest twitter trading of a country "
+}
