@@ -67,7 +67,7 @@ async def fakeactions_handler(client: Client, message: Message):
 
 modules_help['fakeactions'] = {
     'ftype [sec]': 'Typing... action',
-    'fvoice [sec]': 'Sending voice... action',
+    'faudio [sec]': 'Sending voice... action',
     'fvideo [sec]': 'Sending video... action',
     'fphoto [sec]': 'Sending photo... action',
     'fdocument [sec]': 'Sending document... action',
