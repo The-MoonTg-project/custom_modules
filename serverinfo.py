@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import platform
 import sys
+import time
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
@@ -50,7 +51,8 @@ text = (
     "    Upload: {}MB\n"
     "    Download: {}MB\n"
     "    Total: {}MB\n"
-    "    IPv4: <code>{}</code>\n\n"
+    "    IPv4: <code>{}</code>\n"
+    "    Latency: {}ms\n\n"
     "<u>🧾 Dist info</u>\n"
     "    Kernel: {}\n    Arch: {}\n"
     "    OS: {}\n\n"
@@ -148,6 +150,16 @@ async def serverinfo_cmd(_: Client, message: Message):
         else:
             ip = "***"
         inf.append(escape_html(ip))
+
+    except Exception:
+        inf.append("n/a")
+
+    try:
+        start = time.time()
+        await message.edit("<b>Pong!</b>")
+        end = time.time()
+        latency_ms = round((end - start) * 1000, 3)
+        inf.append(latency_ms)
     except Exception:
         inf.append("n/a")
 
