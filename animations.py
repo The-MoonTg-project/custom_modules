@@ -1,13 +1,14 @@
-import os
 import asyncio
 from collections import deque
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
-from utils.misc import modules_help, requirements_list, prefix
+from utils.misc import modules_help, prefix
+
+mention = f"<a href = https://github.com/The-MoonTg-project/Moon-Userbot>Moon-Userbot</a>"
 
 
 @Client.on_message(filters.command("stupid", prefix) & filters.me)
-async def stupid(client: Client, message: Message):
+async def stupid(_, message: Message):
     animation_interval = 0.5
     animation_ttl = range(0, 14)
     await message.edit_text("stupid boy")
@@ -35,7 +36,7 @@ async def stupid(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("bombs", prefix) & filters.me)
-async def bombs(client: Client, message: Message):
+async def bombs(_, message: Message):
 
     await message.edit_text("▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n")
     await asyncio.sleep(0.5)
@@ -60,7 +61,7 @@ async def bombs(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("call", prefix) & filters.me)
-async def cell(client: Client, message: Message):
+async def cell(_, message: Message):
 
     animation_interval = 3
     animation_ttl = range(0, 18)
@@ -91,7 +92,7 @@ async def cell(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("wtf", prefix) & filters.me)
-async def wtf(client: Client, message: Message):
+async def wtf(_, message: Message):
 
     animation_interval = 0.8
     animation_ttl = range(0, 5)
@@ -110,7 +111,7 @@ async def wtf(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("ding", prefix) & filters.me)
-async def ding(client: Client, message: Message):
+async def ding(_, message: Message):
     animation_interval = 0.3
     animation_ttl = range(0, 30)
     animation_chars = [
@@ -134,7 +135,7 @@ async def ding(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("hypo", prefix) & filters.me)
-async def hypo(client: Client, message: Message):
+async def hypo(_, message: Message):
     animation_interval = 0.3
     animation_ttl = range(0, 15)
     await message.edit_text("hypo....")
@@ -161,7 +162,7 @@ async def hypo(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("gangster", prefix) & filters.me)
-async def gangster(client: Client, message: Message):
+async def gangster(_, message: Message):
     await message.edit_text("EVERyBOdy")
     await asyncio.sleep(0.3)
     await message.edit_text("iZ")
@@ -180,7 +181,7 @@ async def gangster(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("charge", prefix) & filters.me)
-async def timer_blankx(client: Client, message: Message):
+async def timer_blankx(_, message: Message):
     txt = (
         message.text[10:]
         + "\n\n<b>Tesla Wireless Charging (beta) Started...\nDevice Detected: Apple iPad 13\nBattery Percentage:</b> "
@@ -200,7 +201,7 @@ async def timer_blankx(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("kill", prefix) & filters.me)
-async def kill(client: Client, message: Message):
+async def kill(_, message: Message):
     animation_interval = 0.3
     animation_ttl = range(0, 103)
     animation_chars = [
@@ -226,7 +227,7 @@ async def kill(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("earth", prefix) & filters.me)
-async def earth(client: Client, message: Message):
+async def earth(_, message: Message):
     deq = deque(list("🌏🌍🌎🌎🌍🌏🌍🌎"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -235,7 +236,7 @@ async def earth(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("think", prefix) & filters.me)
-async def think(client: Client, message: Message):
+async def think(_, message: Message):
     deq = deque(list("🤔🧐🤔🧐🤔🧐"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -244,7 +245,7 @@ async def think(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("lmao", prefix) & filters.me)
-async def lmao(client: Client, message: Message):
+async def lmao(_, message: Message):
     deq = deque(list("😂🤣😂🤣😂🤣"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -253,7 +254,7 @@ async def lmao(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("clock", prefix) & filters.me)
-async def clock(client: Client, message: Message):
+async def clock(_, message: Message):
     deq = deque(list("🕙🕘🕗🕖🕕🕔🕓🕒🕑🕐🕛"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -262,7 +263,7 @@ async def clock(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("heart", prefix) & filters.me)
-async def heart(client: Client, message: Message):
+async def heart(_, message: Message):
     deq = deque(list("❤️🧡💛💚💙💜🖤"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -271,7 +272,7 @@ async def heart(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("gym", prefix) & filters.me)
-async def gym(client: Client, message: Message):
+async def gym(_, message: Message):
     deq = deque(list("🏃‍🏋‍🤸‍🏃‍🏋‍🤸‍🏃‍🏋‍🤸‍"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -280,7 +281,7 @@ async def gym(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("moon", prefix) & filters.me)
-async def moon(client: Client, message: Message):
+async def moon(_, message: Message):
     deq = deque(list("🌗🌘🌑🌒🌓🌔🌕🌖‍"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -289,7 +290,7 @@ async def moon(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("stars", prefix) & filters.me)
-async def stars(client: Client, message: Message):
+async def stars(_, message: Message):
     deq = deque(list("🦋✨🦋✨🦋✨🦋✨‍"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -298,7 +299,7 @@ async def stars(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("boxs", prefix) & filters.me)
-async def boxs(client: Client, message: Message):
+async def boxs(_, message: Message):
     deq = deque(list("🟥🟧🟨🟩🟦🟪🟫⬛⬜"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -307,7 +308,7 @@ async def boxs(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("rain", prefix) & filters.me)
-async def rain(client: Client, message: Message):
+async def rain(_, message: Message):
     deq = deque(list("🌬☁️🌩🌨🌧🌦🌥⛅🌤"))
     for _ in range(48):
         await asyncio.sleep(0.1)
@@ -315,8 +316,35 @@ async def rain(client: Client, message: Message):
         deq.rotate(1)
 
 
+@Client.on_message(filters.command("bird", prefix) & filters.me)
+async def bird(_, message: Message):
+    deq = deque(list("𓅰𓅬𓅭𓅮𓅯"))
+    for _ in range(48):
+        await asyncio.sleep(0.1)
+        await message.edit_text("".join(deq))
+        deq.rotate(1)
+
+
+@Client.on_message(filters.command("fish", prefix) & filters.me)
+async def fish(_, message: Message):
+    deq = deque(list("𓆝𓆟𓆞𓆝𓆟"))
+    for _ in range(48):
+        await asyncio.sleep(0.1)
+        await message.edit_text("".join(deq))
+        deq.rotate(1)
+
+
+@Client.on_message(filters.command("goat", prefix) & filters.me)
+async def goat(_, message: Message):
+    deq = deque(list("𓃖𓃗𓃘𓃙𓃚𓃛𓃜"))
+    for _ in range(48):
+        await asyncio.sleep(0.1)
+        await message.edit_text("".join(deq))
+        deq.rotate(1)
+
+
 @Client.on_message(filters.command("smoon", prefix) & filters.me)
-async def smoon(client: Client, message: Message):
+async def smoon(_, message: Message):
     animation_interval = 0.2
     animation_ttl = range(101)
     animation_chars = [
@@ -337,11 +365,8 @@ async def smoon(client: Client, message: Message):
         await message.edit_text(animation_chars[i % 8])
 
 
-mention = f"<a href = https://github.com/The-MoonTg-project/Moon-Userbot>Moon-Userbot</a>"
-
-
 @Client.on_message(filters.command("deploy", prefix) & filters.me)
-async def deploy(client: Client, message: Message):
+async def deploy(_, message: Message):
     animation_interval = 3
     animation_ttl = range(101)
     animation_chars = [
@@ -367,7 +392,7 @@ async def deploy(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("tmoon", prefix) & filters.me)
-async def tmoon(client: Client, message: Message):
+async def tmoon(_, message: Message):
     animation_interval = 0.2
     animation_ttl = range(96)
     animation_chars = [
@@ -412,6 +437,7 @@ async def tmoon(client: Client, message: Message):
         await message.edit_text(animation_chars[i % 32])
 
 
+
 modules_help["animations"] = {
     "stupid": " stupid animation",
     "gangster": "YO! Gangster animation",
@@ -422,12 +448,20 @@ modules_help["animations"] = {
     "call": "call to durov",
     "bombs": "bombing animation",
     "kill": "fireee animation = target killed ~_- ",
+    "deploy": "Fake heroku deploy animation",
     "gym": "Fun animation try yourself to know more",
+    "boxs": "Fun animation try yourself to know more",
+    "stars": "Fun animation try yourself to know more",
+    "goat": "Fun animation try yourself to know more",
+    "bird": "Fun animation try yourself to know more",
+    "rain": "Fun animation try yourself to know more",
+    "fish": "Fun animation try yourself to know more",
     "heart": "Fun animation try yourself to know more",
     "clock": "Fun animation try yourself to know more",
     "lmao": "Fun animation try yourself to know more",
     "think": "Fun animation try yourself to know more",
     "earth": "Fun animation try yourself to know more",
+    "moon": "Fun animation try yourself to know more",
     "smoon": "Fun animation try yourself to know more",
     "tmoon": "Fun animation try yourself to know more",
 }
