@@ -31,7 +31,10 @@ model_cook = genai.GenerativeModel(
 async def getai(_, message: Message):
     try:
         await message.edit_text("<code>Please Wait...</code>")
-        base_img = await message.reply_to_message.download()
+        try:
+            base_img = await message.reply_to_message.download()
+        except AttributeError:
+            return await message.edit_text("<code>Please reply to an image...</code>")
 
         img = Image.open(base_img)
         prompt = "Get details of given image, be as accurate as possible."
