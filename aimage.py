@@ -44,10 +44,10 @@ async def getai(_, message: Message):
         await message.edit_text(
             f"**Detail Of Image:** {response.text}", parse_mode=enums.ParseMode.MARKDOWN
         )
+        os.remove(base_img)
+        return
     except Exception as e:
         await message.edit_text(f"An error occurred: {format_exc(e)}")
-    finally:
-        os.remove(base_img)
 
 
 @Client.on_message(filters.command("aicook", prefix) & filters.me)
@@ -56,7 +56,10 @@ async def aicook(_, message: Message):
         try:
             await message.edit_text("<code>Cooking...</code>")
 
-            base_img = await message.reply_to_message.download()
+            try:
+                base_img = await message.reply_to_message.download()
+            except AttributeError:
+                return await message.edit_text("<code>Please reply to an image...</code>")
 
             img = Image.open(base_img)
             cook_img = [
@@ -88,7 +91,10 @@ async def aiseller(_, message: Message):
                     f"<b>Usage: </b><code>{prefix}aiseller [target audience] [reply to product image]</code>"
                 )
 
-            base_img = await message.reply_to_message.download()
+            try:
+                base_img = await message.reply_to_message.download()
+            except AttributeError:
+                return await message.edit_text("<code>Please reply to an image...</code>")
 
             img = Image.open(base_img)
             sell_img = [
