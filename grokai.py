@@ -41,7 +41,7 @@ async def fetch_grok_response(query: str, message: Message, reply=False):
 
     grok_api_key = db.get("custom.grok", "api_key", None)
     if not grok_api_key:
-        return await response_msg.edit_text("Grok API key is not set. Use /set_grokapi to set it.")
+        return await response_msg.edit_text(f"Grok API key is not set. Use {prefix}set_grokapi to set it.")
 
     headers = {
         "Authorization": f"Bearer {grok_api_key}",
