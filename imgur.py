@@ -10,11 +10,9 @@ from utils.misc import modules_help, prefix
 
 
 @Client.on_message(filters.command(["imgur"], prefix) & filters.me)
-async def imgur(client: Client, messageL Message):
+async def imgur(_, message: Message):
     # Check if a reply exists
-    msg = await message.reply_text(
-      "🎉 Please patience. trying to upload..."
-    )
+    msg = await message.edit_text("🎉 Please wait. trying to upload...")
     if message.reply_to_message and message.reply_to_message.photo:
         # Download the photo
         photo_path = await message.reply_to_message.download()
@@ -44,7 +42,11 @@ async def imgur(client: Client, messageL Message):
         result = response.json()
         await msg.edit_text(result["data"]["link"])
     else:
-        await msg.edit_text("Please reply to a photo or animation (GIF) to upload to Imgur.")
+        await msg.edit_text(
+            "Please reply to a photo or animation (GIF) to upload to Imgur."
+        )
 
 
-modules_help["imgur"] = {"imgur [img]*": "upload umg to imgur",}
+modules_help["imgur"] = {
+    "imgur [img]*": "upload a photo or animation (GIF) to imgur",
+}
