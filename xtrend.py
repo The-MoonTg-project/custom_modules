@@ -83,6 +83,6 @@ async def trend_command(client, message):
 
 
 modules_help["xtrend"] = {
-    "xtrend [country]": "get latest twitter trading of a country "
+    "xtrend [country]": "get latest twitter trending of a country "
     "if no country is given then it will show global trending",
 }
