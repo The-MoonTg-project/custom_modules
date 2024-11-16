@@ -76,7 +76,7 @@ async def aicook(_, message: Message):
             return
         except Exception as e:
             await message.edit_text(str(e))
-    return await message.edit_text("Kindly reply to an image!")
+    return await message.edit_text("<code>Please reply to an image...</code>")
 
 
 @Client.on_message(filters.command("aiseller", prefix) & filters.me)
@@ -116,7 +116,7 @@ async def aiseller(_, message: Message):
             await message.edit_text(
                 f"<b>Usage: </b><code>{prefix}aiseller [target audience] [reply to product image]</code>"
             )
-    return await message.edit_text("Kindly reply to an image!")
+    return await message.edit_text("<code>Please reply to an image...</code>")
 
 
 modules_help["aimage"] = {
