@@ -2,7 +2,7 @@
 # This is used on my Moon-Userbot: https://github.com/The-MoonTg-project/Moon-Userbot
 # YOu can check it out for uses example
 import os
-import PIL.Image
+from PIL import Image
 import google.generativeai as genai
 
 from pyrogram import Client, filters, enums
@@ -33,7 +33,7 @@ async def getai(_, message: Message):
         await message.edit_text("<code>Please Wait...</code>")
         base_img = await message.reply_to_message.download()
 
-        img = PIL.Image.open(base_img)
+        img = Image.open(base_img)
         prompt = "Get details of given image, be as accurate as possible."
 
         response = model.generate_content([prompt, img])
@@ -55,7 +55,7 @@ async def aicook(_, message: Message):
 
             base_img = await message.reply_to_message.download()
 
-            img = PIL.Image.open(base_img)
+            img = Image.open(base_img)
             cook_img = [
                 "Accurately identify the baked good in the image and provide an appropriate and recipe consistent with your analysis. ",
                 img,
@@ -87,7 +87,7 @@ async def aiseller(_, message: Message):
 
             base_img = await message.reply_to_message.download()
 
-            img = PIL.Image.open(base_img)
+            img = Image.open(base_img)
             sell_img = [
                 "Given an image of a product and its target audience, write an engaging marketing description",
                 "Product Image: ",
