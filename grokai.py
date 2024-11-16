@@ -59,7 +59,7 @@ async def fetch_grok_response(query: str, message: Message, reply=False):
     }
 
     try:
-        response = requests.post(GROK_API_URL, headers=headers, json=payload, timeout=10)
+        response = requests.post(GROK_API_URL, headers=headers, json=payload)
         response.raise_for_status()
 
         data = response.json()
