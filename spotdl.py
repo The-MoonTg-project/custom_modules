@@ -88,7 +88,7 @@ async def spotdl(_, message: Message):
                 if filename.endswith(".mp3"):
                     try:
                         check_call("exiftool", f"shutil/{filename}")
-                        thumb = get_thumb(filename) 
+                        thumb = get_thumb(filename)
                     except CalledProcessError:
                         thumb = None
                     await message.reply_audio(

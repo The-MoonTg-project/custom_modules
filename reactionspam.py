@@ -31,7 +31,11 @@ async def reactspam(client: Client, message: Message):
     try:
         selected_emojis = random.sample(emojis, 3)
         print(selected_emojis)
-        await client.send_reaction(message.chat.id, message_id=message.reply_to_message.id, emoji=selected_emojis)
+        await client.send_reaction(
+            message.chat.id,
+            message_id=message.reply_to_message.id,
+            emoji=selected_emojis,
+        )
         await message.delete()
     except Exception as e:
         return await message.edit_text(format_exc(e))

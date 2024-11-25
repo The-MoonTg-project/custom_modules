@@ -11,7 +11,9 @@ async def tiktok(client: Client, message: Message):
     elif message.reply_to_message:
         link = message.reply_to_message.text
     else:
-        await message.edit("<b>Link isn't provided</b>", parse_mode=enums.ParseMode.HTML)
+        await message.edit(
+            "<b>Link isn't provided</b>", parse_mode=enums.ParseMode.HTML
+        )
         return
 
     try:

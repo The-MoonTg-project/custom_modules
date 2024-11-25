@@ -24,7 +24,7 @@ async def prussian_cmd(_, message: Message):
         "хуй",
     ]
     splitted = message.reply_to_message.text.split()
-    
+
     for i in range(0, len(splitted), random.randint(2, 3)):
         for j in range(1, 2):
             splitted.insert(i, random.choice(words))

@@ -18,6 +18,7 @@ mlog_enabled = filters.create(lambda _, __, ___: db.get("custom.mlog", "status",
 user_media_cache = defaultdict(list)
 media_processing_tasks = {}
 
+
 @Client.on_message(filters.command(["mlog"], prefix) & filters.me)
 async def mlog(_, message: Message):
     if len(message.command) < 2 or message.command[1].lower() not in ["on", "off"]:
@@ -25,13 +26,17 @@ async def mlog(_, message: Message):
 
     status = message.command[1].lower() == "on"
     db.set("custom.mlog", "status", status)
-    await message.edit(f"<b>Media logging is now {'enabled' if status else 'disabled'}</b>")
+    await message.edit(
+        f"<b>Media logging is now {'enabled' if status else 'disabled'}</b>"
+    )
 
 
 @Client.on_message(filters.command(["msetchat"], prefix) & filters.me)
 async def set_chat(_, message: Message):
     if len(message.command) < 2:
-        return await message.edit(f"<b>Usage:</b> <code>{prefix}msetchat [chat_id]</code>")
+        return await message.edit(
+            f"<b>Usage:</b> <code>{prefix}msetchat [chat_id]</code>"
+        )
 
     try:
         chat_id = message.command[1]
@@ -55,7 +60,9 @@ async def media_log(client: Client, message: Message):
     user_media_cache[user_id].append(message)
 
     if user_id not in media_processing_tasks:
-        media_processing_tasks[user_id] = asyncio.create_task(process_media(client, message.from_user))
+        media_processing_tasks[user_id] = asyncio.create_task(
+            process_media(client, message.from_user)
+        )
 
 
 async def process_media(client: Client, user):

@@ -24,7 +24,7 @@ async def wiki(_, message: Message):
 <code>{user_request}</code>
 <b>Result:</b>
 <code>{result}</code>""",
-parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
         )
     except Exception as e:
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)

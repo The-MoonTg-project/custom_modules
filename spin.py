@@ -108,10 +108,14 @@ async def spin_handler(client: Client, message: Message):
                 and not filename.endswith(".jpg")
                 and not filename.endswith(".jpeg")
             ):
-                return await message.edit("<b>Invalid file type!</b>", parse_mode=enums.ParseMode.HTML)
+                return await message.edit(
+                    "<b>Invalid file type!</b>", parse_mode=enums.ParseMode.HTML
+                )
         elif message.reply_to_message.sticker:
             if message.reply_to_message.sticker.is_video:
-                return await message.edit("<b>Video stickers not allowed</b>", parse_mode=enums.ParseMode.HTML)
+                return await message.edit(
+                    "<b>Video stickers not allowed</b>", parse_mode=enums.ParseMode.HTML
+                )
             filename = "sticker.webp"
         elif message.reply_to_message.text:
             result = await quote_cmd(client, message)
@@ -127,7 +131,8 @@ async def spin_handler(client: Client, message: Message):
             await message.reply_to_message.download(f"downloads/{filename}")
     except Exception as ex:
         return await message.edit(
-            f"<b>Message can not be loaded:</b>\n<code>{format_exc(ex)}</code>", parse_mode=enums.ParseMode.HTML
+            f"<b>Message can not be loaded:</b>\n<code>{format_exc(ex)}</code>",
+            parse_mode=enums.ParseMode.HTML,
         )
     await message.edit("<b>Spinning...</b>", parse_mode=enums.ParseMode.HTML)
     offset = int(message.command[1]) if len(message.command) > 1 else 10

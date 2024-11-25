@@ -31,7 +31,10 @@ async def blackbox(client, message):
 
             if m.reply_to_message and (
                 m.reply_to_message.photo
-                or (m.reply_to_message.sticker and not m.reply_to_message.sticker.is_video)
+                or (
+                    m.reply_to_message.sticker
+                    and not m.reply_to_message.sticker.is_video
+                )
             ):
                 file_name = f"blackbox_{m.chat.id}.jpeg"
                 file_path = await m.reply_to_message.download(file_name=file_name)
@@ -68,7 +71,9 @@ async def blackbox(client, message):
                 headers = {"Content-Type": "application/json"}
                 url = "https://www.blackbox.ai/api/chat"
                 try:
-                    async with session.post(url, headers=headers, json=data) as response:
+                    async with session.post(
+                        url, headers=headers, json=data
+                    ) as response:
                         response_text = await response.text()
                 except Exception as e:
                     return await msg.edit(f"❌ Error: {str(e)}")
@@ -99,7 +104,9 @@ async def blackbox(client, message):
                 headers = {"Content-Type": "application/json"}
                 url = "https://www.blackbox.ai/api/chat"
                 try:
-                    async with session.post(url, headers=headers, json=data) as response:
+                    async with session.post(
+                        url, headers=headers, json=data
+                    ) as response:
                         response_text = await response.text()
                 except Exception as e:
                     return await msg.edit(f"❌ Error: {str(e)}")

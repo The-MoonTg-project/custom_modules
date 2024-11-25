@@ -15,7 +15,9 @@ async def forward(client: Client, message: Message):
         try:
             target = await client.get_chat(sta)
         except RPCError:
-            await message.edit("<b>Unknown target.</b>", parse_mode=enums.ParseMode.HTML)
+            await message.edit(
+                "<b>Unknown target.</b>", parse_mode=enums.ParseMode.HTML
+            )
             return
         msgs = []
         async for msg in client.get_chat_history(message.chat.id):

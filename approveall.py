@@ -11,6 +11,7 @@ async def example_edit(client: Client, message: Message):
     await message.edit_text("Done")
     await message.delete()
 
+
 modules_help["approveall"] = {
     "apall": "approve all pending join requests",
 }

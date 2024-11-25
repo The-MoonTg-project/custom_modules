@@ -45,7 +45,7 @@ async def enews(_, message):
 
     except Exception as e:  # Replace with specific exception type if possible
         return await message.edit_text(format_exc(e))
-    
+
 
 @Client.on_message(filters.command("nasa", prefix) & filters.me)
 async def aposj(client, message):
@@ -76,23 +76,30 @@ async def hastag(bot: Client, message: Message):
     url = "https://all-hashtag.com/library/contents/ajax_generator.php"
     await message.edit_text("Generating hashtags for ya...")
     try:
-        text = message.text.split(' ',1)[1]
+        text = message.text.split(" ", 1)[1]
         data = dict(keyword=text, filter="top")
 
         res = requests.post(url, data).text
 
-        content = BeautifulSoup(res, 'html.parser').find("div", {"class":"copy-hashtags"}).string
+        content = (
+            BeautifulSoup(res, "html.parser")
+            .find("div", {"class": "copy-hashtags"})
+            .string
+        )
     except IndexError:
         return await message.edit_text("✦ Example ➠ /hastag python")
-        
-    
+
     await message.edit_text(f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ  ʜᴀsᴛᴀɢ ➠\n\n<pre>{content}</pre>")
 
 
 @Client.on_message(filters.command("coub", prefix) & filters.me)
 async def coub(c: Client, m: Message):
     if len(m.command) == 1:
-        await m.edit_text(("<code>coub</code> [search query] — Sends a random Coub (short video) from search results."))
+        await m.edit_text(
+            (
+                "<code>coub</code> [search query] — Sends a random Coub (short video) from search results."
+            )
+        )
         return
     await m.edit_text(f"<code>Searching Coub for {m.text.split(maxsplit=1)[1]}</code>")
     text = m.text.split(maxsplit=1)[1]
@@ -123,5 +130,5 @@ modules_help["useless"] = {
     + f"\n\nExample: <code>{prefix}hastag technology </code>",
     "nasa": "Gets the daily  nasa  news ."
     + f"\n\nUsage: <code>{prefix}nasa</code>"
-    + f"\n\nExample: <code>{prefix}nasa </code>"
+    + f"\n\nExample: <code>{prefix}nasa </code>",
 }

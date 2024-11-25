@@ -139,7 +139,9 @@ async def delfwd(_, message: Message):
 @Client.on_message(filters.command("autofwd", prefix) & filters.me)
 async def autofwd(_, message: Message):
     source_chats, target_chats = getfwd_data()
-    return await message.edit_text(f"Source Chats: {source_chats}\nTarget Chats: {target_chats}")
+    return await message.edit_text(
+        f"Source Chats: {source_chats}\nTarget Chats: {target_chats}"
+    )
 
 
 @Client.on_message(filters.channel | filters.group)

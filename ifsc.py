@@ -5,6 +5,7 @@ from utils.scripts import format_exc
 
 API_BASE_URL = "https://ifsc.razorpay.com/"
 
+
 @Client.on_message(filters.command("ifsc", prefix) & filters.me)
 async def fetch_ifsc_details(_, message):
     try:
@@ -37,5 +38,6 @@ async def fetch_ifsc_details(_, message):
         await message.edit_text("Please provide valid IFSC Code")
     except IndexError:
         await message.edit_text("Please provide an IFSC Code")
+
 
 modules_help["ifsc"] = {"ifsc [ifsc code]": "Get the IFSC code with full details"}

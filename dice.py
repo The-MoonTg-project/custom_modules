@@ -12,15 +12,18 @@ async def dice_text(client: Client, message: Message):
         if value not in range(1, 7):
             raise AssertionError
     except (ValueError, IndexError, AssertionError):
-        return await message.edit("<b>Invalid value</b>", parse_mode=enums.ParseMode.HTML)
+        return await message.edit(
+            "<b>Invalid value</b>", parse_mode=enums.ParseMode.HTML
+        )
 
     try:
         message.dice = type("bruh", (), {"value": 0})()
         while message.dice.value != value:
-            message = (await asyncio.gather(
-                message.delete(),
-                client.send_dice(message.chat.id)
-            ))[1]
+            message = (
+                await asyncio.gather(
+                    message.delete(), client.send_dice(message.chat.id)
+                )
+            )[1]
     except Exception as e:
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 

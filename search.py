@@ -55,7 +55,9 @@ async def search_cmd(client: Client, message: Message):
             else:
                 break
         if now[message.chat.id]:
-            await message.reply_text("<b>Search finished!</b>", parse_mode=enums.ParseMode.HTML)
+            await message.reply_text(
+                "<b>Search finished!</b>", parse_mode=enums.ParseMode.HTML
+            )
     except Exception as ex:
         await message.edit(format_exc(ex), parse_mode=enums.ParseMode.HTML)
     now[message.chat.id] = False

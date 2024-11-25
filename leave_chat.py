@@ -29,7 +29,9 @@ async def leave_chat(_, message: Message):
         await asyncio.sleep(3)
         await message.chat.leave()
     else:
-        await message.edit("<b>Not supported in private chats</b>", parse_mode=enums.ParseMode.HTML)
+        await message.edit(
+            "<b>Not supported in private chats</b>", parse_mode=enums.ParseMode.HTML
+        )
 
 
 modules_help["leave_chat"] = {

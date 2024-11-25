@@ -20,13 +20,15 @@ class Post:
         return (
             self.file_url
             if self.file_url
-            else self.large_file_url
-            if self.large_file_url
-            else self.source
-            if self.source and "pximg" not in self.source
-            else await self.pximg
-            if self.source
-            else None
+            else (
+                self.large_file_url
+                if self.large_file_url
+                else (
+                    self.source
+                    if self.source and "pximg" not in self.source
+                    else await self.pximg if self.source else None
+                )
+            )
         )
 
     @property
@@ -54,7 +56,7 @@ async def anime_handler(client: Client, message: Message):
         await message.reply_photo(
             photo=img,
             caption=f'<b>{ra.tag_string_general if ra.tag_string_general else "Untitled"}</b>',
-            parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
         )
         return await message.delete()
     except Exception as e:

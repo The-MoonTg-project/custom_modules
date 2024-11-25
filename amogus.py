@@ -18,7 +18,10 @@ from utils.misc import modules_help, prefix
 async def amogus(client: Client, message: Message):
     text = " ".join(message.command[1:])
 
-    await message.edit("<b>amgus, tun tun tun tun tun tun tun tudududn tun tun...</b>", parse_mode=enums.ParseMode.HTML)
+    await message.edit(
+        "<b>amgus, tun tun tun tun tun tun tun tudududn tun tun...</b>",
+        parse_mode=enums.ParseMode.HTML,
+    )
 
     clr = randint(1, 12)
 

@@ -11,6 +11,7 @@ def fetch_data(url):
     response.raise_for_status()
     return response.text
 
+
 # Pyrogram command handler for the job commandx
 @Client.on_message(filters.command("injob", prefix) & filters.me)
 async def gov_job(client: Client, message: Message):

@@ -56,13 +56,19 @@ def process_vid(filename):
 async def circle(client: Client, message: Message):
     try:
         if not message.reply_to_message:
-            return await message.reply("<b>Reply is required for this command</b>", parse_mode=enums.ParseMode.HTML)
+            return await message.reply(
+                "<b>Reply is required for this command</b>",
+                parse_mode=enums.ParseMode.HTML,
+            )
         if message.reply_to_message.photo:
             filename = "circle.jpg"
             typ = "photo"
         elif message.reply_to_message.sticker:
             if message.reply_to_message.sticker.is_video:
-                return await message.reply("<b>Video stickers is not supported</b>", parse_mode=enums.ParseMode.HTML)
+                return await message.reply(
+                    "<b>Video stickers is not supported</b>",
+                    parse_mode=enums.ParseMode.HTML,
+                )
             filename = "circle.webp"
             typ = "photo"
         elif message.reply_to_message.video:
@@ -86,12 +92,18 @@ async def circle(client: Client, message: Message):
                 filename = "circle.mp4"
                 typ = "video"
             else:
-                return await message.reply("<b>Invalid file type</b>", parse_mode=enums.ParseMode.HTML)
+                return await message.reply(
+                    "<b>Invalid file type</b>", parse_mode=enums.ParseMode.HTML
+                )
         else:
-            return await message.reply("<b>Invalid file type</b>", parse_mode=enums.ParseMode.HTML)
+            return await message.reply(
+                "<b>Invalid file type</b>", parse_mode=enums.ParseMode.HTML
+            )
 
         if typ == "photo":
-            await message.edit("<b>Processing image</b>📷", parse_mode=enums.ParseMode.HTML)
+            await message.edit(
+                "<b>Processing image</b>📷", parse_mode=enums.ParseMode.HTML
+            )
             await message.reply_to_message.download(f"downloads/{filename}")
             await asyncio.get_event_loop().run_in_executor(None, process_img, filename)
             await message.delete()
@@ -99,12 +111,16 @@ async def circle(client: Client, message: Message):
                 sticker=im, reply_to_message_id=message.reply_to_message.id
             )
         else:
-            await message.edit("<b>Processing video</b>🎥", parse_mode=enums.ParseMode.HTML)
+            await message.edit(
+                "<b>Processing video</b>🎥", parse_mode=enums.ParseMode.HTML
+            )
             await message.reply_to_message.download(f"downloads/{filename}")
             await asyncio.get_event_loop().run_in_executor(None, process_vid, filename)
 
             await message.edit("<b>Saving video</b>📼", parse_mode=enums.ParseMode.HTML)
-            await asyncio.get_event_loop().run_in_executor(None, video.write_videofile, "downloads/result.mp4")
+            await asyncio.get_event_loop().run_in_executor(
+                None, video.write_videofile, "downloads/result.mp4"
+            )
 
             await message.delete()
             await message.reply_video_note(
@@ -120,5 +136,5 @@ async def circle(client: Client, message: Message):
 
 modules_help["circle"] = {
     "round": "Round a photo or video.",
-    "circle": "Circle a photo or video.",                      
+    "circle": "Circle a photo or video.",
 }

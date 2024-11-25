@@ -11,10 +11,10 @@ async def send_comment(client: Client, message: Message):
     enabled = db.get("custom.auto_comment", "enabled", False)
     with suppress(MsgIdInvalid):
         if enabled:
-            msg = await client.get_discussion_message(
-                message.chat.id, message.id
+            msg = await client.get_discussion_message(message.chat.id, message.id)
+            await msg.reply(
+                db.get("custom.auto_comment", "text"), parse_mode=enums.ParseMode.HTML
             )
-            await msg.reply(db.get("custom.auto_comment", "text"), parse_mode=enums.ParseMode.HTML)
     raise ContinuePropagation
 
 
@@ -27,11 +27,13 @@ async def auto_comment(_, message: Message):
 
         await message.edit(
             f"<b>Auto comment enabled\nComment:</b> <code>{comment}</code>",
-            parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
         )
     else:
         db.set("custom.auto_comment", "enabled", False)
-        await message.edit("<b>Auto comment disabled</b>", parse_mode=enums.ParseMode.HTML)
+        await message.edit(
+            "<b>Auto comment disabled</b>", parse_mode=enums.ParseMode.HTML
+        )
 
 
 modules_help["auto_comment"] = {

@@ -33,7 +33,9 @@ async def weather(client: Client, message: Message):
     else:
         city = message.command[1]
 
-    await message.edit(f"<b>Processing city {city}...</b>", parse_mode=enums.ParseMode.HTML)
+    await message.edit(
+        f"<b>Processing city {city}...</b>", parse_mode=enums.ParseMode.HTML
+    )
 
     try:
         text_resp = requests.get(f"https://wttr.in/{city}?m?M?0?q?T&lang=en")
@@ -56,10 +58,14 @@ async def weather(client: Client, message: Message):
 @Client.on_message(filters.command(["set_weather_city", "swcity"], prefix) & filters.me)
 async def set_weather_city(_, message: Message):
     if len(message.command) == 1:
-        return await message.edit("<b>City name isn't provided</b>", parse_mode=enums.ParseMode.HTML)
+        return await message.edit(
+            "<b>City name isn't provided</b>", parse_mode=enums.ParseMode.HTML
+        )
 
     db.set("custom.weather", "city", message.command[1])
-    await message.edit(f"<b>City {message.command[1]} set!</b>", parse_mode=enums.ParseMode.HTML)
+    await message.edit(
+        f"<b>City {message.command[1]} set!</b>", parse_mode=enums.ParseMode.HTML
+    )
 
 
 modules_help["weather"] = {

@@ -9,6 +9,7 @@ from pyrogram.errors import UserAlreadyParticipant, ChatForwardsRestricted
 from utils.misc import modules_help, prefix
 from utils.scripts import progress, format_exc
 
+
 @Client.on_message(filters.command("rdl", prefix) & filters.me)
 async def dl(client: Client, message: Message):
     # Extract command arguments
@@ -16,7 +17,9 @@ async def dl(client: Client, message: Message):
 
     # Check if the required arguments are provided
     if len(args) < 2:
-        await message.edit_text("Kindly use `.rdl channel_link message_id [number_of_messages]`")
+        await message.edit_text(
+            "Kindly use `.rdl channel_link message_id [number_of_messages]`"
+        )
         return
 
     chat_id = message.chat.id
@@ -47,8 +50,18 @@ async def dl(client: Client, message: Message):
 
             try:
                 # Try to download the media
-                file = await client.download_media(selected_message, progress=progress, progress_args=(ms, c_time, f'`Trying to download...`'))
-                await client.send_document(chat_id, file, caption=file_text, progress=progress, progress_args=(ms, c_time, f'`Uploading...`'))
+                file = await client.download_media(
+                    selected_message,
+                    progress=progress,
+                    progress_args=(ms, c_time, f"`Trying to download...`"),
+                )
+                await client.send_document(
+                    chat_id,
+                    file,
+                    caption=file_text,
+                    progress=progress,
+                    progress_args=(ms, c_time, f"`Uploading...`"),
+                )
                 os.remove(file)
             except ValueError:
                 # If downloading is restricted, try to copy the message
@@ -62,6 +75,7 @@ async def dl(client: Client, message: Message):
         await ms.delete()
     except Exception as e:
         await message.edit_text(format_exc(e))
+
 
 modules_help["rdl"] = {
     "rdl channel_link message_id [number_of_messages]": "download restricted content. Note that number_of_messages is optional if you only want a single message to be downloaded, then don't provide it",

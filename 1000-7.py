@@ -7,9 +7,7 @@ from utils.misc import modules_help, prefix
 
 digits = {
     str(i): el
-    for i, el in enumerate(
-        ["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"]
-    )
+    for i, el in enumerate(["0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣"])
 }
 
 

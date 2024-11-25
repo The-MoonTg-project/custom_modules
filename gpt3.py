@@ -32,7 +32,6 @@ headers = {
 
 @Client.on_message(filters.command("gpt3", prefix) & filters.me)
 async def gpt3(client: Client, message: Message):
-
     if len(message.command) > 1:
         prompt = message.text.split(maxsplit=1)[1]
     else:
@@ -83,14 +82,15 @@ async def gpt3(client: Client, message: Message):
         else:
             try:
                 response = await RendyDevChat.chat_hacked(
-                    args=prompt,
-                    latest_model="gpt-4o"
+                    args=prompt, latest_model="gpt-4o"
                 )
-                    return await message.edit_text(response)
+                return await message.edit_text(response)
             except Exception as e:
                 await message.edit_text(format_exc(e))
     except Exception as e:
         await message.edit_text(format_exc(e))
 
 
-modules_help["gpt3"] = {"gpt3 [prompt*]": "Chat with OpenAI ChatGPT 3 and Chatgpt 4o Model"}
+modules_help["gpt3"] = {
+    "gpt3 [prompt*]": "Chat with OpenAI ChatGPT 3 and Chatgpt 4o Model"
+}

@@ -1,4 +1,3 @@
- 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message, InputMediaPhoto
 from io import BytesIO
@@ -10,6 +9,7 @@ from utils.misc import modules_help, prefix
 # Pinterest API URL
 API_URL = "https://bk9.fun/pinterest/search?q="
 
+
 def resize_image(image_bytes):
     try:
         with Image.open(image_bytes) as img:
@@ -17,7 +17,7 @@ def resize_image(image_bytes):
             if img.size > max_size:
                 img.thumbnail(max_size)
                 output = BytesIO()
-                img.save(output, format='JPEG')
+                img.save(output, format="JPEG")
                 output.seek(0)
                 return output
             image_bytes.seek(0)  # Reset pointer if not resized
@@ -25,6 +25,7 @@ def resize_image(image_bytes):
     except Exception as e:
         print(f"Error resizing image: {e}")
         return image_bytes
+
 
 async def download_image(url):
     try:
@@ -36,17 +37,22 @@ async def download_image(url):
         print(f"Error downloading image: {e}")
     return None
 
+
 @Client.on_message(filters.command("pinterest", prefix) & filters.me)
 async def pinterest_search(client: Client, message: Message):
     if len(message.command) < 2:
-        await message.edit("Usage: `pinterest [number] <query>`", parse_mode=enums.ParseMode.MARKDOWN)
+        await message.edit(
+            "Usage: `pinterest [number] <query>`", parse_mode=enums.ParseMode.MARKDOWN
+        )
         return
 
     num_pics = int(message.command[1]) if message.command[1].isdigit() else 10
     query = " ".join(message.command[2:])
 
     # Update status
-    status_message = await message.edit("Searching for images...", parse_mode=enums.ParseMode.MARKDOWN)
+    status_message = await message.edit(
+        "Searching for images...", parse_mode=enums.ParseMode.MARKDOWN
+    )
 
     url = f"{API_URL}{query}"
     response = requests.get(url)
@@ -60,22 +66,37 @@ async def pinterest_search(client: Client, message: Message):
             # Download images
             downloaded_images = await asyncio.gather(*images)
 
-            media = [InputMediaPhoto(media=img_bytes) for img_bytes in downloaded_images if img_bytes]
+            media = [
+                InputMediaPhoto(media=img_bytes)
+                for img_bytes in downloaded_images
+                if img_bytes
+            ]
 
             if media:
-                await status_message.edit("Uploading pictures...", parse_mode=enums.ParseMode.MARKDOWN)
+                await status_message.edit(
+                    "Uploading pictures...", parse_mode=enums.ParseMode.MARKDOWN
+                )
                 while media:
                     batch = media[:10]
                     media = media[10:]
                     await message.reply_media_group(batch)
                 await status_message.delete()  # Delete status message after uploading
             else:
-                await status_message.edit("No valid images found.", parse_mode=enums.ParseMode.MARKDOWN)
+                await status_message.edit(
+                    "No valid images found.", parse_mode=enums.ParseMode.MARKDOWN
+                )
         else:
-            await status_message.edit("No images found for the given query.", parse_mode=enums.ParseMode.MARKDOWN)
+            await status_message.edit(
+                "No images found for the given query.",
+                parse_mode=enums.ParseMode.MARKDOWN,
+            )
     else:
-        await status_message.edit("An error occurred, please try again later.", parse_mode=enums.ParseMode.MARKDOWN)
+        await status_message.edit(
+            "An error occurred, please try again later.",
+            parse_mode=enums.ParseMode.MARKDOWN,
+        )
+
 
 modules_help["pinterest"] = {
     "pinterest [number]* [query]": "Get images from Pinterest. Default number of images is 10",
-          }
+}

@@ -31,7 +31,7 @@ async def score(_, message: Message):
     sed = "".join(match.get_text() + "\n\n" for match in result)
     await message.edit(
         f"<b>Match information:</b><u> Credits Friday team</u>\n\n\n<code>{sed}</code>",
-        parse_mode=enums.ParseMode.HTML
+        parse_mode=enums.ParseMode.HTML,
     )
 
 

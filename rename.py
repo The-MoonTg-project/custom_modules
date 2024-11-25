@@ -53,7 +53,9 @@ async def example_edit(client: Client, message: Message):
             )
             await i.delete()
         else:
-            await message.edit_text("lOl, Atleast reply to file and give new name (with extension ofc) to rename to -_-")
+            await message.edit_text(
+                "lOl, Atleast reply to file and give new name (with extension ofc) to rename to -_-"
+            )
     except Exception as e:
         await message.edit(format_exc(e))
     finally:

@@ -59,7 +59,9 @@ async def aicook(_, message: Message):
             try:
                 base_img = await message.reply_to_message.download()
             except AttributeError:
-                return await message.edit_text("<code>Please reply to an image...</code>")
+                return await message.edit_text(
+                    "<code>Please reply to an image...</code>"
+                )
 
             img = Image.open(base_img)
             cook_img = [
@@ -94,7 +96,9 @@ async def aiseller(_, message: Message):
             try:
                 base_img = await message.reply_to_message.download()
             except AttributeError:
-                return await message.edit_text("<code>Please reply to an image...</code>")
+                return await message.edit_text(
+                    "<code>Please reply to an image...</code>"
+                )
 
             img = Image.open(base_img)
             sell_img = [

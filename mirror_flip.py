@@ -41,7 +41,9 @@ async def make(client, message, o):
             return await reply.reply_sticker(sticker=path)
         os.remove(path)
 
-    return await message.edit("<b>Need to answer the photo/sticker</b>", parse_mode=enums.ParseMode.HTML)
+    return await message.edit(
+        "<b>Need to answer the photo/sticker</b>", parse_mode=enums.ParseMode.HTML
+    )
 
 
 @Client.on_message(filters.command(["ll", "rr", "dd", "uu"], prefix) & filters.me)

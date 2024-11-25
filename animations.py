@@ -4,7 +4,9 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 
-mention = f"<a href = https://github.com/The-MoonTg-project/Moon-Userbot>Moon-Userbot</a>"
+mention = (
+    f"<a href = https://github.com/The-MoonTg-project/Moon-Userbot>Moon-Userbot</a>"
+)
 
 
 @Client.on_message(filters.command("stupid", prefix) & filters.me)
@@ -32,7 +34,9 @@ async def stupid(_, message: Message):
     for i in animation_ttl:
 
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 14], parse_mode=enums.ParseMode.HTML)
+        await message.edit_text(
+            animation_chars[i % 14], parse_mode=enums.ParseMode.HTML
+        )
 
 
 @Client.on_message(filters.command("bombs", prefix) & filters.me)
@@ -131,7 +135,9 @@ async def ding(_, message: Message):
     await asyncio.sleep(4)
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 10], parse_mode=enums.ParseMode.HTML)
+        await message.edit_text(
+            animation_chars[i % 10], parse_mode=enums.ParseMode.HTML
+        )
 
 
 @Client.on_message(filters.command("hypo", prefix) & filters.me)
@@ -196,7 +202,7 @@ async def timer_blankx(_, message: Message):
     await message.edit_text(
         "<b>Tesla Wireless Charging (beta) Completed...\nDevice Detected: Apple iPad 13 (Space Grey Varient)\nBattery Percentage:</b> [100%](https://telegra.ph/file/a45aa7450c8eefed599d9.mp4) ",
         link_preview=True,
-        parse_mode=enums.ParseMode.HTML
+        parse_mode=enums.ParseMode.HTML,
     )
 
 
@@ -223,7 +229,9 @@ async def kill(_, message: Message):
     await asyncio.sleep(3)
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 103], parse_mode=enums.ParseMode.HTML)
+        await message.edit_text(
+            animation_chars[i % 103], parse_mode=enums.ParseMode.HTML
+        )
 
 
 @Client.on_message(filters.command("earth", prefix) & filters.me)
@@ -384,11 +392,15 @@ async def deploy(_, message: Message):
         "<b>Build Succeeded</b>",
     ]
 
-    await message.edit_text("<code>Deploying...</code>", parse_mode=enums.ParseMode.HTML)
+    await message.edit_text(
+        "<code>Deploying...</code>", parse_mode=enums.ParseMode.HTML
+    )
     await asyncio.sleep(3)
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
-        await message.edit_text(animation_chars[i % 12], parse_mode=enums.ParseMode.HTML)
+        await message.edit_text(
+            animation_chars[i % 12], parse_mode=enums.ParseMode.HTML
+        )
 
 
 @Client.on_message(filters.command("tmoon", prefix) & filters.me)
@@ -435,7 +447,6 @@ async def tmoon(_, message: Message):
     for i in animation_ttl:
         await asyncio.sleep(animation_interval)
         await message.edit_text(animation_chars[i % 32])
-
 
 
 modules_help["animations"] = {

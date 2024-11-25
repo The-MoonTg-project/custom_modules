@@ -473,7 +473,12 @@ async def applemusic_search(client, message: Message):
 @Client.on_message(filters.reply & filters.text & filters.me)
 async def handle_reply(client: Client, message: Message):
     chat_id = message.chat.id
-    search_keys = [f"{chat_id}_google", f"{chat_id}_youtube", f"{chat_id}_movie", f"{chat_id}_apk"]
+    search_keys = [
+        f"{chat_id}_google",
+        f"{chat_id}_youtube",
+        f"{chat_id}_movie",
+        f"{chat_id}_apk",
+    ]
 
     for search_key in search_keys:
         if search_key in search_results:

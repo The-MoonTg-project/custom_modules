@@ -10,7 +10,7 @@ from utils.misc import modules_help, prefix
 async def durov(_, message: Message):
     await message.edit(
         f"<b>Random post from channel: https://t.me/durov/{randint(21, 36500)}</b>",
-        parse_mode=enums.ParseMode.HTML
+        parse_mode=enums.ParseMode.HTML,
     )
 
 

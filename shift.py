@@ -16,8 +16,10 @@ def text(message):
 def parse_limit(limit):
     return int(limit) if limit and limit.isdigit() else None
 
+
 fromchat = None
 tochat = None
+
 
 @Client.on_message(filters.command("shift", prefix) & filters.me)
 async def shift(client, message):
@@ -72,9 +74,7 @@ async def shift(client, message):
             lol.edit("Enter a vailed limit")
             return
         try:
-            async for message in client.get_chat_history(
-                fromchat, limit=limit
-            ):
+            async for message in client.get_chat_history(fromchat, limit=limit):
                 try:
                     await message.copy(tochat)
 

@@ -15,7 +15,9 @@ from PIL import Image, ImageDraw, ImageFont
 
 @Client.on_message(filters.command(["dem"], prefix) & filters.me)
 async def demotivator(client: Client, message: Message):
-    await message.edit("<code>Process of demotivation...</code>", parse_mode=enums.ParseMode.HTML)
+    await message.edit(
+        "<code>Process of demotivation...</code>", parse_mode=enums.ParseMode.HTML
+    )
     font = requests.get(
         "https://github.com/The-MoonTg-project/files/blob/main/Times%20New%20Roman.ttf?raw=true"
     )
@@ -44,9 +46,7 @@ async def demotivator(client: Client, message: Message):
                 (299, 412), text, font=text_font, fill=(255, 255, 255), anchor="ms"
             )
             im.save(f"downloads/{message.id}.png")
-            await message.reply_to_message.reply_photo(
-                f"downloads/{message.id}.png"
-            )
+            await message.reply_to_message.reply_photo(f"downloads/{message.id}.png")
             await message.delete()
         elif message.reply_to_message.sticker:
             if not message.reply_to_message.sticker.is_animated:
@@ -73,11 +73,19 @@ async def demotivator(client: Client, message: Message):
                 )
                 await message.delete()
             else:
-                await message.edit("<b>Animated stickers are not supported</b>", parse_mode=enums.ParseMode.HTML)
+                await message.edit(
+                    "<b>Animated stickers are not supported</b>",
+                    parse_mode=enums.ParseMode.HTML,
+                )
         else:
-            await message.edit("<b>Need to answer the photo/sticker</b>", parse_mode=enums.ParseMode.HTML)
+            await message.edit(
+                "<b>Need to answer the photo/sticker</b>",
+                parse_mode=enums.ParseMode.HTML,
+            )
     else:
-        await message.edit("<b>Need to answer the photo/sticker</b>", parse_mode=enums.ParseMode.HTML)
+        await message.edit(
+            "<b>Need to answer the photo/sticker</b>", parse_mode=enums.ParseMode.HTML
+        )
 
 
 modules_help["demotivator"] = {

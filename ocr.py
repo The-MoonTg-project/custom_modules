@@ -23,27 +23,33 @@ async def ocr_space_api(_, message: Message):
 async def ocr_space(_, message: Message):
     OCR_SPACE_API_KEY = db.get("custom.ocr", "ocr_api", None)
     if OCR_SPACE_API_KEY is None:
-        return await message.edit_text(f"OCRSPACE API key isn't set, please set it using `<code>{prefix}set_ocrapi <your_api></code> command")
+        return await message.edit_text(
+            f"OCRSPACE API key isn't set, please set it using `<code>{prefix}set_ocrapi <your_api></code> command"
+        )
     if not message.reply_to_message or not message.reply_to_message.photo:
-        await message.edit(f"Reply to an image with <code>{prefix}ocr</code> command to extract text.")
+        await message.edit(
+            f"Reply to an image with <code>{prefix}ocr</code> command to extract text."
+        )
         return
 
     await message.edit("Processing image...")
 
     photo = await message.reply_to_message.download()
     try:
-        with open(photo, 'rb') as image_file:
+        with open(photo, "rb") as image_file:
             response = requests.post(
                 OCR_SPACE_URL,
                 files={"file": image_file},
                 data={"apikey": OCR_SPACE_API_KEY},
-                timeout=10  # Optional timeout
+                timeout=10,  # Optional timeout
             )
 
         if response.status_code == 200:
             result = response.json()
             if result["IsErroredOnProcessing"]:
-                await message.edit("Error occurred during OCR processing. Please try again.")
+                await message.edit(
+                    "Error occurred during OCR processing. Please try again."
+                )
             else:
                 parsed_text = result["ParsedResults"][0]["ParsedText"]
                 await message.edit(f"Extracted Text:\n{parsed_text}")

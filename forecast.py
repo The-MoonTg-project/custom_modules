@@ -7,31 +7,33 @@ from utils.misc import prefix, modules_help
 
 BASE_URL = "https://www.samirxpikachu.run.place/weather/"
 
+
 def get_weather_data(city):
     """Fetches weather data from the API."""
     url = f"{BASE_URL}{city}"
     response = requests.get(url)
     return response.json() if response.status_code == 200 else None
 
+
 def format_weather_data(data):
     """Formats weather data into a readable string."""
     if not data:
         return "No weather data available."
 
-    city = data.get('city', 'N/A')
-    region = data.get('region', 'N/A')
-    country = data.get('country', 'N/A')
-    temperature = data.get('temperature', {})
-    condition = data.get('condition', {})
-    wind = data.get('wind', {})
-    pressure = data.get('pressure', {})
-    precipitation = data.get('precipitation', {})
-    humidity = data.get('humidity', 'N/A')
-    feels_like = data.get('feels_like', {})
-    visibility = data.get('visibility', {})
-    uv_index = data.get('uv_index', 'N/A')
-    gust = data.get('gust', {})
-    air_quality = data.get('air_quality', {})
+    city = data.get("city", "N/A")
+    region = data.get("region", "N/A")
+    country = data.get("country", "N/A")
+    temperature = data.get("temperature", {})
+    condition = data.get("condition", {})
+    wind = data.get("wind", {})
+    pressure = data.get("pressure", {})
+    precipitation = data.get("precipitation", {})
+    humidity = data.get("humidity", "N/A")
+    feels_like = data.get("feels_like", {})
+    visibility = data.get("visibility", {})
+    uv_index = data.get("uv_index", "N/A")
+    gust = data.get("gust", {})
+    air_quality = data.get("air_quality", {})
 
     weather_info = (
         f"Weather in {city}, {region}, {country}:\n"
@@ -59,22 +61,19 @@ def format_weather_data(data):
     return weather_info
 
 
-
 @Client.on_message(filters.command("forecast", prefix) & filters.me)
 async def weather(client, message):
     if len(message.text.split()) < 2:
         await message.edit_text("Please provide a search query.")
         return
-    
+
     await message.edit_text("Fetching weather data...")
     city = message.text.split(None, 1)[1]  # Extract the query from the command
-    
+
     data = get_weather_data(city)  # Changed from generate_image
-    
+
     weather_info = format_weather_data(data)
     await message.edit_text(weather_info)
 
 
-modules_help["forecast"] = {
-    "forecast": "Get the weather forecast for a city."
-}
+modules_help["forecast"] = {"forecast": "Get the weather forecast for a city."}

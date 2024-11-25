@@ -24,16 +24,20 @@ async def calc(_, message: Message):
                     )
                 else:
                     await message.reply(
-                        f"<code>{result[x:x + 4096]}</code>", parse_mode=enums.ParseMode.HTML
+                        f"<code>{result[x:x + 4096]}</code>",
+                        parse_mode=enums.ParseMode.HTML,
                     )
                 i += 1
                 await asyncio.sleep(0.18)
         else:
             await message.edit(
-                f"<i>{args}</i><b>=</b><code>{result}</code>", parse_mode=enums.ParseMode.HTML
+                f"<i>{args}</i><b>=</b><code>{result}</code>",
+                parse_mode=enums.ParseMode.HTML,
             )
     except Exception as e:
-        await message.edit(f"<i>{args}=</i><b>=</b><code>{e}</code>", parse_mode=enums.ParseMode.HTML)
+        await message.edit(
+            f"<i>{args}=</i><b>=</b><code>{e}</code>", parse_mode=enums.ParseMode.HTML
+        )
 
 
 modules_help["calculator"] = {

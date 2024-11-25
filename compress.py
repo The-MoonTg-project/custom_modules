@@ -24,18 +24,24 @@ from utils.scripts import progress as pg
 async def compress(client: Client, message: Message):
     replied = message.reply_to_message
     if not replied.media:
-        await edit_or_reply(message,"<b>Please Reply To A Video</b>", parse_mode=enums.ParseMode.HTML)
+        await edit_or_reply(
+            message, "<b>Please Reply To A Video</b>", parse_mode=enums.ParseMode.HTML
+        )
         return
     if replied.media:
         c_time = time.time()
-        ms_ = await edit_or_reply(message,"<code>Downloading Video . . .</code>", parse_mode=enums.ParseMode.HTML)
+        ms_ = await edit_or_reply(
+            message,
+            "<code>Downloading Video . . .</code>",
+            parse_mode=enums.ParseMode.HTML,
+        )
         file = await client.download_media(
             message=replied,
             file_name="resources/",
             progress=pg,
-            progress_args=(ms_, c_time, '`Downloading This File!`'),
+            progress_args=(ms_, c_time, "`Downloading This File!`"),
         )
-        #replied.media.duration
+        # replied.media.duration
         # d_time = time.time()
         out_file = file + ".mp4"
         file_stats = os.stat(file)
@@ -52,19 +58,23 @@ async def compress(client: Client, message: Message):
         stdout = cmd_obj.communicate(timeout=60)
         x, y = stdout
         if y and y.endswith("NOT_FOUND"):
-            return await edit_or_reply(message,f"ERROR: `{y}`")
+            return await edit_or_reply(message, f"ERROR: `{y}`")
         total_frames = x.split(":")[1].split("\n")[0]
         try:
             if len(message.command) > 1:
-                crf  = message.text.split(maxsplit=1)[1]
+                crf = message.text.split(maxsplit=1)[1]
             else:
                 crf = 24
-            await edit_or_reply(message, "<code>Trying to compress. . .</code>", parse_mode=enums.ParseMode.HTML)
+            await edit_or_reply(
+                message,
+                "<code>Trying to compress. . .</code>",
+                parse_mode=enums.ParseMode.HTML,
+            )
             # await message.edit("<code>If video size is big it'll take a while please be patient</code>", parse_mode=enums.ParseMode.HTML)
             with open(progress, "w"):
                 pass
             proce = await asyncio.create_subprocess_shell(
-                f'ffmpeg -hide_banner -loglevel quiet -progress {progress} -i {file} -preset ultrafast -vcodec libx265 -crf {crf} {out_file}',
+                f"ffmpeg -hide_banner -loglevel quiet -progress {progress} -i {file} -preset ultrafast -vcodec libx265 -crf {crf} {out_file}",
                 stdout=PIPE,
                 stderr=PIPE,
             )
@@ -91,10 +101,13 @@ async def compress(client: Client, message: Message):
                             round(per, 2),
                         )
 
-                        e_size = f"{humanbytes(size)} of ~{humanbytes((size / per) * 100)}"
+                        e_size = (
+                            f"{humanbytes(size)} of ~{humanbytes((size / per) * 100)}"
+                        )
                         eta = f"~{time_formatter(some_eta)}"
                         try:
-                            await edit_or_reply(message,
+                            await edit_or_reply(
+                                message,
                                 text
                                 + progress_str
                                 + "`"
@@ -103,7 +116,7 @@ async def compress(client: Client, message: Message):
                                 + "\n\n`"
                                 + eta
                                 + "`",
-                                parse_mode=enums.ParseMode.MARKDOWN
+                                parse_mode=enums.ParseMode.MARKDOWN,
                             )
                         except Exception as e:
                             await message.edit_text(format_exc(e))
@@ -111,28 +124,38 @@ async def compress(client: Client, message: Message):
             out_file_size = out_file_stats.st_size
             com_time = time.time()
             difff = time_formatter((com_time - c_time) * 1000)
-            await edit_or_reply(message,f"<code>Compressed {humanbytes(file_size)} to {humanbytes(out_file_size)}, Uploading Now . . .</code>",
-                                        parse_mode=enums.ParseMode.HTML
-                                    )
+            await edit_or_reply(
+                message,
+                f"<code>Compressed {humanbytes(file_size)} to {humanbytes(out_file_size)}, Uploading Now . . .</code>",
+                parse_mode=enums.ParseMode.HTML,
+            )
             # await message.delete()
             differ = 100 - ((out_file_size / file_size) * 100)
-            await client.send_document(message.chat.id,
-                                       out_file,
-                                       progress=pg,
-                                       progress_args=(ms_, c_time, '`Uploading...`'),
-                                       caption=f"<b>Original Size:</b> <code>{humanbytes(file_size)}MB</code>\n<b>Compressed Size:</b> <code>{humanbytes(out_file_size)}</code>\n<b>Compression Ratio:</b> <code>{differ:.2f}%</code>\n <b>Time Taken To Compress:</b> <code>{difff}</code>",
-                                       reply_to_message_id=message.id,
-                                       parse_mode=enums.ParseMode.HTML
-                                    )
+            await client.send_document(
+                message.chat.id,
+                out_file,
+                progress=pg,
+                progress_args=(ms_, c_time, "`Uploading...`"),
+                caption=f"<b>Original Size:</b> <code>{humanbytes(file_size)}MB</code>\n<b>Compressed Size:</b> <code>{humanbytes(out_file_size)}</code>\n<b>Compression Ratio:</b> <code>{differ:.2f}%</code>\n <b>Time Taken To Compress:</b> <code>{difff}</code>",
+                reply_to_message_id=message.id,
+                parse_mode=enums.ParseMode.HTML,
+            )
         except BaseException as e:
-            await edit_or_reply(message,f"<b>INFO:</b> <code>{e}</code>", parse_mode=enums.ParseMode.HTML)
+            await edit_or_reply(
+                message,
+                f"<b>INFO:</b> <code>{e}</code>",
+                parse_mode=enums.ParseMode.HTML,
+            )
         finally:
             os.remove(file)
             os.remove(out_file)
             os.remove(progress)
     else:
-        await edit_or_reply(message,"<b>Please Reply To A Video</b>", parse_mode=enums.ParseMode.HTML)
+        await edit_or_reply(
+            message, "<b>Please Reply To A Video</b>", parse_mode=enums.ParseMode.HTML
+        )
         return
+
 
 modules_help["compress"] = {
     "compress [crf value]": f"reply to a video to compress it :)\ncrf value is optional if not given default will be used"

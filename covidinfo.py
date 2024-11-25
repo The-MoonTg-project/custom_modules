@@ -41,10 +41,13 @@ async def covid_local(_, message: Message):
             + f"<b>⚠️ Critical</b>: <code>{local_status['critical']}</code>\n"
             + f"<b>💀 Deaths</b>: <code>{local_status['deaths']}</code>\n"
             + f"<b>🚑 Recovered</b>: <code>{local_status['recovered']}</code>\n",
-            parse_mode=enums.ParseMode.HTML
+            parse_mode=enums.ParseMode.HTML,
         )
     except ValueError:
-        await message.edit(f"<b>There is no region called {region}</b>", parse_mode=enums.ParseMode.HTML)
+        await message.edit(
+            f"<b>There is no region called {region}</b>",
+            parse_mode=enums.ParseMode.HTML,
+        )
 
 
 @Client.on_message(filters.command("regions", prefix) & filters.me)

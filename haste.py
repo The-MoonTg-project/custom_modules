@@ -6,9 +6,8 @@ from utils.scripts import with_reply
 
 BASE = "https://hastebin.com"
 
-headers = {
-  'Authorization': 'Bearer YOURTOKEN'
-}
+headers = {"Authorization": "Bearer YOURTOKEN"}
+
 
 @Client.on_message(filters.command("haste", prefix) & filters.me)
 @with_reply
@@ -22,9 +21,11 @@ async def haste(client: Client, message: Message):
 
     try:
         response = requests.post(
-            "{}/documents".format(BASE), data=reply.text.encode("UTF-8"), headers=headers
+            "{}/documents".format(BASE),
+            data=reply.text.encode("UTF-8"),
+            headers=headers,
         )
-        response.raise_for_status() # Raises an HTTPError if the response was unsuccessful
+        response.raise_for_status()  # Raises an HTTPError if the response was unsuccessful
         result = response.json()
     except requests.exceptions.HTTPError as http_err:
         await message.reply(f"HTTP error occurred: {http_err}")
@@ -40,5 +41,6 @@ async def haste(client: Client, message: Message):
         "{}/{}.py".format(BASE, result["key"]),
         reply_to_message_id=reply.message_id,
     )
+
 
 modules_help["haste"] = {"haste": "reply to text will upload text to hastebin ;)"}

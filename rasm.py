@@ -10,20 +10,20 @@ from utils.scripts import format_exc
 # Define the URL and headers
 url = "https://armconverter.com/api/convert"
 headers = {
-    'accept': '*/*',
-    'accept-language': 'en-US,en;q=0.9',
-    'content-type': 'text/plain;charset=UTF-8',
-    'dnt': '1',
-    'origin': 'https://armconverter.com',
-    'priority': 'u=1, i',
-    'referer': 'https://armconverter.com/',
-    'sec-ch-ua': '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Linux"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'same-origin',
-    'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+    "accept": "*/*",
+    "accept-language": "en-US,en;q=0.9",
+    "content-type": "text/plain;charset=UTF-8",
+    "dnt": "1",
+    "origin": "https://armconverter.com",
+    "priority": "u=1, i",
+    "referer": "https://armconverter.com/",
+    "sec-ch-ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Linux"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
 }
 
 
@@ -42,7 +42,7 @@ async def asm(_, message: Message):
         data = {
             "asm": f"{asm_code}",
             "offset": "",
-            "arch": ["arm64","arm","armbe","thumb","thumbbe"]
+            "arch": ["arm64", "arm", "armbe", "thumb", "thumbbe"],
         }
 
         # Send the request
@@ -56,18 +56,25 @@ async def asm(_, message: Message):
             for arch, hex_data in response_data["hex"].items():
                 if hex_data[0]:
                     if hex_data[1] == "":
-                        return await message.edit_text("<b>ERROR:</b> <code>Invalid operand/mnemonic</code>")
+                        return await message.edit_text(
+                            "<b>ERROR:</b> <code>Invalid operand/mnemonic</code>"
+                        )
                     result += f"{arch}: <code>{hex_data[1]}</code>\n"
             if result == "":
-                await message.edit_text("<b>ERROR:</b> <code>Invalid operand/mnemonic</code>")
+                await message.edit_text(
+                    "<b>ERROR:</b> <code>Invalid operand/mnemonic</code>"
+                )
             else:
-                await message.edit_text(f"<b>INPUT:</b> <code>{asm_code}</code>\n<b>OUTPUT:</b> \n{result}")
+                await message.edit_text(
+                    f"<b>INPUT:</b> <code>{asm_code}</code>\n<b>OUTPUT:</b> \n{result}"
+                )
         else:
             await message.edit_text(
                 f"Request failed with status code {response.status_code}"
             )
     except Exception as e:
         await message.edit_text(format_exc(e))
+
 
 @Client.on_message(filters.command("disasm", prefix) & filters.me)
 async def disasm(_, message: Message):
@@ -84,7 +91,7 @@ async def disasm(_, message: Message):
         data = {
             "hex": f"{hex_code}",
             "offset": "",
-            "arch": ["arm64","arm","armbe","thumb","thumbbe"]
+            "arch": ["arm64", "arm", "armbe", "thumb", "thumbbe"],
         }
 
         # Send the request
@@ -99,9 +106,13 @@ async def disasm(_, message: Message):
                 if asm_data[0]:
                     result += f"{arch}: <code>{asm_data[1]}</code>\n"
             if result == "":
-                await message.edit_text("<b>ERROR:</b> <code>Invalid operand/mnemonic</code>")
+                await message.edit_text(
+                    "<b>ERROR:</b> <code>Invalid operand/mnemonic</code>"
+                )
             else:
-                await message.edit_text(f"<b>INPUT:</b> <code>{hex_code}</code>\n</b>OUTPUT:</b> \n{result}")
+                await message.edit_text(
+                    f"<b>INPUT:</b> <code>{hex_code}</code>\n</b>OUTPUT:</b> \n{result}"
+                )
         else:
             await message.edit_text(
                 f"Request failed with status code {response.status_code}"
@@ -109,7 +120,8 @@ async def disasm(_, message: Message):
     except Exception as e:
         await message.edit_text(format_exc(e))
 
+
 modules_help["rasm"] = {
     "asm [asm code*]": "Convert an ASM code to ARM assembly hex code",
-    "disasm [hex code*]": "Convert an ARM assembly hex code to ASM code"
+    "disasm [hex code*]": "Convert an ARM assembly hex code to ASM code",
 }

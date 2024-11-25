@@ -30,7 +30,7 @@ headers = {
 }
 
 
-@Client.on_message(filters.command(["currency","cc"], prefix) & filters.me)
+@Client.on_message(filters.command(["currency", "cc"], prefix) & filters.me)
 async def convert(_, message: Message):
     if len(message.command) == 1:
         await message.edit("<b>Enter currency name</b>")
@@ -56,5 +56,5 @@ async def convert(_, message: Message):
 
 modules_help["currency"] = {
     "currency [currency]*": "Transfer from any state currency to the dollar. Don't use more than 10 times per minute",
-    "cc [currency]*": "Transfer from any state currency to the dollar. Don't use more than 10 times per minute"
+    "cc [currency]*": "Transfer from any state currency to the dollar. Don't use more than 10 times per minute",
 }

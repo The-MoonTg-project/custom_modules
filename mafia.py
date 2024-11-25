@@ -9,7 +9,7 @@ from utils.scripts import format_exc
 from utils.db import db
 
 
-now_status = db.get('custom.mafia', 'status', False)
+now_status = db.get("custom.mafia", "status", False)
 
 
 async def status_filter(_, __, m):
@@ -19,30 +19,38 @@ async def status_filter(_, __, m):
 status = filters.create(status_filter)
 
 
-@Client.on_message(
-    status
-)
+@Client.on_message(status)
 async def mafia_basic_lovler(client: Client, message: Message):
     try:
         if message.reply_markup and message.reply_markup.inline_keyboard:
             await message.click(0)
-            return await client.send_message('me', '<b>🧛 MafiaDrawing:</b> gift successfully caught!', parse_mode=enums.ParseMode.HTML)
+            return await client.send_message(
+                "me",
+                "<b>🧛 MafiaDrawing:</b> gift successfully caught!",
+                parse_mode=enums.ParseMode.HTML,
+            )
     except Exception as e:
-        return await client.send_message('me', f'<b>🧛 Mafia Drawing:</b>\n{format_exc(e)}', parse_mode=enums.ParseMode.HTML)
+        return await client.send_message(
+            "me",
+            f"<b>🧛 Mafia Drawing:</b>\n{format_exc(e)}",
+            parse_mode=enums.ParseMode.HTML,
+        )
 
 
 # noinspection PyUnusedLocal
-@Client.on_message(
-    filters.command(["mafia", "md"], prefix) & filters.me
-)
+@Client.on_message(filters.command(["mafia", "md"], prefix) & filters.me)
 async def mafia_handler(client: Client, message: Message):
     global now_status
     now = not now_status
-    db.set('custom.mafia', 'status', now)
+    db.set("custom.mafia", "status", now)
     now_status = now
-    return await message.edit('<b><i>🧛 MafiaDrawing is now</i> ' + ('enabled</b>' if now else 'disabled</b>'), parse_mode=enums.ParseMode.HTML)
+    return await message.edit(
+        "<b><i>🧛 MafiaDrawing is now</i> "
+        + ("enabled</b>" if now else "disabled</b>"),
+        parse_mode=enums.ParseMode.HTML,
+    )
 
 
-modules_help['mafia'] = {
-    'md': 'Enable/Disable Mafia Drawing',
+modules_help["mafia"] = {
+    "md": "Enable/Disable Mafia Drawing",
 }

@@ -78,7 +78,10 @@ async def preview(client: Client, message: Message):
                 )
                 await message.delete()
     except:
-        await message.edit(f"This <a href='{video_id}'>link</a> does not exist", parse_mode=enums.ParseMode.HTML)
+        await message.edit(
+            f"This <a href='{video_id}'>link</a> does not exist",
+            parse_mode=enums.ParseMode.HTML,
+        )
 
 
 modules_help["yt_preview"] = {

@@ -19,7 +19,9 @@ async def tagall(client: Client, message: Message):
             string += f"@{tag}\n" if tag != None else f"{member.user.mention}\n"
             limit += 1
         else:
-            await client.send_message(chat_id, text=string, parse_mode=enums.ParseMode.HTML)
+            await client.send_message(
+                chat_id, text=string, parse_mode=enums.ParseMode.HTML
+            )
             limit = 1
             string = ""
             await asyncio.sleep(2)
@@ -28,4 +30,3 @@ async def tagall(client: Client, message: Message):
 modules_help["tagall"] = {
     "tagall": "Tag all members",
 }
-

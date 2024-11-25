@@ -89,21 +89,18 @@ REPLACEMENT_MAP = {
 
 @Client.on_message(filters.command("flip", prefix) & filters.me)
 async def flip(client: Client, message: Message):
-	text = " ".join(message.command[1:])
-	final_str = ""
-	for char in text:
-		if char in REPLACEMENT_MAP.keys():
-			new_char = REPLACEMENT_MAP[char]
-		else:
-			new_char = char
-		final_str += new_char
-	if text != final_str:
-		await message.edit(final_str)
-	else:
-		await message.edit(text)
+    text = " ".join(message.command[1:])
+    final_str = ""
+    for char in text:
+        if char in REPLACEMENT_MAP.keys():
+            new_char = REPLACEMENT_MAP[char]
+        else:
+            new_char = char
+        final_str += new_char
+    if text != final_str:
+        await message.edit(final_str)
+    else:
+        await message.edit(text)
 
 
-modules_help["fliptext"] = {
-	"flip [amount]*": "flip text upside down"
-
-}
+modules_help["fliptext"] = {"flip [amount]*": "flip text upside down"}

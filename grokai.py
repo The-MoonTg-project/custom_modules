@@ -15,7 +15,10 @@ async def set_grok_api(_, message: Message):
 
     new_api_key = message.text.split(maxsplit=1)[1]
 
-    headers = {"Authorization": f"Bearer {new_api_key}", "Content-Type": "application/json"}
+    headers = {
+        "Authorization": f"Bearer {new_api_key}",
+        "Content-Type": "application/json",
+    }
     test_payload = {
         "messages": [{"role": "system", "content": "Test message"}],
         "model": "grok-beta",
@@ -23,7 +26,9 @@ async def set_grok_api(_, message: Message):
     }
 
     try:
-        test_response = requests.post(GROK_API_URL, headers=headers, json=test_payload, timeout=10)
+        test_response = requests.post(
+            GROK_API_URL, headers=headers, json=test_payload, timeout=10
+        )
         test_response.raise_for_status()
         db.set("custom.grok", "api_key", new_api_key)
         await message.edit_text("Grok API key set and validated successfully!")
@@ -41,7 +46,9 @@ async def fetch_grok_response(query: str, message: Message, reply=False):
 
     grok_api_key = db.get("custom.grok", "api_key", None)
     if not grok_api_key:
-        return await response_msg.edit_text(f"Grok API key is not set. Use {prefix}set_grokapi to set it.")
+        return await response_msg.edit_text(
+            f"Grok API key is not set. Use {prefix}set_grokapi to set it."
+        )
 
     headers = {
         "Authorization": f"Bearer {grok_api_key}",
@@ -71,7 +78,9 @@ async def fetch_grok_response(query: str, message: Message, reply=False):
 
         response_content = f"**Question:**\n{query}\n**Answer:**\n{response_text}"
 
-        await response_msg.edit_text(response_content, parse_mode=enums.ParseMode.MARKDOWN)
+        await response_msg.edit_text(
+            response_content, parse_mode=enums.ParseMode.MARKDOWN
+        )
 
     except requests.exceptions.RequestException as e:
         await response_msg.edit_text(f"An error occurred: {str(e)}")

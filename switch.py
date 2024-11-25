@@ -38,7 +38,9 @@ async def switch(client: Client, message: Message):
             if history and history[1].from_user.is_self and history[1].text:
                 text = history[1].text
             else:
-                await message.edit("<b>Text to switch not found</b>", parse_mode=enums.ParseMode.HTML)
+                await message.edit(
+                    "<b>Text to switch not found</b>", parse_mode=enums.ParseMode.HTML
+                )
                 return
     else:
         text = message.text.split(maxsplit=1)[1]

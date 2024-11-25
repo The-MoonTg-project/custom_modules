@@ -13,11 +13,7 @@ DEFAULT_COUNTRY = "PK"
 
 
 async def fetch_namaz_times(city_name: str, country_name: str) -> dict:
-    params = {
-        'city': city_name,
-        'country': country_name,
-        'method': DEFAULT_METHOD
-    }
+    params = {"city": city_name, "country": country_name, "method": DEFAULT_METHOD}
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(ALADHAN_API_URL, params=params) as response:
@@ -30,15 +26,15 @@ async def fetch_namaz_times(city_name: str, country_name: str) -> dict:
 def format_time_12hr(time_str: str) -> str:
     try:
         # Split time into hours and minutes
-        hours, minutes = map(int, time_str.split(':'))
+        hours, minutes = map(int, time_str.split(":"))
         # Convert to 12-hour format
-        period = 'AM' if hours < 12 else 'PM'
+        period = "AM" if hours < 12 else "PM"
         if hours == 0:
             hours = 12
         elif hours > 12:
             hours -= 12
         elif hours == 12:
-            period = 'PM'
+            period = "PM"
         return f"{hours}:{minutes:02d} {period}"
     except Exception as e:
         return f"Error formatting time: {str(e)}"
@@ -60,20 +56,20 @@ async def namaz_times(client: Client, message: Message):
         else:
             city_name = args[1]
             country_name = args[2]
-    
+
     data = await fetch_namaz_times(city_name, country_name)
-    
-    if 'error' in data:
+
+    if "error" in data:
         result = f"<b>Error:</b> <i>{data['error']}</i>"
-    elif 'data' in data:
-        timings = data['data']['timings']
-        today = datetime.now().strftime('%Y-%m-%d')
+    elif "data" in data:
+        timings = data["data"]["timings"]
+        today = datetime.now().strftime("%Y-%m-%d")
         formatted_timings = {
-            'Fajr': format_time_12hr(timings['Fajr']),
-            'Dhuhr': format_time_12hr(timings['Dhuhr']),
-            'Asr': format_time_12hr(timings['Asr']),
-            'Maghrib': format_time_12hr(timings['Maghrib']),
-            'Isha': format_time_12hr(timings['Isha']),
+            "Fajr": format_time_12hr(timings["Fajr"]),
+            "Dhuhr": format_time_12hr(timings["Dhuhr"]),
+            "Asr": format_time_12hr(timings["Asr"]),
+            "Maghrib": format_time_12hr(timings["Maghrib"]),
+            "Isha": format_time_12hr(timings["Isha"]),
         }
         result = (
             f"<b>Prayer Times for {city_name}, {country_name} on {today}:</b>\n\n"
@@ -85,10 +81,10 @@ async def namaz_times(client: Client, message: Message):
         )
     else:
         result = "<b>Error:</b> <i>Unable to get prayer times for the specified location.</i>"
-    
+
     await message.edit_text(result)
 
 
 modules_help["namaz"] = {
     "prayer [city_name] [country_name]": "Shows the prayer times. Default to Pakistan if no country is provided"
-  }
+}

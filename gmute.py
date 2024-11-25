@@ -20,13 +20,17 @@ async def gmute(client, message):
     else:
         user = get_arg(message)
         if not user:
-            await message.edit("<b>Whom should I gmute?</b>", parse_mode=enums.ParseMode.HTML)
+            await message.edit(
+                "<b>Whom should I gmute?</b>", parse_mode=enums.ParseMode.HTML
+            )
             return
     get_user = await client.get_users(user)
     gmuted_users = db.get("core.gmute", "gmuted_users", [])
     gmuted_users.append(get_user.id)
     db.set("custom.gmute", "gmuted_users", gmuted_users)
-    await message.edit(f"<b>Gmuted {get_user.first_name}, LOL!</b>", parse_mode=enums.ParseMode.HTML)
+    await message.edit(
+        f"<b>Gmuted {get_user.first_name}, LOL!</b>", parse_mode=enums.ParseMode.HTML
+    )
 
 
 @Client.on_message(filters.command("ungmute", prefix) & filters.me)
@@ -36,7 +40,9 @@ async def ungmute(client, message):
     else:
         user = get_arg(message)
         if not user:
-            await message.edit("<b>Whom should I ungmute?</b>", parse_mode=enums.ParseMode.HTML)
+            await message.edit(
+                "<b>Whom should I ungmute?</b>", parse_mode=enums.ParseMode.HTML
+            )
             return
     get_user = await client.get_users(user)
     gmuted_users = db.get("core.gmute", "gmuted_users", [])
@@ -45,7 +51,9 @@ async def ungmute(client, message):
     except ValueError:
         pass
     db.set("custom.gmute", "gmuted_users", gmuted_users)
-    await message.edit(f"<b>Unmuted {get_user.first_name}, enjoy!</b>", parse_mode=enums.ParseMode.HTML)
+    await message.edit(
+        f"<b>Unmuted {get_user.first_name}, enjoy!</b>", parse_mode=enums.ParseMode.HTML
+    )
 
 
 @Client.on_message(filters.group)

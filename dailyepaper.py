@@ -74,5 +74,5 @@ async def scrape_command(client: Client, message: Message):
 
 modules_help["dailyepaper"] = {
     "epaper": "get daily news paper (english only)",
-    "dailyepaper": "get daily news paper (english only)"
+    "dailyepaper": "get daily news paper (english only)",
 }
