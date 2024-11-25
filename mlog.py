@@ -14,9 +14,19 @@ from utils.misc import modules_help, prefix
 
 mlog_enabled = filters.create(lambda _, __, ___: db.get("custom.mlog", "status", False))
 
-# Dictionary to store media messages per user temporarily
+# Media cache and processing tasks
 user_media_cache = defaultdict(list)
 media_processing_tasks = {}
+
+
+# Helper to get group-specific data
+def get_group_data(group_id):
+    return db.get(f"custom.mlog", str(group_id), {})
+
+
+# Helper to update group-specific data
+def update_group_data(group_id, data):
+    db.set(f"custom.mlog", str(group_id), data)
 
 
 @Client.on_message(filters.command(["mlog"], prefix) & filters.me)
@@ -80,15 +90,19 @@ async def process_media(client: Client, user):
             f"Media Logger is on, but no Chat ID is set. Use {prefix}msetchat to set it.",
         )
 
-    topic_id = db.get(f"custom.mlog.topics.{user_id}", "topic_id")
+    group_data = get_group_data(chat_id)
+    user_topics = group_data.get("user_topics", {})
+    topic_id = user_topics.get(str(user_id))  # Fetch user's topic ID if it exists
+
     if not topic_id:
         topic = await client.create_forum_topic(chat_id, user.first_name)
         topic_id = topic.id
-        db.set(f"custom.mlog.topics.{user_id}", "topic_id", topic_id)
+        user_topics[str(user_id)] = topic_id  # Store topic ID for this user
+        update_group_data(chat_id, {"user_topics": user_topics})
         m = await client.send_message(
             chat_id=chat_id,
             message_thread_id=topic_id,
-            text=f"Chat Name: {user.full_name}\nUser ID: {user_id}\nUsername: @{user.username or 'N/A'}\nPhone num: {user.phone_number or 'N/A'}",
+            text=f"<b>Chat Name:</b> {user.full_name}\n<b>User ID:</b> {user_id}\n<b>Username:</b> @{user.username or 'N/A'}\n<b>Phone No:</b> +{user.phone_number or 'N/A'}",
         )
         await m.pin()
 
@@ -102,11 +116,12 @@ async def process_media(client: Client, user):
         except TopicDeleted:
             topic = await client.create_forum_topic(chat_id, user.first_name)
             topic_id = topic.id
-            db.set(f"custom.mlog.topics.{user_id}", "topic_id", topic_id)
+            user_topics[str(user_id)] = topic_id  # Update the new topic ID
+            update_group_data(chat_id, {"user_topics": user_topics})
             await client.send_message(
                 chat_id=chat_id,
                 message_thread_id=topic_id,
-                text=f"Chat Name: {user.full_name}\nUser ID: {user_id}\nUsername: @{user.username or 'N/A'}\nPhone num: {user.phone_number or 'N/A'}",
+                text=f"<b>Chat Name:</b> {user.full_name}\n<b>User ID:</b> {user_id}\n<b>Username:</b> @{user.username or 'N/A'}\n<b>Phone No:</b> +{user.phone_number or 'N/A'}",
             )
             await media_message.copy(chat_id=chat_id, message_thread_id=topic_id)
         except TopicClosed:
