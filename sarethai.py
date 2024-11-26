@@ -24,13 +24,13 @@ from utils.misc import modules_help, prefix
 from modules.url import generate_screenshot
 
 # API URLs
-BASE_URL = "https://deliriusapi-official.vercel.app"
+BASE_URL = "https://deliriussapi-oficial.vercel.app/"
 URL = f"{BASE_URL}/ia"
 GOOGLE_SEARCH_URL = f"{BASE_URL}/search/googlesearch?query="
 YOUTUBE_SEARCH_URL = f"{BASE_URL}/search/ytsearch?q="
 MOVIE_SEARCH_URL = f"{BASE_URL}/search/movie?query="
-APK_SEARCH_URL = "https://api.maher-zubair.tech/search/apk?q="
-APK_DOWNLOAD_URL = "https://api.maher-zubair.tech/download/apk?id="
+APK_SEARCH_URL = f"https://bk9.fun/search/apkfab?q="
+APK_DOWNLOAD_URL = "https://bk9.fun/download/apkfab?url="
 
 
 def clean_data(data):
@@ -80,10 +80,7 @@ def format_movie_results(results):
 def format_apk_results(results):
     results = results[:15]
     return results, "\n\n".join(
-        [
-            f"{i+1}. **{item['name']}**\nID: {item['id']}"
-            for i, item in enumerate(results)
-        ]
+        [f"{i+1}. [{item['title']}]({item['link']})" for i, item in enumerate(results)]
     )
 
 
@@ -169,7 +166,7 @@ def format_apple_music_result(data):
 
 async def search_music(api_url, format_function, message, query):
     await message.edit("Searching...")
-    url = f"{api_url}{query}"
+    url = f"{api_url}{query}&limit=10"
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -186,6 +183,8 @@ async def search_music(api_url, format_function, message, query):
             await message.edit(result, parse_mode=enums.ParseMode.MARKDOWN)
         except (ValueError, KeyError, TypeError) as e:
             await message.edit(f"An error occurred while processing the data: {str(e)}")
+    elif response.json()["msg"]:
+        await message.edit(response.json()["msg"])
     else:
         await message.edit("An error occurred, please try again later.")
 
@@ -316,7 +315,7 @@ async def apk_search(client, message: Message):
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
-        results, formatted_results = format_apk_results(data["result"])
+        results, formatted_results = format_apk_results(data["BK9"])
         search_message = await message.edit(
             f"**APK Search Results for:** `{query}`\n\n{formatted_results}",
             parse_mode=enums.ParseMode.MARKDOWN,
@@ -328,27 +327,31 @@ async def apk_search(client, message: Message):
             "message_id": search_message.id,
         }
 
-        # Download the APK file
-        download_url = f"https://api.maher-zubair.tech/download/apk?id={query}"
-        response = requests.get(download_url)
-        if response.status_code == 200:
-            apk_data = response.json()
-            apk_file_url = apk_data["result"]["dllink"]
-            apk_file_name = f"{apk_data['result']['name']}.apk"
-            apk_response = requests.get(apk_file_url)
-            if apk_response.status_code == 200:
-                with open(apk_file_name, "wb") as f:
-                    f.write(apk_response.content)
+        apk_url = f"{APK_DOWNLOAD_URL}{data['BK9'][0]['link']}"
+        fetch_apk_url = requests.get(apk_url)
 
-                # Upload the APK file to Telegram
-                await message.reply_document(apk_file_name)
-
-                # Delete the APK file from the server
-                os.remove(apk_file_name)
-            else:
-                await message.edit("Failed to download the APK file.")
+        if fetch_apk_url.status_code != 200:
+            await message.edit("Failed to fetch APK data.")
         else:
-            await message.edit("Failed to retrieve the APK download link.")
+            data_apk = fetch_apk_url.json()
+            download_url = data_apk["BK9"]["link"]
+            size_apk = data_apk["BK9"]["size"]
+            apk_size = float(size_apk.split(" ")[0])
+
+            if "GB" in size_apk or apk_size > 70:
+                await message.reply("File size is too large to download.")
+            else:
+                apk_file_name = f"{data_apk['BK9']['title']}.apk"
+                response = requests.get(download_url)
+
+                if response.status_code != 200:
+                    await message.reply("Failed to download the APK file.")
+                else:
+                    with open(apk_file_name, "wb") as f:
+                        f.write(response.content)
+
+                    await message.reply_document(apk_file_name)
+                    os.remove(apk_file_name)
 
         asyncio.create_task(
             delete_search_data(client, message.chat.id, search_message.id)
@@ -369,7 +372,7 @@ async def gptweb(_, message: Message):
     if response.status_code == 200:
         data = response.json()
         await message.edit(
-            f"**Question:**\n{query}\n**Answer:**\n{data['gpt']}",
+            f"**Question:**\n{query}\n**Answer:**\n{data['data']}",
             parse_mode=enums.ParseMode.MARKDOWN,
         )
     else:
@@ -494,9 +497,7 @@ async def handle_reply(client: Client, message: Message):
                     message.reply_to_message.id == search_message_id
                     and 0 <= index < len(results)
                 ):
-                    await message.edit(
-                        "Please wait..."
-                    )  # Edit the reply message to show "Please wait..."
+                    await message.edit("Please wait...")
 
                     if search_key.endswith("_movie"):
                         # Send movie details with image
@@ -530,28 +531,38 @@ async def handle_reply(client: Client, message: Message):
                                 caption, parse_mode=enums.ParseMode.MARKDOWN
                             )
                     elif search_key.endswith("_apk"):
-                        apk_id = results[index]["id"]
-                        download_url = f"{APK_DOWNLOAD_URL}{apk_id}"
-                        response = requests.get(download_url)
-                        if response.status_code == 200:
-                            apk_data = response.json()
-                            apk_name = apk_data["result"]["name"]
-                            apk_link = apk_data["result"]["dllink"]
-                            apk_file = requests.get(apk_link)
-                            if apk_file.status_code == 200:
-                                apk_path = f"{apk_name}.apk"
-                                with open(apk_path, "wb") as f:
-                                    f.write(apk_file.content)
-                                await message.reply_document(apk_path)
-                                os.remove(apk_path)
-                            else:
-                                await message.reply("Failed to download APK.")
+                        apk_url = f"{APK_DOWNLOAD_URL}{results[index]['link']}"
+                        fetch_apk_url = requests.get(apk_url)
+                        if fetch_apk_url.status_code != 200:
+                            await message.edit("Failed to fetch APK data.")
                         else:
-                            await message.reply("Failed to fetch APK download link.")
+                            data_apk = fetch_apk_url.json()
+                            download_url = data_apk["BK9"]["link"]
+                            size_apk = data_apk["BK9"]["size"]
+                            apk_size = float(size_apk.split(" ")[0])
+
+                            if "GB" in size_apk or apk_size > 100:
+                                await message.edit(
+                                    "File size is too large to download."
+                                )
+                            else:
+                                apk_file_name = f"{data_apk['BK9']['title']}.apk"
+                                response = requests.get(download_url)
+
+                                if response.status_code != 200:
+                                    await message.edit(
+                                        "Failed to download the APK file."
+                                    )
+                                else:
+                                    with open(apk_file_name, "wb") as f:
+                                        f.write(response.content)
+
+                                    await message.reply_document(apk_file_name)
+                                    os.remove(apk_file_name)
                     else:
                         url = results[index]["url"]
                         await send_screenshot(client, message, url)
-                    await message.delete()  # Delete the "Please wait..." message
+                    await message.delete()
                     return
             except ValueError:
                 pass
