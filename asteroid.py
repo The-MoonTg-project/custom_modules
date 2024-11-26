@@ -51,7 +51,7 @@ async def asteroids_handler(client, message):
     try:
         _, start_date, end_date = message.command
     except ValueError:
-        await message.reply_text("Please provide a start and end date in the format: /asteroids YYYY-MM-DD YYYY-MM-DD")
+        await message.reply_text("Please provide a start and end date in the format:{prefix}asteroids YYYY-MM-DD YYYY-MM-DD")
         return
 
     try:
