@@ -327,32 +327,6 @@ async def apk_search(client, message: Message):
             "message_id": search_message.id,
         }
 
-        apk_url = f"{APK_DOWNLOAD_URL}{data['BK9'][0]['link']}"
-        fetch_apk_url = requests.get(apk_url)
-
-        if fetch_apk_url.status_code != 200:
-            await message.edit("Failed to fetch APK data.")
-        else:
-            data_apk = fetch_apk_url.json()
-            download_url = data_apk["BK9"]["link"]
-            size_apk = data_apk["BK9"]["size"]
-            apk_size = float(size_apk.split(" ")[0])
-
-            if "GB" in size_apk or apk_size > 70:
-                await message.reply("File size is too large to download.")
-            else:
-                apk_file_name = f"{data_apk['BK9']['title']}.apk"
-                response = requests.get(download_url)
-
-                if response.status_code != 200:
-                    await message.reply("Failed to download the APK file.")
-                else:
-                    with open(apk_file_name, "wb") as f:
-                        f.write(response.content)
-
-                    await message.reply_document(apk_file_name)
-                    os.remove(apk_file_name)
-
         asyncio.create_task(
             delete_search_data(client, message.chat.id, search_message.id)
         )
