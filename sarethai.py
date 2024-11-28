@@ -319,6 +319,7 @@ async def apk_search(client, message: Message):
         search_message = await message.edit(
             f"**APK Search Results for:** `{query}`\n\n{formatted_results}",
             parse_mode=enums.ParseMode.MARKDOWN,
+            disable_web_page_preview=True,
         )
         search_key = f"{message.chat.id}_apk"
         global search_results
