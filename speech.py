@@ -1,120 +1,156 @@
 import os
-import requests
 from asyncio import sleep
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
+from pyht import Client as PlayHTClient
+from pyht.client import TTSOptions
 from utils.misc import modules_help, prefix
+from utils.db import db
 
-# Play.ht API Configuration
-USER_ID = "uxynq8XNFuUIXG77byu3Vzq5Wm12"
-API_KEY = "c30cb61772e643788fd963613685ae4a"
-PLAY_HT_API_URL = "https://api.play.ht/api/v2/tts/stream"
-
-# Average speaking rate (words per minute)
-WORDS_PER_MINUTE = 150
-
-# Define moods and their corresponding settings
-MOODS = {
-    "happy": {"rate": 170, "pitch": 1.1},
-    "sad": {"rate": 130, "pitch": 0.9},
-    "lazy": {"rate": 120, "pitch": 1.0},
-    "tired": {"rate": 110, "pitch": 0.8},
-    "normal": {"rate": 150, "pitch": 1.0},
+# Default Play.ht configuration
+DEFAULT_PARAMS = {
+    "voice": "s3://voice-cloning-zero-shot/ec7103a2-a80c-46a1-b8dd-fca1179e2b5d/original/manifest.json",
+    "speed": 1.0,
+    "temperature": 1.0,
+    "sample_rate": 22050,
+    "seed": 42,
+    "voice_guidance": 4.0,
+    "style_guidance": 10.0,
+    "text_guidance": 1.5,
 }
 
-@Client.on_message(filters.command("voice", prefix))
-async def voice_command(client: Client, message: Message):
-    """Generate a conversational voice with fake recording simulation."""
-    if len(message.command) < 2:
-        await message.reply("Usage: `voice <mood> <text>`")
-        return
+# Get Play.ht client
+def get_playht_client():
+    user_id = db.get("custom.playht", "user_id")
+    api_key = db.get("custom.playht", "api_key")
+    if not user_id or not api_key:
+        raise ValueError("Play.ht `user_id` or `api_key` is not configured. Use `/set_playht` to set them.")
+    return PlayHTClient(user_id=user_id, api_key=api_key)
 
-    # Extract mood and text from the command
-    mood = "normal"  # Default mood
-    if message.command[1] in MOODS:
-        mood = message.command[1]
-        text = " ".join(message.command[2:]).strip()
-    else:
-        text = " ".join(message.command[1:]).strip()
+# Estimate audio duration
+def estimate_audio_duration(text: str) -> float:
+    words_per_minute = 150
+    return len(text.split()) / words_per_minute * 60
 
-    # Delete the original command message
-    await message.delete()
+# Generate Play.ht audio
+async def generate_conversational_audio(text: str):
+    params = {key: db.get("custom.playht", key, default) for key, default in DEFAULT_PARAMS.items()}
+    options = TTSOptions(
+        voice=params["voice"],
+        speed=float(params["speed"]),
+        temperature=float(params["temperature"]),
+        sample_rate=int(params["sample_rate"]),
+        seed=int(params["seed"]),
+        voice_guidance=float(params["voice_guidance"]),
+        style_guidance=float(params["style_guidance"]),
+        text_guidance=float(params["text_guidance"]),
+    )
+    client = get_playht_client()
+    audio_path = "play_ht_conversational_voice.mp3"
 
-    # Start fake recording action
-    recording_task = client.loop.create_task(fake_recording_action(client, message.chat.id, text))
+    with open(audio_path, "wb") as f:
+        for chunk in client.tts(text, options):
+            f.write(chunk)
 
-    try:
-        # Generate voice using Play.ht API with mood adjustments
-        audio_path = await generate_conversational_audio(text, mood)
-        if audio_path:
-            # Wait until the fake recording action has completed before sending audio
-            estimated_duration = estimate_audio_duration(text)
-            await sleep(estimated_duration + 2)  # Adjust buffer time if needed
-            # Send the generated voice message
-            await client.send_voice(chat_id=message.chat.id, voice=audio_path)
-            # Remove the audio file after sending
-            os.remove(audio_path)
-    except Exception as e:
-        # Notify user of errors
-        await client.send_message(message.chat.id, f"Error: {str(e)}")
-    finally:
-        # Ensure the fake recording action stops only after audio is sent
-        recording_task.cancel()
+    return audio_path
 
-
+# Simulate recording action
 async def fake_recording_action(client: Client, chat_id: int, text: str):
-    """Simulate the 'recording voice' action until the audio is fully 'recorded'."""
-    estimated_duration = estimate_audio_duration(text)  # Estimate the duration of the audio
+    duration = estimate_audio_duration(text)
     try:
-        while estimated_duration > 0:
-            await client.send_chat_action(chat_id=chat_id, action=enums.ChatAction.RECORD_AUDIO)
+        while duration > 0:
+            await client.send_chat_action(chat_id, enums.ChatAction.RECORD_AUDIO)
             await sleep(5)
-            estimated_duration -= 5
+            duration -= 5
     except Exception:
         pass
 
+# Command: Play.ht voice generation
+@Client.on_message(filters.command("playht", prefix))
+async def voice_command(client: Client, message: Message):
+    if len(message.command) < 2:
+        await message.edit_text(
+            "❌ **Usage:**\n"
+            "`playht <text>`\n\n"
+            "Generate a conversational voice message from the given text. Example:\n"
+            "`playht Hello, how are you?`"
+        )
+        return
 
-async def generate_conversational_audio(text: str, mood: str):
-    """Generate audio using Play.ht API."""
-    headers = {
-        "X-USER-ID": USER_ID,
-        "AUTHORIZATION": API_KEY,
-        "accept": "audio/mpeg",
-        "content-type": "application/json",
-    }
+    text = " ".join(message.command[1:]).strip()
+    await message.delete()
 
-    # Extract mood settings
-    mood_settings = MOODS.get(mood, MOODS["normal"])
+    recording_task = client.loop.create_task(fake_recording_action(client, message.chat.id, text))
+    try:
+        audio_path = await generate_conversational_audio(text)
+        if audio_path:
+            await sleep(estimate_audio_duration(text) + 2)
+            await client.send_voice(chat_id=message.chat.id, voice=audio_path)
+            os.remove(audio_path)
+    except Exception as e:
+        await client.send_message(message.chat.id, f"Error: {e}")
+    finally:
+        recording_task.cancel()
 
-    payload = {
-        "text": text,
-        "voice_engine": "Play3.0",
-        "voice": "s3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/female-cs/manifest.json",
-        "output_format": "mp3",
-        "rate": mood_settings["rate"],  # Adjust rate based on mood
-        "pitch": mood_settings["pitch"],  # Adjust pitch based on mood
-    }
+# Command: Set or view Play.ht configuration
+@Client.on_message(filters.command("set_playht", prefix) & filters.me)
+async def set_playht_config(_, message: Message):
+    args = message.command
+    if len(args) == 1:
+        current_values = {key: db.get("custom.playht", key, default) for key, default in DEFAULT_PARAMS.items()}
+        user_id = db.get("custom.playht", "user_id", "Not Set")
+        api_key = db.get("custom.playht", "api_key", "Not Set")
+        response = (
+            "💡 **Current Play.ht Configuration:**\n"
+            f"- **user_id**: `{user_id}`\n"
+            f"- **api_key**: `{api_key}`\n"
+            + "\n".join([f"- **{key}**: `{value}`" for key, value in current_values.items()])
+            + "\n\n**Usage:**\n"
+            "`set_playht <key> <value>`\n"
+            "**Keys:** `user_id`, `api_key`, `voice`, `speed`, `temperature`, "
+            "`sample_rate`, `seed`, `voice_guidance`, `style_guidance`, `text_guidance`"
+        )
+        await message.edit_text(response, parse_mode=enums.ParseMode.MARKDOWN)
+        return
 
-    response = requests.post(PLAY_HT_API_URL, headers=headers, json=payload, timeout=15, stream=True)
-    response.raise_for_status()
+    if len(args) < 3:
+        await message.edit_text(
+            "❌ **Invalid Usage:**\n"
+            "`set_playht <key> <value>`\n"
+            "Use `/set_playht` without arguments to see the current configuration."
+        )
+        return
 
-    # Save audio to file
-    audio_path = "play_ht_conversational_voice.mp3"
-    with open(audio_path, "wb") as f:
-        for chunk in response.iter_content(chunk_size=1024):
-            if chunk:
-                f.write(chunk)
-    return audio_path
+    key = args[1].lower()
+    value = " ".join(args[2:])
+    if key not in ["user_id", "api_key", *DEFAULT_PARAMS.keys()]:
+        await message.edit_text(
+            "❌ **Invalid Key:**\n"
+            "Allowed keys are: `user_id`, `api_key`, `voice`, `speed`, `temperature`, "
+            "`sample_rate`, `seed`, `voice_guidance`, `style_guidance`, `text_guidance`."
+        )
+        return
 
+    # Convert to appropriate types
+    if key in ["speed", "temperature", "voice_guidance", "style_guidance", "text_guidance"]:
+        try:
+            value = float(value)
+        except ValueError:
+            await message.edit_text(f"❌ `{key}` must be a numeric value (float).")
+            return
+    elif key in ["sample_rate", "seed"]:
+        try:
+            value = int(value)
+        except ValueError:
+            await message.edit_text(f"❌ `{key}` must be an integer value.")
+            return
 
-def estimate_audio_duration(text: str) -> float:
-    """Estimate the duration of the audio based on word count."""
-    word_count = len(text.split())
-    duration_in_seconds = (word_count / WORDS_PER_MINUTE) * 60
-    return duration_in_seconds
-
+    db.set("custom.playht", key, value)
+    await message.edit_text(f"✅ **Play.ht {key} updated successfully!**\nNew value: `{value}`")
 
 # Module help
-modules_help["voice"] = {
-    "voice [mood] [text]": "Generate a conversational voice with mood variation and fake recording simulation. Moods: happy, sad, lazy, tired, normal.",
-              }
+modules_help["playht"] = {
+    "playht [text]*": "Generate a conversational voice with fake recording simulation.",
+    "set_playht": "View or update Play.ht configuration parameters.",
+    "set_playht <key> <value>": "Set a specific Play.ht parameter.",
+}
