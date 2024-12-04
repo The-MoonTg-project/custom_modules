@@ -46,4 +46,4 @@ async def tts(client: Client, message: Message):
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
 
-modules_help["gtts"] = {"tts [lang]* [text]*": "Say text"}
+modules_help["tts"] = {"tts [lang]* [text]*": "Say text"}
