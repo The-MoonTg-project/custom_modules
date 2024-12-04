@@ -75,5 +75,5 @@ async def scancel_cmd(_: Client, message: Message):
 
 modules_help["search"] = {
     "search [/cmd]* [search_word]* [timeout=2.0]": "Search for a specific word in bot (while)",
-    "scancel": "Cansel current search",
+    "scancel": "Cancel current search",
 }
