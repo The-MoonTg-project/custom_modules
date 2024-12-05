@@ -325,7 +325,7 @@ async def tsearch(client: Client, message: Message):
             os.remove("coverImage.jpg")
 
 
-@Client.on_message(filters.command("tts", prefix) & filters.me)
+@Client.on_message(filters.command("stts", prefix) & filters.me)
 async def tts(client: Client, message: Message):
     characters = await voice_characters()
     await message.edit_text("<code>Please Wait...</code>")
