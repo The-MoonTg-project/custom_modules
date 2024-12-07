@@ -1,4 +1,6 @@
+from datetime import datetime
 from io import BytesIO
+import os
 import requests
 
 from pyrogram import Client, filters
@@ -189,11 +191,74 @@ async def nasa_api(_, message: Message):
     await message.edit_text("Nasa api key set successfully!")
 
 
+@Client.on_message(filters.command("asteroids", prefix) & filters.me)
+async def asteroids_handler(_, message: Message):
+    api_key = db.get("custom.nasa", "api", None)
+    if not api_key:
+        await message.edit_text(
+            "API Key isn't set using dmeo key instead, it has much lower rate limits!"
+        )
+    try:
+        _, start_date, end_date = message.command
+    except ValueError:
+        await message.edit_text(
+            f"Please provide a start and end date in the format:{prefix}asteroids YYYY-MM-DD YYYY-MM-DD"
+        )
+        return
+
+    try:
+        datetime.strptime(start_date, "%Y-%m-%d")
+        datetime.strptime(end_date, "%Y-%m-%d")
+    except ValueError:
+        await message.edit_text("Invalid date format. Please use YYYY-MM-DD.")
+        return
+
+    url = f"{API_URL}neo/rest/v1/feed"
+    params = {
+        "start_date": start_date,
+        "end_date": end_date,
+        "api_key": api_key if api_key else "DEMO_KEY",
+    }
+    response = requests.get(url=url, params=params)
+
+    if response.status_code == 200:
+        data = response.json()
+        element_count = data["element_count"]
+        near_earth_objects = data["near_earth_objects"]
+
+        if element_count == 0:
+            return "❌ No asteroids found for the given date range."
+
+        info = f"Asteroids from {start_date} to {end_date} 🌌:\n\n"
+        for date in near_earth_objects:
+            for asteroid in near_earth_objects[date]:
+                info += f"**🚀 {asteroid['name']}**\n"
+                info += f"  - *📏 Diameter (meters):* {asteroid['estimated_diameter']['meters']['estimated_diameter_min']:.2f} - {asteroid['estimated_diameter']['meters']['estimated_diameter_max']:.2f}\n"
+                info += f"  - *⚠️ Hazardous:* {'Yes' if asteroid['is_potentially_hazardous_asteroid'] else 'No'}\n"
+                info += f"  - *📅 Close Approach Date:* {asteroid['close_approach_data'][0]['close_approach_date']}\n"
+                info += f"  - *🌍 Miss Distance (km):* {float(asteroid['close_approach_data'][0]['miss_distance']['kilometers']):,.2f}\n"
+                info += f"  - *💨 Relative Velocity (km/h):* {float(asteroid['close_approach_data'][0]['relative_velocity']['kilometers_per_hour']):,.2f}\n\n"
+
+        with open("asteroids.txt", "w") as f:
+            f.write(info)
+        await message.reply_document(
+            "asteroids.txt",
+            caption=f"Asteroids from {start_date} to {end_date} 🌌:",
+        )
+        os.remove("asteroids.txt")
+        return
+    else:
+        return await message.edit_text(
+            "⚠️ Error fetching asteroid information. Please try again later."
+        )
+
+
 modules_help["nasa"] = {
     "apod": "Get Astronomy Picture of the Day from NASA.",
     "earthpic": "Get Earth Polychromatic Imaging Camera (EPIC) image from NASA.",
     "earthi [longitude]* [lattitude]*": "Get Earth Imagery from NASA.",
     "exoplanet": "Get Exoplanet data from NASA.",
     "donki": "Get Space Weather data from NASA.",
+    "asteroids [start_date]* [end_date]*": "Get Asteroid data from NASA.",
     "nasa_api [api_key]*": "Set your NASA API key to use the commands.",
 }
