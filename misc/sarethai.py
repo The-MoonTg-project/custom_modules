@@ -23,6 +23,12 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from modules.url import generate_screenshot
 
+from pyrogram import filters
+
+from utils.scripts import with_reply, no_prefix
+
+np = no_prefix(prefix)
+
 # API URLs
 BASE_URL = "https://deliriussapi-oficial.vercel.app/"
 URL = f"{BASE_URL}/ia"
@@ -374,7 +380,7 @@ async def gemini(_, message: Message):
 
 
 @Client.on_message(filters.command(["sputify"], prefix) & filters.me)
-async def spotify_search(client, message: Message):
+async def spotify_search(_, message: Message):
     query = (
         message.text.split(maxsplit=1)[1]
         if len(message.command) > 1
@@ -389,7 +395,7 @@ async def spotify_search(client, message: Message):
 
 
 @Client.on_message(filters.command(["lyrics"], prefix) & filters.me)
-async def lyrics_search(client, message: Message):
+async def lyrics_search(_, message: Message):
     query = (
         message.text.split(maxsplit=1)[1]
         if len(message.command) > 1
@@ -404,7 +410,7 @@ async def lyrics_search(client, message: Message):
 
 
 @Client.on_message(filters.command(["soundcloud"], prefix) & filters.me)
-async def soundcloud_search(client, message: Message):
+async def soundcloud_search(_, message: Message):
     query = (
         message.text.split(maxsplit=1)[1]
         if len(message.command) > 1
@@ -419,7 +425,7 @@ async def soundcloud_search(client, message: Message):
 
 
 @Client.on_message(filters.command(["deezer"], prefix) & filters.me)
-async def deezer_search(client, message: Message):
+async def deezer_search(_, message: Message):
     query = (
         message.text.split(maxsplit=1)[1]
         if len(message.command) > 1
@@ -434,7 +440,7 @@ async def deezer_search(client, message: Message):
 
 
 @Client.on_message(filters.command(["applemusic"], prefix) & filters.me)
-async def applemusic_search(client, message: Message):
+async def applemusic_search(_, message: Message):
     query = (
         message.text.split(maxsplit=1)[1]
         if len(message.command) > 1
@@ -448,7 +454,7 @@ async def applemusic_search(client, message: Message):
     )
 
 
-@Client.on_message(filters.reply & filters.text & filters.me)
+@Client.on_message(filters.reply & filters.text & filters.me & np)
 async def handle_reply(client: Client, message: Message):
     chat_id = message.chat.id
     search_keys = [
