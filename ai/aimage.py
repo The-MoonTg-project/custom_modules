@@ -3,13 +3,15 @@
 # YOu can check it out for uses example
 import os
 from PIL import Image
-import google.generativeai as genai
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
-from utils.scripts import format_exc
+from utils.scripts import format_exc, import_library
+
+genai = import_library("google.generativeai", "google-generativeai")
+
 from utils.config import gemini_key
 
 genai.configure(api_key=gemini_key)
