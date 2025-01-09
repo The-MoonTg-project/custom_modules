@@ -30,7 +30,7 @@ from utils.scripts import with_reply, no_prefix
 np = no_prefix(prefix)
 
 # API URLs
-BASE_URL = "https://deliriussapi-oficial.vercel.app/"
+BASE_URL = "https://deliriussapi-oficial.vercel.app"
 URL = f"{BASE_URL}/ia"
 GOOGLE_SEARCH_URL = f"{BASE_URL}/search/googlesearch?query="
 YOUTUBE_SEARCH_URL = f"{BASE_URL}/search/ytsearch?q="
