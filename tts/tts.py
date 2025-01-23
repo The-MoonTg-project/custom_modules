@@ -24,11 +24,15 @@ from utils.scripts import format_exc, import_library
 
 gTTS = import_library("gtts").gTTS
 
-
 @Client.on_message(filters.command("tts", prefix) & filters.me)
 async def tts(client: Client, message: Message):
-    lang = message.command[1]
-    text = " ".join(message.command[2:])
+    if message.reply_to_message:
+        lang = message.command[1]
+        text = message.reply_to_message.text
+    else:
+        lang = message.command[1]
+        text = " ".join(message.command[2:])
+
     await message.edit("<b>Speech synthesis...</b>", parse_mode=enums.ParseMode.HTML)
 
     try:
@@ -45,5 +49,7 @@ async def tts(client: Client, message: Message):
     except Exception as e:
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
-
-modules_help["tts"] = {"tts [lang]* [text]*": "Say text"}
+modules_help["tts"] = {
+    "tts [lang]* [text]*": "Say text",
+    "tts [lang]* replied message": "Say text"
+}
