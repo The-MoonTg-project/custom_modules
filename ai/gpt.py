@@ -54,7 +54,7 @@ async def chatgpt(_, message: Message):
         else:
             await message.edit_text(messager, parse_mode=enums.ParseMode.MARKDOWN)
     except Exception as e:
-        return format_exc(e)
+        return await message.edit(format_exc(e))
 
 
 modules_help["gpt"] = {
