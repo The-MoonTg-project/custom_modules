@@ -23,7 +23,7 @@ from utils.scripts import import_library
 
 import_library("apksearch")
 
-from apksearch import APKPure, APKMirror, AppTeka, APKCombo, APKFab
+from apksearch import APKPure, APKMirror, AppTeka, APKCombo, APKFab, APKad, Aptoide
 
 
 def search_apkmirror(query: str) -> str:
@@ -31,8 +31,8 @@ def search_apkmirror(query: str) -> str:
     result = apkmirror.search_apk()
     if result:
         title, apk_link = result
-        return f"<b>{title}</b>:{apk_link}"
-    return "<code>No results found</code>"
+        return f"APKMirror:\n<b>{title}</b>:{apk_link}"
+    return "APKMirror:<code>No results found</code>"
 
 
 def search_apkpure(query: str) -> str:
@@ -40,8 +40,8 @@ def search_apkpure(query: str) -> str:
     result = apkpure.search_apk()
     if result:
         title, apk_link = result
-        return f"<b>{title}</b>:{apk_link}"
-    return "<code>No results found</code>"
+        return f"APKPure:\n<b>{title}</b>:{apk_link}"
+    return "APKPure:<code>No results found</code>"
 
 
 def search_appteka(query: str) -> str:
@@ -49,8 +49,8 @@ def search_appteka(query: str) -> str:
     result = appteka.search_apk()
     if result:
         title, apk_link = result
-        return f"<b>{title}</b>:{apk_link}"
-    return "<code>No results found</code>"
+        return f"AppTeka:\n<b>{title}</b>:{apk_link}"
+    return "AppTeka:<code>No results found</code>"
 
 
 def search_apkcombo(query: str) -> str:
@@ -58,8 +58,8 @@ def search_apkcombo(query: str) -> str:
     result = apkcombo.search_apk()
     if result:
         title, apk_link = result
-        return f"<b>{title}</b>:{apk_link}"
-    return "<code>No results found</code>"
+        return f"APKCombo:\n<b>{title}</b>:{apk_link}"
+    return "APKCombo:<code>No results found</code>"
 
 
 def search_apkfab(query: str) -> str:
@@ -67,8 +67,26 @@ def search_apkfab(query: str) -> str:
     result = apkfab.search_apk()
     if result:
         title, apk_link = result
-        return f"<b>{title}</b>:{apk_link}"
-    return "<code>No results found</code>"
+        return f"APKFab:\n<b>{title}</b>:{apk_link}"
+    return "APKFab:<code>No results found</code>"
+
+
+def search_apkad(query: str) -> str:
+    apkad = APKad(query)
+    result = apkad.search_apk()
+    if result:
+        title, apk_link = result
+        return f"APKad:\n<b>{title}</b>:{apk_link}"
+    return "APKad:<code>No results found</code>"
+
+
+def search_aptoide(query: str) -> str:
+    aptoide = Aptoide(query)
+    result = aptoide.search_apk()
+    if result:
+        title, apk_link = result
+        return f"Aptoide:\n<b>{title}</b>:{apk_link}"
+    return "Aptoide:<code>No results found</code>"
 
 
 def apksearch(query: str) -> str:
@@ -77,12 +95,16 @@ def apksearch(query: str) -> str:
     appteka_result = search_appteka(query)
     apkcombo_result = search_apkcombo(query)
     apkfab_result = search_apkfab(query)
+    apkad_result = search_apkad(query)
+    aptoide_result = search_aptoide(query)
     results = [
         apkmirror_result,
         apkpure_result,
         appteka_result,
         apkcombo_result,
         apkfab_result,
+        apkad_result,
+        aptoide_result,
     ]
     return "\n\n".join(results)
 
@@ -132,11 +154,30 @@ async def appteka(_, message: Message):
     await message.edit_text(result, disable_web_page_preview=True)
 
 
+@Client.on_message(filters.command("apkad", prefix) & filters.me)
+async def appteka(_, message: Message):
+    if len(message.command) > 2:
+        return await message.edit("<code>No query provided</code>")
+    query = message.text.split(maxsplit=1)[1]
+    result = search_apkad(query)
+    await message.edit_text(result, disable_web_page_preview=True)
+
+
+@Client.on_message(filters.command("aptoide", prefix) & filters.me)
+async def appteka(_, message: Message):
+    if len(message.command) > 2:
+        return await message.edit("<code>No query provided</code>")
+    query = message.text.split(maxsplit=1)[1]
+    result = search_aptoide(query)
+    await message.edit_text(result, disable_web_page_preview=True)
+
+
 @Client.on_message(filters.command("apksearch", prefix) & filters.me)
 async def apks(_, message: Message):
     if len(message.command) > 2:
         return await message.edit("<code>No query provided</code>")
     query = message.text.split(maxsplit=1)[1]
+    await message.edit("<code>Searching...</code>")
     result = apksearch(query)
     await message.edit_text(result, disable_web_page_preview=True)
 
@@ -147,5 +188,7 @@ modules_help["apksearch"] = {
     "appteka [package_name]*": "Search for an apk on appteka",
     "apksearch [package_name]*": "Search for an apk on apksearch",
     "apkpure [package_name]*": "Search for an apk on apkpure",
+    "aptoide [package_name]*": "Search for an apk on aptoide",
+    "apkad [package_name]*": "Search for an apk on apkad",
     "apksearch [package_name]*": "Search for an apk on all supported sources",
 }
