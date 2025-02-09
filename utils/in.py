@@ -1,5 +1,6 @@
 import os
 import shutil
+
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
@@ -10,14 +11,13 @@ from utils.scripts import restart
 async def in_f(client: Client, message: Message):
     if message.reply_to_message.document:
         module = await client.download_media(message.reply_to_message)
+        module_name = os.path.basename(module)
         if os.path.exists(module):
-            shutil.copyfile(module, f"modules/custom_modules/{module}")
-        await message.edit(f"<b>Module {module} downloaded succesfully restartin UB!</b>")
-        restart()
-    else:
-        await message.edit(
-            f"<b>Usage: </b><code>{prefix}dlf [reply to a file]</code>"
-        )
+            shutil.move(module, f"modules/custom_modules/{module_name}")
+            await message.edit(f"<b>Module {module_name} downloaded successfully, restarting UB!</b>")
+            restart()
+        else:
+            await message.edit(f"<b>Usage: </b><code>{prefix}dlf [reply to a file]</code>")
 
 @Client.on_message(filters.command("un", prefix) & filters.me)
 async def un_f(client: Client, message: Message):
@@ -25,16 +25,14 @@ async def un_f(client: Client, message: Message):
         module = message.reply_to_message.document.file_name
         if os.path.exists(f"modules/custom_modules/{module}"):
             os.remove(f"modules/custom_modules/{module}")
-            await message.edit(f"<b>Module {module} removed succesfully restarting UB!</b>")
+            await message.edit(f"<b>Module {module} removed successfully, restarting UB!</b>")
             restart()
         else:
             await message.edit(f"<b>Module {module} not found!</b>")
     else:
-        await message.edit(
-            f"<b>Usage: </b><code>{prefix}ulf [reply to a module name]</code>"
-        )
+        await message.edit(f"<b>Usage: </b><code>{prefix}un [reply to a module name]</code>")
 
-modules_help = {
+modules_help["in"] = {
     "in [reply*]": "Download a module from telegram",
     "un [reply*]": "Remove a module from telegram"
 }
