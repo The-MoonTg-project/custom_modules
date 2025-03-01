@@ -28,7 +28,7 @@ async def gcast(client, message):
 
     await message.reply(f"Broadcast completed: {done} successful, {errors} failed.")
 
-@Client.on_message(filters.command("gucast") & filters.user(OWNER_ID))
+@Client.on_message(filters.command("gucast") & filters.me)
 async def gucast(client, message):
     if message.reply_to_message:
         msg = message.reply_to_message.text
