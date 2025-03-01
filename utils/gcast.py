@@ -34,7 +34,7 @@ async def gcast(client: Client, message: Message):
     await message.edit(f"Broadcast completed: {done} successful, {errors} failed.")
 
 
-@Client.on_message(filters.command("gucast") & filters.me)
+@Client.on_message(filters.command("gucast", prefix) & filters.me)
 async def gucast(client: Client, message: Message):
     if message.reply_to_message:
         msg = message.reply_to_message.text
@@ -44,7 +44,7 @@ async def gucast(client: Client, message: Message):
         await message.edit("Provide text or reply to a message to broadcast globally to users.")
         return
 
-    await message.reply("Starting global user broadcast...")
+    await message.edit("Starting global user broadcast...")
     done, errors = 0, 0
 
     async for dialog in client.get_dialogs():
@@ -60,6 +60,6 @@ async def gucast(client: Client, message: Message):
 
 
 modules_help["gcast"] = {
-    "gcast": "Use .gcast <message> or reply to a message with .gcast to broadcast to all groups",
-    "gucast": "Use .gucast <message> or reply to a message with .gucast to broadcast to all private users."
+    "gcast [text/reply to text]*": "Broadcast message to all groups.",
+    "gucast [text/reply to text]*": "Broadcast message to all private users."
 }
