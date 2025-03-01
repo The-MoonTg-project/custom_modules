@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.errors import FloodWait
 import asyncio
 
-@Client.on_message(filters.command("gcast") & filters.user(OWNER_ID))
+@Client.on_message(filters.command("gcast") & filters.me)
 async def gcast(client, message):
     if message.reply_to_message:
         msg = message.reply_to_message.text
