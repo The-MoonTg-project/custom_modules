@@ -21,7 +21,7 @@ async def gcast(client: Client, message: Message):
     done, errors = 0, 0
 
     async for dialog in client.get_dialogs():
-        if dialog.chat.type in ["supergroup", "group"]:
+        if dialog.chat.type.value in ["supergroup", "group"]:
             try:
                 await client.send_message(dialog.chat.id, msg)
                 done += 1
@@ -48,7 +48,7 @@ async def gucast(client: Client, message: Message):
     done, errors = 0, 0
 
     async for dialog in client.get_dialogs():
-        if dialog.chat.type == "private" and not dialog.chat.is_bot:
+        if dialog.chat.type.value == "private" and not dialog.chat.is_bot:
             try:
                 await client.send_message(dialog.chat.id, msg)
                 done += 1
