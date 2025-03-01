@@ -1,18 +1,23 @@
-from pyrogram import Client, filters
-from pyrogram.errors import FloodWait
 import asyncio
 
-@Client.on_message(filters.command("gcast") & filters.me)
-async def gcast(client, message):
+from pyrogram import Client, filters
+from pyrogram.errors import FloodWait
+from pyrogram.types import Message
+
+from utils.misc import modules_help, prefix
+
+
+@Client.on_message(filters.command("gcast", prefix) & filters.me)
+async def gcast(client: Client, message: Message):
     if message.reply_to_message:
         msg = message.reply_to_message.text
     elif len(message.command) > 1:
         msg = " ".join(message.command[1:])
     else:
-        await message.reply("Provide text or reply to a message to broadcast globally.")
+        await message.edit("Provide text or reply to a message to broadcast globally.")
         return
 
-    await message.reply("Starting global broadcast...")
+    await message.edit("Starting global broadcast...")
     done, errors = 0, 0
 
     async for dialog in client.get_dialogs():
@@ -26,16 +31,17 @@ async def gcast(client, message):
                 errors += 1
                 print(f"Error: {e}")
 
-    await message.reply(f"Broadcast completed: {done} successful, {errors} failed.")
+    await message.edit(f"Broadcast completed: {done} successful, {errors} failed.")
+
 
 @Client.on_message(filters.command("gucast") & filters.me)
-async def gucast(client, message):
+async def gucast(client: Client, message: Message):
     if message.reply_to_message:
         msg = message.reply_to_message.text
     elif len(message.command) > 1:
         msg = " ".join(message.command[1:])
     else:
-        await message.reply("Provide text or reply to a message to broadcast globally to users.")
+        await message.edit("Provide text or reply to a message to broadcast globally to users.")
         return
 
     await message.reply("Starting global user broadcast...")
@@ -50,4 +56,10 @@ async def gucast(client, message):
                 errors += 1
                 print(f"Error: {e}")
 
-    await message.reply(f"Broadcast completed: {done} successful, {errors} failed.")
+    await message.edit(f"Broadcast completed: {done} successful, {errors} failed.")
+
+
+modules_help["gcast"] = {
+    "gcast": "Use .gcast <message> or reply to a message with .gcast to broadcast to all groups",
+    "gucast": "Use .gucast <message> or reply to a message with .gucast to broadcast to all private users."
+}
