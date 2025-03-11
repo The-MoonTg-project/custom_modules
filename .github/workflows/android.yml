@@ -1,0 +1,37 @@
+name: Update Modules
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  update-modules:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Main repository
+        uses: actions/checkout@v3
+
+      - name: Update file
+        run: |
+          ls -R
+          printf "%s\n" "$(ls -d */*)" | sed 's/\.py$//' > ./full.txt
+
+      - name: Commit changes
+        run: |
+          git add ./full.txt
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          echo "new_modules_available=true" >> $GITHUB_ENV
+
+      - name: Create Pull Request
+        if: success() && env.new_modules_available == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update modules/full.txt"
+          branch: update-modules-file
+          title: "Update for custom_modules"
+          body: "This PR updates the full.txt file with the latest changes."
