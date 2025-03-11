@@ -1,41 +1,17 @@
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~# MoonUserBot #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-# Copyright (C) 2023-2024 by MoonUserBot@Github.
-
-# This file is part of: https://github.com/The-Moon-Userbot
-# and is released under the "GNU v3.0 License Agreement".
-
-# Please see: https://github.com/The-Moon-Userbot/blob/master/LICENSE
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
-
-import warnings
 import os
-import sys
-import asyncio
-import subprocess
-
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
+from utils.scripts import import_library
 
-# Suppress specific warnings from lottie
-warnings.filterwarnings("ignore", message="Merge paths are not supported")
+lottie = import_library("lottie")
 
-# Check and install required packages
-try:
-    import lottie
-except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "lottie"])
 
-@Client.on_message(filters.command(["destroy"], prefix) & filters.me)
+@Client.on_message(filters.command("destroy", prefix) & filters.me)
 async def destroy_sticker(client: Client, message: Message):
     """Destroy animated stickers by modifying their animation properties"""
     try:
-        # Verify lottie tools are available
-        if not os.path.exists(sys.executable.replace("python", "lottie_convert.py")):
-            await message.edit("**Installing required tools...**", parse_mode=enums.ParseMode.MARKDOWN)
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "lottie"])
-
         reply = message.reply_to_message
         if not reply or not reply.sticker or not reply.sticker.is_animated:
             return await message.edit(
@@ -93,7 +69,7 @@ async def destroy_sticker(client: Client, message: Message):
                 except Exception as clean_error:
                     print(f"Cleanup error: {clean_error}")
 
-# ================================== Help Module ================================== #
-modules_help["sticker_tools"] = {
+
+modules_help["destroy"] = {
     "destroy [reply]": "Modify and destroy animated stickers"
 }
