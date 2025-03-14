@@ -39,6 +39,7 @@ fun/fliptext
 fun/hearts
 fun/jac
 fun/mafia
+fun/mention
 fun/mirror_flip
 fun/perfectrussian
 fun/reactionspam
