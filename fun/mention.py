@@ -32,7 +32,7 @@ def custom_mention(user, custom_text):
 @Client.on_message(filters.command("mention", prefix) & filters.me)
 async def example_edit(client: Client, message: Message):
     chat_id = message.chat.id
-    if message.reply_to_message:
+    if message.reply_to_message and not len(message.text.split()) > 1:
         user = message.reply_to_message.from_user
         custom_text = (
             message.text.split(maxsplit=1)[1] if len(message.text.split()) > 1 else None
