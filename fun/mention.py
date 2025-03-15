@@ -30,7 +30,8 @@ def custom_mention(user, custom_text):
 
 
 @Client.on_message(filters.command("mention", prefix) & filters.me)
-async def example_edit(_: Client, message: Message):
+async def example_edit(client: Client, message: Message):
+    chat_id = message.chat.id
     if message.reply_to_message:
         user = message.reply_to_message.from_user
         custom_text = (
@@ -39,13 +40,33 @@ async def example_edit(_: Client, message: Message):
         if custom_text:
             await message.edit(custom_mention(user, custom_text))
         else:
-            await message.edit(user.mention)
+            await message.delete()
+            await client.send_message(chat_id, user.mention)
     else:
-        await message.edit("Please reply to a message to mention the user.")
-        await message.delete()
+        if len(message.text.split()) > 1:
+            user_id = message.text.split()[1]
+            if user_id.isdigit():
+                text = (
+                    message.text.split(maxsplit=2)[2]
+                    if len(message.text.split()) > 2
+                    else None
+                )
+                if text:
+                    men = Link(f"tg://user?id={user_id}", text, client.parse_mode)
+                else:
+                    men = (await client.get_users(user_id)).mention
+                await message.edit(men)
+            else:
+                await message.edit("Invalid user_id")
+                await message.delete()
+        else:
+            await message.edit("Reply to a message or provide a user_id")
+            await message.delete()
 
 
 modules_help["mention"] = {
+    "mention": "Mention the user you replied to.",
     "mention [custom_text]": "Mention the user you replied to with custom text.",
-    "mention": "Mention the user you replied to with their username.",
+    "mention [user_id] [custom_text]": "Mention a user by their user_id with custom text.",
+    "mention [user_id]": "Mention a user by their user_id.",
 }
