@@ -7,7 +7,7 @@ import requests
 from utils.misc import modules_help, prefix
 
 
-@Client.on_message(filters.command(["repo", "rp"], prefix) & filters.me)
+@Client.on_message(filters.command(["repod", "rp"], prefix) & filters.me)
 async def github_repo(client: Client, message: Message):
     try:
         if len(message.command) > 1:
@@ -78,5 +78,6 @@ async def github_repo(client: Client, message: Message):
 
 
 modules_help["repo"] = {
-    "repo [link/reply to link]*": "Download GitHub repository",
+    "repod [link/reply to link]*": "Download GitHub repository",
+    "rp [link/reply to link]*": "Download GitHub repository",
 }
