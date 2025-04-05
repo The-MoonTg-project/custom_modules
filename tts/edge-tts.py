@@ -16,15 +16,16 @@
 
 import os
 
-from tabulate import tabulate
-
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc, import_library
 
+tabulate = import_library("tabulate")
 edge_tts = import_library("edge_tts", "edge-tts")
+
+from tabulate import tabulate
 
 from edge_tts import Communicate, list_voices
 from edge_tts.constants import DEFAULT_VOICE
