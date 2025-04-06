@@ -73,6 +73,8 @@ async def etts(client: Client, message: Message):
                 return
         if lang == "d" or lang == "default":
             lang = DEFAULT_VOICE
+        if lang == "hi":
+            lang = "hi-IN-SwaraNeural"
         if not text:
             await message.edit("<b>No text to speech</b>")
             return
