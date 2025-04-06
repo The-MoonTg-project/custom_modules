@@ -151,5 +151,5 @@ modules_help["edge-tts"] = {
     "estts [lang]* [text]*": "Say text & Generate subtitles",
     "estts [lang]* replied message": "Say text & Generate subtitles"
     f"\n for default lang (en-US-EmmaMultilingualNeural) use 'd' or 'default' in lang place, for e.g., <code>{prefix}etts d hello</code>"
-    "\n\n<b>Example:</b>\n<code>{prefix}etts en-US-AriaNeural Hello world</code>",
+    f"\n\n<b>Example:</b>\n<code>{prefix}etts en-US-AriaNeural Hello world</code>",
 }
