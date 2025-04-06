@@ -135,3 +135,4 @@ utils/time
 utils/translator
 utils/uplud
 utils/wikipedia
+utils/xiaomi
