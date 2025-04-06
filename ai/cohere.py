@@ -12,9 +12,12 @@ co = cohere.Client(cohere_key)
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc
 from utils.db import db
+from utils.rentry import paste as rentry_paste
+
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
+from pyrogram.errors import MessageTooLong
 
 
 @Client.on_message(filters.command("cohere", prefix) & filters.me)
@@ -41,7 +44,7 @@ async def cohere(c: Client, message: Message):
             chat_history=chat_history,
             model="command-r-plus",
             message=prompt,
-            temperature=0.3,
+            temperature=0.8,
             tools=[{"name": "internet_search"}],
             connectors=[],
             prompt_truncation="OFF",
@@ -94,6 +97,29 @@ async def cohere(c: Client, message: Message):
             await message.edit_text(
                 f"**Question:**`{prompt}`\n**Answer:** {output}\n",
                 parse_mode=enums.ParseMode.MARKDOWN,
+                disable_web_page_preview=True,
+            )
+        except MessageTooLong:
+            await message.edit_text(
+                "<code>Output is too long... Pasting to rentry...</code>"
+            )
+            try:
+                output = output + "\n\n" + references if references else output
+                rentry_url, edit_code = await rentry_paste(
+                    text=output, return_edit=True
+                )
+            except RuntimeError:
+                await message.edit_text(
+                    "<b>Error:</b> <code>Failed to paste to rentry</code>"
+                )
+                return
+            await c.send_message(
+                "me",
+                f"Here's your edit code for Url: {rentry_url}\nEdit code:  <code>{edit_code}</code>",
+                disable_web_page_preview=True,
+            )
+            await message.edit_text(
+                f"<b>Output:</b> {rentry_url}\n<b>Note:</b> <code>Edit Code has been sent to your saved messages</code>",
                 disable_web_page_preview=True,
             )
 
