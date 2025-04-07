@@ -55,8 +55,7 @@ async def translatedl(_client, message):
             source_lang = "unknown"
 
         await message.edit_text(
-            f"<b>Translated</b> from <code>{
-                source_lang}</code> to <code>{dtarget}</code>:\n\n"
+            f"<b>Translated</b> from <code>{source_lang}</code> to <code>{dtarget}</code>:\n\n"
             + "{}".format(translated_text)
         )
 
