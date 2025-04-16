@@ -3,38 +3,37 @@
 
 import asyncio
 from pyrogram import Client, filters
-from pyrogram.errors import UserBlocked
+from pyrogram.errors import YouBlockedUser
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc
+from utils.conv import Conversation
 
 
-async def forward_xiaomi_bot_reply(client: Client, cmd_text: str, message: Message, loading_text: str):
+async def forward_xiaomi_bot_reply(
+    client: Client, cmd_text: str, message: Message, loading_text: str
+):
     """Helper function to handle XiaomiGeeksBot interactions"""
     try:
         status_msg = await message.edit(loading_text)
         bot_username = "@XiaomiGeeksBot"
 
-        # Send command to bot
-        await client.send_message(bot_username, cmd_text)
+        async with Conversation(client, bot_username, timeout=15) as conv:
+            await conv.send_message(cmd_text)
 
-        # Wait for response
-        await asyncio.sleep(3)
+            response = await conv.get_response(timeout=10)
 
-        # Get and forward response
-        async for msg in client.get_chat_history(bot_username, limit=1):
             await client.forward_messages(
                 chat_id=message.chat.id,
                 from_chat_id=bot_username,
-                message_ids=msg.id
+                message_ids=response.id,
             )
             await status_msg.delete()
-            return
 
-        await status_msg.edit("<i>No response from bot.</i>")
-
-    except UserBlocked:
+    except YouBlockedUser:
         await message.edit("<i>Please unblock @XiaomiGeeksBot first.</i>")
+    except TimeoutError:
+        await message.edit("<i>No response from bot within the timeout period.</i>")
     except Exception as e:
         await message.edit(f"<i>Error: {format_exc(e)}</i>")
 
@@ -49,7 +48,7 @@ async def firmware_cmd(client: Client, message: Message):
         client,
         f"/firmware {message.command[1]}",
         message,
-        "<i>Fetching firmware info...</i>"
+        "<i>Fetching firmware info...</i>",
     )
 
 
@@ -63,7 +62,7 @@ async def vendor_cmd(client: Client, message: Message):
         client,
         f"/vendor {message.command[1]}",
         message,
-        "<i>Fetching vendor info...</i>"
+        "<i>Fetching vendor info...</i>",
     )
 
 
@@ -77,7 +76,7 @@ async def specs_cmd(client: Client, message: Message):
         client,
         f"/specs {message.command[1]}",
         message,
-        "<i>Fetching device specs...</i>"
+        "<i>Fetching device specs...</i>",
     )
 
 
@@ -91,7 +90,7 @@ async def fastboot_cmd(client: Client, message: Message):
         client,
         f"/fastboot {message.command[1]}",
         message,
-        "<i>Fetching fastboot ROM...</i>"
+        "<i>Fetching fastboot ROM...</i>",
     )
 
 
@@ -105,7 +104,7 @@ async def recovery_cmd(client: Client, message: Message):
         client,
         f"/recovery {message.command[1]}",
         message,
-        "<i>Fetching recovery ROM...</i>"
+        "<i>Fetching recovery ROM...</i>",
     )
 
 
@@ -119,7 +118,7 @@ async def of_cmd(client: Client, message: Message):
         client,
         f"/of {message.command[1]}",
         message,
-        "<i>Fetching OrangeFox Recovery...</i>"
+        "<i>Fetching OrangeFox Recovery...</i>",
     )
 
 
@@ -133,7 +132,7 @@ async def latest_cmd(client: Client, message: Message):
         client,
         f"/latest {message.command[1]}",
         message,
-        "<i>Fetching latest OS info...</i>"
+        "<i>Fetching latest OS info...</i>",
     )
 
 
@@ -147,7 +146,7 @@ async def archive_cmd(client: Client, message: Message):
         client,
         f"/archive {message.command[1]}",
         message,
-        "<i>Fetching archive links...</i>"
+        "<i>Fetching archive links...</i>",
     )
 
 
@@ -161,7 +160,7 @@ async def eu_cmd(client: Client, message: Message):
         client,
         f"/eu {message.command[1]}",
         message,
-        "<i>Fetching Xiaomi.eu ROMs...</i>"
+        "<i>Fetching Xiaomi.eu ROMs...</i>",
     )
 
 
@@ -172,10 +171,7 @@ async def twrp_cmd(client: Client, message: Message):
         await message.edit(f"<b>Usage:</b> <code>{prefix}twrp [codename]</code>")
         return
     await forward_xiaomi_bot_reply(
-        client,
-        f"/twrp {message.command[1]}",
-        message,
-        "<i>Fetching TWRP...</i>"
+        client, f"/twrp {message.command[1]}", message, "<i>Fetching TWRP...</i>"
     )
 
 
@@ -186,10 +182,7 @@ async def models_cmd(client: Client, message: Message):
         await message.edit(f"<b>Usage:</b> <code>{prefix}models [codename]</code>")
         return
     await forward_xiaomi_bot_reply(
-        client,
-        f"/models {message.command[1]}",
-        message,
-        "<i>Fetching models...</i>"
+        client, f"/models {message.command[1]}", message, "<i>Fetching models...</i>"
     )
 
 
@@ -200,10 +193,7 @@ async def whatis_cmd(client: Client, message: Message):
         await message.edit(f"<b>Usage:</b> <code>{prefix}whatis [codename]</code>")
         return
     await forward_xiaomi_bot_reply(
-        client,
-        f"/whatis {message.command[1]}",
-        message,
-        "<i>Identifying device...</i>"
+        client, f"/whatis {message.command[1]}", message, "<i>Identifying device...</i>"
     )
 
 
@@ -219,5 +209,5 @@ modules_help["xiaomi"] = {
     "specs [codename]": "Get device specifications",
     "twrp [codename]": "Get TWRP download link",
     "vendor [codename]": "Get latest vendor for Xiaomi device",
-    "whatis [codename]": "Get device name from codename"
+    "whatis [codename]": "Get device name from codename",
 }
