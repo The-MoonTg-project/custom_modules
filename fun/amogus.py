@@ -1,5 +1,6 @@
 # Original module author: t.me/KeyZenD
-# Adaptation for Moon-Userbot by t.me/AmokDev (github.com/AmokDev)
+# Adaptation for Dragon-Userbot by t.me/AmokDev (github.com/AmokDev)
+# Adaptation for Moon-Userbot by Abhi
 
 from io import BytesIO
 from random import randint
@@ -30,9 +31,11 @@ async def amogus(client: Client, message: Message):
     imposter = Image.open(BytesIO(get(f"{url}{clr}.png").content))
 
     text_ = "\n".join(["\n".join(wrap(part, 30)) for part in text.split("\n")])
-    w, h = ImageDraw.Draw(Image.new("RGB", (1, 1))).multiline_textsize(
-        text_, font, stroke_width=2
+    bbox = ImageDraw.Draw(Image.new("RGB", (1, 1))).multiline_textbbox(
+        (0, 0), text_, font, stroke_width=2
     )
+    # w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    w, h = bbox[2], bbox[3]
     text = Image.new("RGBA", (w + 30, h + 30))
     ImageDraw.Draw(text).multiline_text(
         (15, 15), text_, "#FFF", font, stroke_width=2, stroke_fill="#000"
