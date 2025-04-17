@@ -108,6 +108,7 @@ utils/compress
 utils/currency
 utils/date
 utils/domaininfo
+utils/dub
 utils/duckduckgo
 utils/fedutils
 utils/files
