@@ -13,7 +13,7 @@ yt_dlp = import_library("yt_dlp", "yt-dlp")
 from urllib.parse import parse_qs, urlparse
 
 from yt_dlp import YoutubeDL
-from yt_dlp.utils import DownloadError, ExtractorError, UnavailableVideoError
+from yt_dlp.utils import DownloadError, ExtractorError
 
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc, progress, resize_image
@@ -99,7 +99,7 @@ def download_video(url):
             file_path = f"downloads/ytdl/videos/{i_d}.{ext}"
             ydl.download([url])
             return file_path, title, img, thumb_url
-    except (DownloadError, ExtractorError, UnavailableVideoError):
+    except (DownloadError, ExtractorError):
         video_id = extract_video_id(url)
         is_videoId = True if video_id is not None else False
         video_id = url if video_id is None else video_id
@@ -139,7 +139,7 @@ def download_music(url):
             else:
                 raise FileNotFoundError("Downloaded file not found in audios folder")
             return file_path, title, img
-    except (DownloadError, ExtractorError, UnavailableVideoError):
+    except (DownloadError, ExtractorError):
         video_id = extract_video_id(url)
         is_videoId = True if video_id is not None else False
         video_id = url if video_id is None else video_id
