@@ -26,6 +26,7 @@ dl/spotdl
 dl/ytdl
 fun/1000-7
 fun/amogus
+fun/amongus
 fun/animations
 fun/aniquotes
 fun/circle
