@@ -139,7 +139,13 @@ async def imposter_cmd(client: Client, message: Message):
 
 @Client.on_message(filters.command(["imp", "impn"], prefix) & filters.me)
 async def imp_animation(client: Client, message: Message):
-    name = " ".join(message.command[1:]) if len(message.command) > 1 else "Unknown"
+    name = " ".join(message.command[1:]) if len(message.command) > 1 else ""
+    if not name:
+        reply = message.reply_to_message
+        if reply:
+            name = reply.from_user.first_name
+        else:
+            name = message.from_user.first_name
     cmd = message.command[0].lower()
 
     text1 = await edit_or_reply(message, "Uhmm... Something is wrong here!!")
@@ -168,7 +174,7 @@ async def imp_animation(client: Client, message: Message):
     await text4.edit("<b>Others:</b> Who??")
     await asyncio.sleep(2)
     await text4.edit(
-        f"<b>{message.from_user.first_name}:</b> Its {name}, I saw {name} using vent,"
+        f"<b>{message.from_user.first_name}:</b> Its {name}, I saw {name} using vent"
     )
     await asyncio.sleep(3)
     await text4.edit(f"<b>Others:</b> Okay.. Vote {name}")
