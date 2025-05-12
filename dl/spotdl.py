@@ -3,7 +3,6 @@ import os
 import shutil
 import time
 import requests
-from pytubefix import YouTube
 
 from subprocess import check_call, CalledProcessError
 from urllib.parse import parse_qs, urlparse
@@ -13,6 +12,9 @@ from pyrogram.types import Message
 
 from utils.misc import modules_help, prefix
 from utils.scripts import format_module_help, import_library, format_exc, progress
+
+pytubefix = import_library("pytubefix")
+from pytubefix import YouTube
 
 spotdl = import_library("spotdl")
 
