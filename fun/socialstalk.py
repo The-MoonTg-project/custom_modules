@@ -173,7 +173,7 @@ async def github_stalk(_, message: Message):
                 photo=data.get("avatar_url", "").replace("?v=4", ""),
                 caption=f"</b>GitHub Profile:</b>\n"
                 f"</b>Name:</b> {data.get('name', 'N/A')}\n"
-                f"</b>Username:</b> {data.get('username', 'N/A')}\n"
+                f"</b>Username:</b> {data.get('login', 'N/A')}\n"
                 f"</b>Bio:</b> {data.get('bio', 'N/A')}\n"
                 f"</b>Public Repositories:</b> <a href='{data.get('repos_url', '')}'>{data.get('public_repos', 'N/A')}</a>\n"
                 f"</b>Public Gists:</b> <a href='{data.get('gists_url', '')}'>{data.get('public_gists', 'N/A')}</a>\n"
