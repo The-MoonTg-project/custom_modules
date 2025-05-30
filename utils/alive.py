@@ -6,7 +6,7 @@ from pyrogram import __version__ as pyro_version
 
 StartTime = time.time()
 
-# Start Image Url @Tech_Shreyansh29
+# Start Image Url
 ALIVE_MEDIA = "https://i.ibb.co/B5MvLpkP/Uploaded-6910445402.jpg"
 
 def get_readable_time(seconds: int) -> str:
@@ -39,10 +39,10 @@ async def get_alive_text(client: Client, message):
     return (
         f"Welcome {user.mention(user.first_name)} To <a href='https://github.com/The-MoonTg-project/Moon-Userbot'>Moon-Userbot</a>\n\n"
         f" › User            :   <code>×͜× {user.first_name}</code>\n"
-        f" › Python          :   <code>v{version_info.major}.{version_info.minor}.{version_info.micro}</code>\n"
-        f" › Pyrogram        :   <code>v{pyro_version}</code>\n"
+        f" › Python        :   <code>v{version_info.major}.{version_info.minor}.{version_info.micro}</code>\n"
+        f" › Pyrogram   :   <code>v{pyro_version}</code>\n"
         f" › Core            :   <code>v0.2.1</code>\n"
-        f" › Uptime          :   <code>{uptime}</code>"
+        f" › Uptime       :   <code>{uptime}</code>"
     )
 
 @Client.on_message(filters.command("alive", prefix) & filters.me)
