@@ -170,7 +170,7 @@ async def github_stalk(_, message: Message):
         )
         if data:
             await message.reply_photo(
-                photo=data.get("avatar_url", ""),
+                photo=data.get("avatar_url", "").replace("?v=4", ""),
                 caption=f"</b>GitHub Profile:</b>\n"
                 f"</b>Name:</b> {data.get('name', 'N/A')}\n"
                 f"</b>Username:</b> {data.get('username', 'N/A')}\n"
