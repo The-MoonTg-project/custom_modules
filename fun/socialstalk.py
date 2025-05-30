@@ -181,7 +181,7 @@ async def github_stalk(_, message: Message):
                 f"</b>Location:</b> {data.get('location', 'N/A')}\n"
                 f"</b>Email:</b> {data.get('email', 'N/A')}\n"
                 f"</b>Website:</b> {data.get('blog', 'N/A')}\n"
-                f"</b>Created At:</b> {formatted_date.strftime('%Y-%m-%d %I:%M:%S %p') if formatted_date else 'N/A'}"
+                f"</b>Created At:</b> {formatted_date.strftime('%Y-%m-%d %I:%M:%S %p') if formatted_date else 'N/A'}\n"
                 f"</b>Hireable:</b> {data.get('hireable', 'N/A')}\n"
                 f"</b>Followers:</b> {data.get('followers', 'N/A')}\n"
                 f"</b>Following:</b> {data.get('following', 'N/A')}",
