@@ -64,3 +64,7 @@ modules_help["formatter"] = {
     "mono <text>": "Format text as monospace",
     "code [language] <text>": "Format text as code block with optional syntax highlighting",
 }
+
+
+#Author: @Tech_Shreyansh1
+#Version: 1.0
