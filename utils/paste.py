@@ -93,6 +93,16 @@ async def d_paste(message, extension=None):
         }
     return {"error": "Unable to reach dogbin."}
 
+# Don't Remove Credit @Tech_Shreyansh29, @MrGhostsx
+#
+# Copyright (C) 2025 by MrGhostsx@Github, < https://github.com/TechyShreyansh>.
+#
+# This file is part of < https://github.com/TechyShreyansh > project,
+# and is released under the MIT License.
+# Please see < https://github.com/TechyShreyansh/blob/master/LICENSE >
+#
+# All rights reserved.
+
 async def pastetext(text_to_print, pastetype=None, extension=None):
     response = {"error": "something went wrong"}
     if pastetype is not None:
