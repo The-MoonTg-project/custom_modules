@@ -22,6 +22,7 @@ anime/neko
 dl/aria2p
 dl/ebook
 dl/repo
+dl/savetube
 dl/spotdl
 dl/ytdl
 fun/1000-7
