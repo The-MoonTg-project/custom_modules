@@ -69,6 +69,7 @@ async def musicbot(client: Client, message: Message):
             subprocess.run(
                 ["git", "clone", "https://github.com/The-MoonTg-project/musicbot.git"]
             )
+            shutil.rmtree("musicbot/.git")
             subprocess.run(
                 [
                     sys.executable,
