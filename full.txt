@@ -97,6 +97,7 @@ news/aionews
 news/dailyepaper
 news/news
 paste/haste
+paste/pasty
 rev/apkid
 rev/dexrepair
 rev/rasm
