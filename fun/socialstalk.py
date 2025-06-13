@@ -170,10 +170,10 @@ async def github_stalk(_, message: Message):
         )
         if data:
             await message.reply_photo(
-                photo=data.get("avatar_url", ""),
+                photo=data.get("avatar_url", "").replace("?v=4", ""),
                 caption=f"</b>GitHub Profile:</b>\n"
                 f"</b>Name:</b> {data.get('name', 'N/A')}\n"
-                f"</b>Username:</b> {data.get('username', 'N/A')}\n"
+                f"</b>Username:</b> {data.get('login', 'N/A')}\n"
                 f"</b>Bio:</b> {data.get('bio', 'N/A')}\n"
                 f"</b>Public Repositories:</b> <a href='{data.get('repos_url', '')}'>{data.get('public_repos', 'N/A')}</a>\n"
                 f"</b>Public Gists:</b> <a href='{data.get('gists_url', '')}'>{data.get('public_gists', 'N/A')}</a>\n"
@@ -181,7 +181,7 @@ async def github_stalk(_, message: Message):
                 f"</b>Location:</b> {data.get('location', 'N/A')}\n"
                 f"</b>Email:</b> {data.get('email', 'N/A')}\n"
                 f"</b>Website:</b> {data.get('blog', 'N/A')}\n"
-                f"</b>Created At:</b> {formatted_date.strftime('%Y-%m-%d %I:%M:%S %p') if formatted_date else 'N/A'}"
+                f"</b>Created At:</b> {formatted_date.strftime('%Y-%m-%d %I:%M:%S %p') if formatted_date else 'N/A'}\n"
                 f"</b>Hireable:</b> {data.get('hireable', 'N/A')}\n"
                 f"</b>Followers:</b> {data.get('followers', 'N/A')}\n"
                 f"</b>Following:</b> {data.get('following', 'N/A')}",
