@@ -44,9 +44,21 @@ async def resolve_input(message, cmd):
         await (message.edit(txt) if is_self else message.reply(txt))
         return None, None, None
     url = extract_youtube_link(query)
+    # Map command to format
+    fmt_map = {"sta": "mp3", "stv": "720", "stvl": "360"}
+    fmt = fmt_map.get(cmd, "mp3")
     if url:
         status = await (message.edit_text("<code>Downloading from YouTube link...</code>") if is_self else message.reply("<code>Downloading from YouTube link...</code>"))
-        return {"title": "YouTube Video", "url": url}, status, True
+        # Fetch video info from the API to get the real title for the correct format
+        info = await fetch_json(DL_API.format(url, fmt))
+        if not info.get("status") or not info.get("result"):
+            await status.edit_text("<code>Could not fetch video info.</code>")
+            return None, None, None
+        video = {
+            "title": info["result"].get("title", "YouTube Video"),
+            "url": url
+        }
+        return video, status, True
     status = await (message.edit_text(f"<code>Searching for {query} on YouTube...</code>") if is_self else message.reply(f"<code>Searching for {query} on YouTube...</code>"))
     data = await fetch_json(SEARCH_API.format(query))
     if not data.get("status") or not data.get("result"):
