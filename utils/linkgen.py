@@ -43,7 +43,11 @@ async def get_file_link(client: Client, file_message: Message, bot_username: str
 @Client.on_message(filters.command("l", prefix) & filters.me)
 async def generate_link(client: Client, message: Message):
     replied = message.reply_to_message
+<<<<<<< HEAD
     bot_username = db.get("linkgen", BOT_KEY)
+=======
+    bot_username = db.get("custom.linkgen", BOT_KEY)
+>>>>>>> 206d9f27e3e0d8f47a6602c67d8aa6341a4cea26
 
     if not bot_username:
         return await message.edit(f"❌ <b>No bot set.</b> Use <code>{prefix}addbot @botusername</code> first.")
@@ -71,12 +75,20 @@ async def add_bot(_, message: Message):
     if not bot_username.startswith("@"):
         return await message.edit("❌ <b>Please provide a valid bot username starting with</b> <code>@</code>")
     
+<<<<<<< HEAD
     db.set("linkgen", BOT_KEY, bot_username)
+=======
+    db.set("custom.linkgen", BOT_KEY, bot_username)
+>>>>>>> 206d9f27e3e0d8f47a6602c67d8aa6341a4cea26
     await message.edit(f"✅ <b>Bot set to:</b> <code>{bot_username}</code>")
 
 @Client.on_message(filters.command("delbot", prefix) & filters.me)
 async def delete_bot(_, message: Message):
+<<<<<<< HEAD
     db.set("linkgen", BOT_KEY, None)
+=======
+    db.set("custom.linkgen", BOT_KEY, None)
+>>>>>>> 206d9f27e3e0d8f47a6602c67d8aa6341a4cea26
     await message.edit(f"✅ <b>Bot removed successfully.</b>\nYou can add again using <code>{prefix}addbot @botusername</code>.")
 
 modules_help["linkgen"] = {

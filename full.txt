@@ -125,6 +125,7 @@ utils/ipinfo
 utils/joindate
 utils/kill
 utils/leave_chat
+utils/linkgen
 utils/log_tag
 utils/mediasaver
 utils/messaging
