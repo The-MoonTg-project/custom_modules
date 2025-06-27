@@ -1,140 +1,119 @@
-import asyncio
 import os
-from io import BytesIO
-
-from PIL import Image, ImageDraw, ImageFilter, ImageOps
-from pyrogram import Client, filters, enums
+import tempfile
+import json
+import asyncio
+import time
+from pyrogram import Client, filters
 from pyrogram.types import Message
-
-# noinspection PyUnresolvedReferences
 from utils.misc import modules_help, prefix
 
-# noinspection PyUnresolvedReferences
-from utils.scripts import import_library, format_exc
-
-
-VideoFileClip = import_library("moviepy.editor", "moviepy").VideoFileClip
-
-im = None
-
-
-def process_img(filename):
-    global im
-    im = Image.open(f"downloads/{filename}")
-    w, h = im.size
-    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    img.paste(im, (0, 0))
-    m = min(w, h)
-    img = img.crop(((w - m) // 2, (h - m) // 2, (w + m) // 2, (h + m) // 2))
-    w, h = img.size
-    mask = Image.new("L", (w, h), 0)
-    draw = ImageDraw.Draw(mask)
-    draw.ellipse((10, 10, w - 10, h - 10), fill=255)
-    mask = mask.filter(ImageFilter.GaussianBlur(2))
-    img = ImageOps.fit(img, (w, h))
-    img.putalpha(mask)
-    im = BytesIO()
-    im.name = "img.webp"
-    img.save(im)
-    im.seek(0)
-
-
-video = None
-
-
-def process_vid(filename):
-    global video
-    video = VideoFileClip(f"downloads/{filename}")
-    video.reader.close()
-    w, h = video.size
-    m = min(w, h)
-    box = [(w - m) // 2, (h - m) // 2, (w + m) // 2, (h + m) // 2]
-    video = video.crop(*box)
-
-
-@Client.on_message(filters.command(["circle", "round"], prefix) & filters.me)
-async def circle(client: Client, message: Message):
+async def run_subprocess(cmd, timeout=None):
+    proc = await asyncio.create_subprocess_exec(
+        *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
     try:
-        if not message.reply_to_message:
-            return await message.reply(
-                "<b>Reply is required for this command</b>",
-                parse_mode=enums.ParseMode.HTML,
-            )
-        if message.reply_to_message.photo:
-            filename = "circle.jpg"
-            typ = "photo"
-        elif message.reply_to_message.sticker:
-            if message.reply_to_message.sticker.is_video:
-                return await message.reply(
-                    "<b>Video stickers is not supported</b>",
-                    parse_mode=enums.ParseMode.HTML,
-                )
-            filename = "circle.webp"
-            typ = "photo"
-        elif message.reply_to_message.video:
-            filename = "circle.mp4"
-            typ = "video"
-        elif message.reply_to_message.document:
-            _filename = message.reply_to_message.document.file_name.casefold()
-            if _filename.endswith(".png"):
-                filename = "circle.png"
-                typ = "photo"
-            elif _filename.endswith(".jpg"):
-                filename = "circle.jpg"
-                typ = "photo"
-            elif _filename.endswith(".jpeg"):
-                filename = "circle.jpeg"
-                typ = "photo"
-            elif _filename.endswith(".webp"):
-                filename = "circle.webp"
-                typ = "photo"
-            elif _filename.endswith(".mp4"):
-                filename = "circle.mp4"
-                typ = "video"
+        stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout)
+        return proc.returncode, stdout.decode(), stderr.decode()
+    except asyncio.TimeoutError:
+        proc.kill()
+        await proc.communicate()
+        raise
+
+async def get_video_duration(video_path):
+    cmd = [
+        "ffprobe", "-v", "error", "-show_entries", "format=duration",
+        "-of", "json", video_path
+    ]
+    try:
+        returncode, stdout, _ = await run_subprocess(cmd, timeout=20)
+        if returncode != 0 or not stdout:
+            return 10
+        return min(float(json.loads(stdout)["format"]["duration"]), 60)
+    except Exception:
+        return 10
+
+@Client.on_message(filters.command("circle", prefix) & filters.me)
+async def send_circle_video(client: Client, message: Message):
+    reply = getattr(message, "reply_to_message", None)
+    if not reply or not (reply.video or reply.animation or reply.document):
+        await message.edit("Reply to a video.")
+        return
+
+    parts = message.text.strip().split()
+    target_username = parts[1] if len(parts) >= 2 and parts[1].startswith("@") else None
+    send_to_current_chat = target_username is None
+
+    if len(parts) >= 2 and not parts[1].startswith("@"):
+        await message.edit("`.circle` or `.circle @user`")
+        return
+
+    await message.edit("Downloading...")
+
+    video_path = circle_path = None
+    try:
+        video_path = await client.download_media(reply)
+        if not video_path:
+            await message.edit("Download failed.")
+            return
+
+        video_duration = await get_video_duration(video_path)
+
+        with tempfile.NamedTemporaryFile(suffix='_circle.mp4', delete=False) as temp_file:
+            circle_path = temp_file.name
+
+        await message.edit("Processing...")
+
+        # Use higher bitrate and better scaling algorithm to reduce blurriness
+        cmd = [
+            "ffmpeg", "-y", "-i", video_path,
+            "-filter_complex",
+            (
+                "[0:v]scale=640:640:force_original_aspect_ratio=increase:flags=lanczos,"
+                "crop=640:640[scaled];"
+                "color=white:size=640x640[c];"
+                "[scaled]format=rgba,"
+                "geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':"
+                "a='if(gte(hypot(X-320,Y-320),320),0,255)'[masked];"
+                "[c][masked]overlay=0:0"
+            ),
+            "-c:v", "libx264", "-pix_fmt", "yuv420p",
+            "-c:a", "aac", "-b:v", "2000k", "-b:a", "128k",
+            "-r", "30", "-t", str(video_duration),
+            "-preset", "ultrafast", "-movflags", "+faststart",
+            circle_path
+        ]
+
+        returncode, _, stderr = await run_subprocess(cmd, timeout=300)
+        if returncode != 0 or not os.path.exists(circle_path) or os.path.getsize(circle_path) == 0:
+            await message.edit("FFmpeg error." if returncode != 0 else "Convert failed.")
+            return
+
+        await message.edit("Sending...")
+        send_kwargs = dict(
+            video_note=circle_path, duration=int(video_duration), length=640
+        )
+        try:
+            if send_to_current_chat:
+                await client.send_video_note(chat_id=message.chat.id, **send_kwargs)
+                await message.edit("Done!")
             else:
-                return await message.reply(
-                    "<b>Invalid file type</b>", parse_mode=enums.ParseMode.HTML
-                )
-        else:
-            return await message.reply(
-                "<b>Invalid file type</b>", parse_mode=enums.ParseMode.HTML
-            )
+                await client.send_video_note(chat_id=target_username, **send_kwargs)
+                await message.edit(f"Sent to {target_username}")
+        except Exception as e:
+            await message.edit("Send failed.")
 
-        if typ == "photo":
-            await message.edit(
-                "<b>Processing image</b>📷", parse_mode=enums.ParseMode.HTML
-            )
-            await message.reply_to_message.download(f"downloads/{filename}")
-            await asyncio.get_event_loop().run_in_executor(None, process_img, filename)
-            await message.delete()
-            return await message.reply_sticker(
-                sticker=im, reply_to_message_id=message.reply_to_message.id
-            )
-        else:
-            await message.edit(
-                "<b>Processing video</b>🎥", parse_mode=enums.ParseMode.HTML
-            )
-            await message.reply_to_message.download(f"downloads/{filename}")
-            await asyncio.get_event_loop().run_in_executor(None, process_vid, filename)
-
-            await message.edit("<b>Saving video</b>📼", parse_mode=enums.ParseMode.HTML)
-            await asyncio.get_event_loop().run_in_executor(
-                None, video.write_videofile, "downloads/result.mp4"
-            )
-
-            await message.delete()
-            await message.reply_video_note(
-                video_note="downloads/result.mp4",
-                duration=int(video.duration),
-                reply_to_message_id=message.reply_to_message.id,
-            )
-            os.remove(f"downloads/{filename}")
-            os.remove("downloads/result.mp4")
+    except asyncio.TimeoutError:
+        await message.edit("Timeout.")
     except Exception as e:
-        await message.reply(format_exc(e), parse_mode=enums.ParseMode.HTML)
-
-
+        await message.edit("Error.")
+    finally:
+        for path in (video_path, circle_path):
+            try:
+                if path and os.path.exists(path):
+                    os.remove(path)
+            except Exception:
+                pass
+                
 modules_help["circle"] = {
-    "round": "Round a photo or video.",
-    "circle": "Circle a photo or video.",
+    "circle": "Convert video to circle. High quality and less blurry."
 }
