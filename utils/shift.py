@@ -22,7 +22,7 @@ tochat = None
 
 
 @Client.on_message(filters.command("shift", prefix) & filters.me)
-async def shift(client, message):
+async def shift(client: Client, message):
     lol = await edit_or_reply(message, "Processing please wait")
     x = message.text.split(None, 1)[1]
     x = x.replace(" ", "")
@@ -49,7 +49,7 @@ async def shift(client, message):
     a = 0
     if limit == "None" or limit == "none":
         try:
-            async for message in client.get_chat_history(fromchat):
+            async for message in client.get_chat_history(fromchat, reverse=True):
                 try:
                     await message.copy(tochat)
                     a = a + 1
@@ -74,7 +74,9 @@ async def shift(client, message):
             lol.edit("Enter a vailed limit")
             return
         try:
-            async for message in client.get_chat_history(fromchat, limit=limit):
+            async for message in client.get_chat_history(
+                fromchat, limit=limit, reverse=True
+            ):
                 try:
                     await message.copy(tochat)
 
@@ -95,7 +97,7 @@ async def shift(client, message):
 
 
 @Client.on_message(filters.command("dmshift", prefix) & filters.me)
-async def dmshift(client, message):
+async def dmshift(_, message):
     await message.edit("Processing, please wait...")
 
     command_parts = message.text.split()
