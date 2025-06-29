@@ -13,7 +13,7 @@ from utils.misc import modules_help, prefix
 from utils.scripts import import_library, format_exc
 
 
-VideoFileClip = import_library("moviepy.editor", "moviepy").VideoFileClip
+VideoFileClip = import_library("moviepy", "moviepy==2.2.1").VideoFileClip
 
 im = None
 
@@ -45,15 +45,19 @@ video = None
 def process_vid(filename):
     global video
     video = VideoFileClip(f"downloads/{filename}")
-    video.reader.close()
     w, h = video.size
     m = min(w, h)
-    box = [(w - m) // 2, (h - m) // 2, (w + m) // 2, (h + m) // 2]
-    video = video.crop(*box)
+    box = {
+        "x1": (w - m) // 2,
+        "y1": (h - m) // 2,
+        "x2": (w + m) // 2,
+        "y2": (h + m) // 2,
+    }
+    video = video.cropped(**box)
 
 
 @Client.on_message(filters.command(["circle", "round"], prefix) & filters.me)
-async def circle(client: Client, message: Message):
+async def circle(_, message: Message):
     try:
         if not message.reply_to_message:
             return await message.reply(
@@ -128,6 +132,8 @@ async def circle(client: Client, message: Message):
                 duration=int(video.duration),
                 reply_to_message_id=message.reply_to_message.id,
             )
+            if isinstance(video, VideoFileClip):
+                video.close()
             os.remove(f"downloads/{filename}")
             os.remove("downloads/result.mp4")
     except Exception as e:
