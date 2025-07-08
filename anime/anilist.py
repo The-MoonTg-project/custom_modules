@@ -9,13 +9,13 @@ from pyrogram.errors import MediaCaptionTooLong
 from utils.misc import prefix, modules_help
 from utils.scripts import format_exc
 
-url = "https://api.safone.dev"
+url = "https://api.safone.co"
 
 headers = {
     "Accept-Language": "en-US,en;q=0.9",
     "Connection": "keep-alive",
     "DNT": "1",
-    "Referer": "https://api.safone.dev/docs",
+    "Referer": "https://api.safone.co/docs",
     "Sec-Fetch-Dest": "empty",
     "Sec-Fetch-Mode": "cors",
     "Sec-Fetch-Site": "same-origin",
