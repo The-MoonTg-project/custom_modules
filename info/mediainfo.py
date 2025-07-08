@@ -1,10 +1,9 @@
 # NOTE: If you're on local installation then you'll need `mediainfo` installed in your system
 # If you're on heroku then make sure to install `mediainfo` buildpacks
-# Others installations like docker users doesn;t need to install anything
+# Others installations like docker users doesn't need to install anything
 
 import os
 import time
-import urllib3
 import datetime
 import subprocess
 import requests
@@ -16,50 +15,23 @@ from utils.misc import prefix, modules_help
 from utils.scripts import format_exc, progress, edit_or_reply
 
 
-async def telegraph(user_name, content):
-    url = "https://api.safone.dev"
+async def telegraph(content):
+    url = "https://pasty.lus.pm/api/v1/pastes"
+    headers = {"User-Agent": "Mozilla/5.0", "content-type": "application/json"}
+    data = {"content": content}
 
-    formatted_content = "<br>".join(content.split("\n"))
-    formatted_content = "<p>" + formatted_content + "</p>"
-
-    headers = {
-        "Accept-Language": "en-US,en;q=0.9",
-        "Connection": "keep-alive",
-        "DNT": "1",
-        "Referer": "https://api.safone.dev/docs",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-        "accept": "application/json",
-        "sec-ch-ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"Linux"',
-    }
-
-    data = {
-        "title": "MediaInfo",
-        "content": formatted_content,
-        "author_name": user_name,
-    }
     try:
-        response = requests.post(
-            url=f"{url}/telegraph/text", headers=headers, json=data, timeout=5
-        )
-        result = response.json()
-        result = result["url"]
-    except (
-        TimeoutError,
-        urllib3.exceptions.ConnectTimeoutError,
-        requests.exceptions.ConnectTimeout,
-        urllib3.exceptions.MaxRetryError,
-        requests.exceptions.JSONDecodeError,
-    ):
-        result = None
-        with open("mdf.txt", "w", encoding="utf-8") as f:
-            f.write(content)
+        response = requests.post(url, json=data, headers=headers, timeout=5)
+        response.raise_for_status()
+        paste_id = response.json().get("id")
+        if paste_id:
+            return f"https://pasty.lus.pm/{paste_id}.txt"
+    except Exception:
+        pass
 
-    return result
+    with open("mdf.txt", "w", encoding="utf-8") as f:
+        f.write(content)
+    return None
 
 
 @Client.on_message(filters.command("mediainfo", prefix) & filters.me)
@@ -68,7 +40,6 @@ async def mediainfo(client: Client, message: Message):
         return await message.edit_text("Kindly Reply to a File")
     file_path = None
     try:
-        user_name = message.from_user.id
         ms = await edit_or_reply(message, "<code>Downloading...</code>")
         ct = time.time()
         file_path = await message.reply_to_message.download(
@@ -83,8 +54,8 @@ async def mediainfo(client: Client, message: Message):
         )
         paste = subprocess.run(["mediainfo", file_path], capture_output=True, text=True)
         result = paste.stdout
-        content = await telegraph(user_name=user_name, content=result)
-        if content is not None:
+        content = await telegraph(content=result)
+        if content:
             await ms.edit_text(
                 f"**File Name:** `{file_name[0]}`\n**Size:** `{file_size} bytes`\n**Last Modified:** `{last_modified}`\n**Result:** {content}",
                 parse_mode=enums.ParseMode.MARKDOWN,
