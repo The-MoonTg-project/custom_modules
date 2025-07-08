@@ -3,7 +3,7 @@ import os
 import re
 import time
 import asyncio
-from pyrogram import Client, filters, enums
+from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from subprocess import Popen, PIPE
@@ -26,6 +26,25 @@ async def compress(client: Client, message: Message):
     if not replied.media:
         await edit_or_reply(message, "<b>Please Reply To A Video</b>")
         return
+
+    media_type = replied.media.name
+    if media_type == "VIDEO":
+        media = replied.video
+    elif media_type == "DOCUMENT":
+        media = replied.document
+        mime_type = media.mime_type
+        if not mime_type.startswith("video/"):
+            await edit_or_reply(message, "<b>Unsupported media type</b>")
+            return
+    else:
+        await edit_or_reply(message, "<b>Unsupported media type</b>")
+        return
+
+    if media:
+        file_name = media.file_name.strip().replace(",", "").replace("|", "")
+    else:
+        await edit_or_reply(message, f"<b>Unsupported media type</b>")
+        return
     if replied.media:
         c_time = time.time()
         ms_ = await edit_or_reply(
@@ -34,9 +53,9 @@ async def compress(client: Client, message: Message):
         )
         file = await client.download_media(
             message=replied,
-            file_name="resources/",
+            file_name=f"resources/{file_name}",
             progress=pg,
-            progress_args=(ms_, c_time, "`Downloading This File!`"),
+            progress_args=(ms_, c_time, "<code>Downloading This File!</code>"),
         )
         # replied.media.duration
         # d_time = time.time()
@@ -54,7 +73,7 @@ async def compress(client: Client, message: Message):
         )
         stdout = cmd_obj.communicate(timeout=60)
         x, y = stdout
-        if y and y.endswith("NOT_FOUND"):
+        if y and y.endswith(("NOT_FOUND", "not found")):
             return await edit_or_reply(message, f"ERROR: `{y}`")
         total_frames = x.split(":")[1].split("\n")[0]
         try:
@@ -129,7 +148,7 @@ async def compress(client: Client, message: Message):
                 message.chat.id,
                 out_file,
                 progress=pg,
-                progress_args=(ms_, c_time, "`Uploading...`"),
+                progress_args=(ms_, c_time, "<code>Uploading...</code>"),
                 caption=f"<b>Original Size:</b> <code>{humanbytes(file_size)}MB</code>\n<b>Compressed Size:</b> <code>{humanbytes(out_file_size)}</code>\n<b>Compression Ratio:</b> <code>{differ:.2f}%</code>\n <b>Time Taken To Compress:</b> <code>{difff}</code>",
                 reply_to_message_id=message.id,
             )
@@ -139,6 +158,7 @@ async def compress(client: Client, message: Message):
                 f"<b>INFO:</b> <code>{e}</code>",
             )
         finally:
+            await ms_.delete()
             os.remove(file)
             os.remove(out_file)
             os.remove(progress)
