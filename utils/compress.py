@@ -2,6 +2,7 @@ import math
 import os
 import re
 import time
+import shutil
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
@@ -22,6 +23,9 @@ from utils.scripts import progress as pg
 @Client.on_message(filters.command("compress", prefix) & filters.me)
 @with_reply
 async def compress(client: Client, message: Message):
+    if not shutil.which("mediainfo"):
+        await edit_or_reply(message, "<b>mediainfo not found</b>")
+        return
     replied = message.reply_to_message
     if not replied.media:
         await edit_or_reply(message, "<b>Please Reply To A Video</b>")
