@@ -2,10 +2,13 @@
 # This is used on my Moon-Userbot: https://github.com/The-MoonTg-project/Moon-Userbot
 # YOu can check it out for uses example
 import os
+import io
 
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 from pyrogram.errors import MessageTooLong
+
+from PIL import Image
 
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc, import_library
@@ -16,29 +19,79 @@ genai = import_library("google.generativeai", "google-generativeai")
 
 genai.configure(api_key=gemini_key)
 
-model = genai.GenerativeModel("gemini-2.0-flash")
+model_name = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+system_prompt = os.environ.get("GEMINI_SYSTEM_PROMPT", "You are a helpful AI assistant.")
+safety_settings = {
+    "HARM_CATEGORY_DANGEROUS_CONTENT": "BLOCK_NONE",
+    "HARM_CATEGORY_HARASSMENT": "BLOCK_NONE",
+    "HARM_CATEGORY_HATE_SPEECH": "BLOCK_NONE",
+    "HARM_CATEGORY_SEXUALLY_EXPLICIT": "BLOCK_NONE",
+}
+model = genai.GenerativeModel(
+    model_name, safety_settings=safety_settings, system_instruction=system_prompt
+)
 
 
 @Client.on_message(filters.command("gemini", prefix) & filters.me)
 async def say(client: Client, message: Message):
     try:
-        await message.edit_text("<code>Please Wait...</code>")
+        await message.edit_text("<code>Thinking...</code>")
 
-        if len(message.command) > 1:
-            prompt = message.text.split(maxsplit=1)[1]
+        command_text = message.text or message.caption or ""
+        prompt = ""
+        parts = command_text.split(maxsplit=1)
+        if len(parts) > 1:
+            prompt = parts[1]
         elif message.reply_to_message:
-            prompt = message.reply_to_message.text
-        else:
+            prompt = (
+                message.reply_to_message.text
+                or message.reply_to_message.caption
+                or ""
+            )
+
+        image_part = None
+        photo = message.photo or (
+            message.reply_to_message and message.reply_to_message.photo
+        )
+
+        if photo:
+            image_stream = await client.download_media(photo, in_memory=True)
+            if image_stream:
+                try:
+                    pil_image = Image.open(image_stream)
+                    image_part = pil_image
+                except Exception as e:
+                    await message.edit_text(
+                        f"<b>Error:</b> <code>Failed to process image: {e}</code>"
+                    )
+                    return
+
+        if not prompt and not image_part:
             await message.edit_text(
-                f"<b>Usage: </b><code>{prefix}gemini [prompt/reply to message]</code>"
+                f"<b>Usage: </b><code>{prefix}gemini [prompt/reply to message with text or image]</code>"
             )
             return
 
-        chat = model.start_chat()
-        response = chat.send_message(prompt)
+        contents = []
+        if prompt:
+            contents.append(prompt)
+        if image_part:
+            contents.append(image_part)
+
+        response = model.generate_content(contents)
+
+        output_text = response.text
+        if prompt:
+            processed_prompt = prompt.replace('\n', '\n> ')
+            question_text = f"👤**Prompt:**\n> {processed_prompt}"
+        else:
+            question_text = ""
+
+        processed_response = output_text.replace('\n', '\n> ')
+        formatted_response = f"🤖**Response:**\n> {processed_response}"
 
         await message.edit_text(
-            f"**Question:**`{prompt}`\n**Answer:** {response.text}",
+            f"{question_text}\n{formatted_response}\nPowered by Gemini",
             parse_mode=enums.ParseMode.MARKDOWN,
         )
     except MessageTooLong:
@@ -47,7 +100,7 @@ async def say(client: Client, message: Message):
         )
         try:
             rentry_url, edit_code = await rentry_paste(
-                text=response.text, return_edit=True
+                text=f"{response.text}\n\nPowered by Gemini", return_edit=True
             )
         except RuntimeError:
             await message.edit_text(
