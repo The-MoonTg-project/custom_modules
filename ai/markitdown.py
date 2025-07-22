@@ -26,7 +26,7 @@ import_library("markitdown")
 from markitdown import MarkItDown
 
 
-@Client.on_message(filters.command("markitdown", prefix) & filters.me)
+@Client.on_message(filters.command(["markitdown", "mkdn"], prefix) & filters.me)
 @with_reply
 async def markitdown(client: Client, message: Message):
     if message.reply_to_message.document:
