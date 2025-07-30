@@ -4,11 +4,11 @@ from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 
 @Client.on_message(filters.command("tdel", prefix) & filters.me)
-async def del_message(_, message: Message):
+async def tdel_message(_, message: Message):
     if len(message.command) <= 2:
         await message.edit(
-            "<b>❌ خطا:</b> <i>باید زمان (ثانیه) و متن پیام رو مشخص کنی</i>\n"
-            "<b>مثال:</b> <code>.del 10 سلام دوستان!</code>",
+            "<b>Error:</b> <i>You must specify time (seconds) and message text</i>\n"
+            "<b>Example:</b> <code>.tdel 10 Hello everyone!</code>",
             parse_mode=enums.ParseMode.HTML,
         )
         await asyncio.sleep(5)
@@ -16,25 +16,21 @@ async def del_message(_, message: Message):
         return
     
     try:
-        # گرفتن زمان از آرگومان دوم
         delete_time = int(message.command[1])
-        
-        # گرفتن متن از باقی آرگومان‌ها
         text = " ".join(message.command[2:])
         
-        # بررسی محدودیت‌ها
         if delete_time <= 0:
             await message.edit(
-                "<b>❌ خطا:</b> <i>زمان باید عدد مثبت باشه!</i>",
+                "<b>Error:</b> <i>Time must be a positive number!</i>",
                 parse_mode=enums.ParseMode.HTML,
             )
             await asyncio.sleep(3)
             await message.delete()
             return
             
-        if delete_time > 86400:  # 24 ساعت
+        if delete_time > 86400:
             await message.edit(
-                "<b>❌ خطا:</b> <i>حداکثر زمان ۲۴ ساعت (۸۶۴۰۰ ثانیه) هست!</i>",
+                "<b>Error:</b> <i>Maximum time is 24 hours (86400 seconds)!</i>",
                 parse_mode=enums.ParseMode.HTML,
             )
             await asyncio.sleep(5)
@@ -43,42 +39,40 @@ async def del_message(_, message: Message):
         
         if not text.strip():
             await message.edit(
-                "<b>❌ خطا:</b> <i>متن پیام نمی‌تونه خالی باشه!</i>",
+                "<b>Error:</b> <i>Message text cannot be empty!</i>",
                 parse_mode=enums.ParseMode.HTML,
             )
             await asyncio.sleep(3)
             await message.delete()
             return
         
-        # ویرایش پیام با متن جدید
         await message.edit(
             text,
             parse_mode=enums.ParseMode.HTML,
         )
         
-        # منتظر موندن و حذف پیام
         await asyncio.sleep(delete_time)
         await message.delete()
         
     except ValueError:
         await message.edit(
-            "<b>❌ خطا:</b> <i>زمان باید عدد صحیح باشه!</i>\n"
-            "<b>مثال:</b> <code>.del 30 این پیام ۳۰ ثانیه دیگه حذف میشه</code>",
+            "<b>Error:</b> <i>Time must be an integer!</i>\n"
+            "<b>Example:</b> <code>.tdel 30 This message will be deleted in 30 seconds</code>",
             parse_mode=enums.ParseMode.HTML,
         )
         await asyncio.sleep(5)
         await message.delete()
     except Exception as e:
         await message.edit(
-            f"<b>❌ خطای غیرمنتظره:</b> <code>{str(e)}</code>",
+            f"<b>Unexpected error:</b> <code>{str(e)}</code>",
             parse_mode=enums.ParseMode.HTML,
         )
         await asyncio.sleep(5)
         await message.delete()
 
-modules_help["self_delete"] = {
-    "tdel [time] [text]*": "ارسال پیام خودحذفشونده\n"
-    "زمان: مدت زمان تا حذف (ثانیه)\n"
-    "متن: محتوای پیام\n"
-    "مثال: .del 60 این پیام یک دقیقه دیگه حذف میشه"
+modules_help["timed_delete"] = {
+    "tdel [time] [text]*": "send self-deleting message\n"
+    "time: seconds until deletion\n"
+    "text: message content\n"
+    "example: .tdel 60 this message will delete in one minute"
 }
