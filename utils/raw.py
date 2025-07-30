@@ -17,17 +17,17 @@ async def get_raw_message(client: Client, message: Message):
     chunk_size = 4096 - 10
     
     if len(json_data) <= chunk_size:
-        await client.send_message("me", f"```json\n{json_data}\n```", parse_mode="markdown")
+        await client.send_message("me", f"```json\n{json_data}\n```", parse_mode=enums.ParseMode.MARKDOWN)
     else:
         chunks = [json_data[i:i+chunk_size] for i in range(0, len(json_data), chunk_size)]
         
         for i, chunk in enumerate(chunks):
             if i == 0:
-                await client.send_message("me", f"```json\n{chunk}", parse_mode="markdown")
+                await client.send_message("me", f"```json\n{chunk}", parse_mode=enums.ParseMode.MARKDOWN)
             elif i == len(chunks) - 1:
-                await client.send_message("me", f"{chunk}\n```", parse_mode="markdown")
+                await client.send_message("me", f"{chunk}\n```", parse_mode=enums.ParseMode.MARKDOWN)
             else:
-                await client.send_message("me", chunk, parse_mode="markdown")
+                await client.send_message("me", chunk, parse_mode=enums.ParseMode.MARKDOWN)
     
     await message.delete()
 
