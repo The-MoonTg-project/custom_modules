@@ -3,7 +3,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
 
-@Client.on_message(filters.command("del", prefix) & filters.me)
+@Client.on_message(filters.command("tdel", prefix) & filters.me)
 async def del_message(_, message: Message):
     if len(message.command) <= 2:
         await message.edit(
@@ -77,7 +77,7 @@ async def del_message(_, message: Message):
         await message.delete()
 
 modules_help["self_delete"] = {
-    "del [time] [text]*": "ارسال پیام خودحذفشونده\n"
+    "tdel [time] [text]*": "ارسال پیام خودحذفشونده\n"
     "زمان: مدت زمان تا حذف (ثانیه)\n"
     "متن: محتوای پیام\n"
     "مثال: .del 60 این پیام یک دقیقه دیگه حذف میشه"
