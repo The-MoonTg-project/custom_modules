@@ -1,46 +1,37 @@
-import asyncio
-from pyrogram import Client, filters, enums
+from pyrogram import Client, filters
 from pyrogram.types import Message
+import json
+
 from utils.misc import modules_help, prefix
 
-@Client.on_message(filters.command("raw", prefix) & filters.me)
-async def raw_message(client: Client, message: Message):
-   if not message.reply_to_message:
-       await message.edit("<code>Reply to a message to get its raw JSON</code>", parse_mode=enums.ParseMode.HTML)
-       return
-   
-   try:
-       raw_json = str(message.reply_to_message)
-       
-       if len(raw_json) > 4096:
-           i = 0
-           for x in range(0, len(raw_json), 4096):
-               if i == 0:
-                   sent_msg = await client.send_message(
-                       "me",
-                       f"<b>Raw JSON:</b>\n<code>{raw_json[x:x + 4096]}</code>",
-                       parse_mode=enums.ParseMode.HTML,
-                   )
-               else:
-                   await client.send_message(
-                       "me",
-                       f"<code>{raw_json[x:x + 4096]}</code>",
-                       parse_mode=enums.ParseMode.HTML,
-                   )
-               i += 1
-               await asyncio.sleep(0.18)
-       else:
-           sent_msg = await client.send_message(
-               "me",
-               f"<b>Raw JSON:</b>\n<code>{raw_json}</code>",
-               parse_mode=enums.ParseMode.HTML,
-           )
-       
-       await message.edit("<code>Raw JSON sent to Saved Messages</code>", parse_mode=enums.ParseMode.HTML)
-       
-   except Exception as e:
-       await message.edit(f"<code>Error: {e}</code>", parse_mode=enums.ParseMode.HTML)
 
-modules_help["raw"] = {
-   "raw*": "get raw JSON of replied message and send it to Saved Messages"
+@Client.on_message(filters.command("raw", prefix) & filters.me)
+async def get_raw_message(client: Client, message: Message):
+    if not message.reply_to_message:
+        await message.delete()
+        return
+    
+    raw_data = str(message.reply_to_message)
+    json_data = json.dumps(json.loads(raw_data), indent=2, ensure_ascii=False)
+    
+    chunk_size = 4096 - 10
+    
+    if len(json_data) <= chunk_size:
+        await client.send_message("me", f"```json\n{json_data}\n```", parse_mode="MarkdownV2")
+    else:
+        chunks = [json_data[i:i+chunk_size] for i in range(0, len(json_data), chunk_size)]
+        
+        for i, chunk in enumerate(chunks):
+            if i == 0:
+                await client.send_message("me", f"```json\n{chunk}", parse_mode="MarkdownV2")
+            elif i == len(chunks) - 1:
+                await client.send_message("me", f"{chunk}\n```", parse_mode="MarkdownV2")
+            else:
+                await client.send_message("me", chunk, parse_mode="MarkdownV2")
+    
+    await message.delete()
+
+
+modules_help["raw_json"] = {
+    "raw [reply]": "Get raw JSON data of replied message and send to saved messages",
 }
