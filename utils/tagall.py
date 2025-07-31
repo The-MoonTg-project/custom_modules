@@ -31,42 +31,50 @@ async def tagall(client: Client, message: Message):
 async def hidetagall(client: Client, message: Message):
     chat_id = message.chat.id
     
-    original_text = message.text or message.caption or ""
-    command_parts = original_text.split(maxsplit=1)
-    remaining_text = command_parts[1] if len(command_parts) > 1 else ""
+    # استخراج متن بعد از دستور
+    command_text = message.text or message.caption or ""
+    command_prefix = f"{prefix}hidetagall"
+    remaining_text = command_text.replace(command_prefix, "", 1).strip()
     
-    hidden_mentions = ""
-    member_count = 0
-    max_members = 100
+    # دریافت تمام اعضای گروه
+    members = []
+    icm = client.get_chat_members(chat_id)
+    async for member in icm:
+        # فقط کاربران واقعی (نه بات‌ها و اکانت‌های حذف شده)
+        if not member.user.is_deleted and not member.user.is_bot:
+            members.append(member.user)
     
-    try:
-        icm = client.get_chat_members(chat_id)
-        async for member in icm:
-            if member_count >= max_members:
-                break
-            if not member.user.is_bot and not member.user.is_deleted:
-                hidden_mentions += f'<a href="tg://user?id={member.user.id}">‍</a> '
-                member_count += 1
-    except Exception as e:
-        await message.edit_text(f"Error getting members: {str(e)}")
-        return
+    # ایجاد رشته منشن مخفی
+    invisible_char = "‍"  # Zero Width Joiner (U+200D)
+    tag_parts = []
     
-    final_text = hidden_mentions + remaining_text
+    # برای هر عضو یک کاراکتر مخفی با منشن
+    for user in members:
+        tag_parts.append(f"[{invisible_char}](tg://user?id={user.id})")
     
+    # اتصال با فاصله بین کاراکترها
+    tag_string = " ".join(tag_parts)
+    
+    # ترکیب با متن باقی‌مانده
+    final_text = tag_string
+    if remaining_text:
+        final_text += f" {remaining_text}"
+    
+    # ادیت پیام اصلی
     try:
         if message.media:
-            await message.edit_caption(final_text, parse_mode=enums.ParseMode.HTML)
+            # اگر پیام دارای مدیا است، کپشن رو ادیت کن
+            await message.edit_caption(final_text, parse_mode=enums.ParseMode.MARKDOWN)
         else:
-            await message.edit_text(final_text, parse_mode=enums.ParseMode.HTML)
+            # در غیر این صورت متن رو ادیت کن
+            await message.edit_text(final_text, parse_mode=enums.ParseMode.MARKDOWN)
     except Exception as e:
-        if message.media:
-            await message.delete()
-            await client.send_message(chat_id, final_text, parse_mode=enums.ParseMode.HTML)
-        else:
-            await message.edit_text(f"Error editing message: {str(e)}")
+        # اگر ادیت ممکن نبود، پیام رو حذف و جدید ارسال کن
+        await message.delete()
+        await client.send_message(chat_id, final_text, parse_mode=enums.ParseMode.MARKDOWN)
 
 
 modules_help["tagall"] = {
-    "tagall": "Tag all members visibly",
-    "hidetagall [text/media]": "Tag all members invisibly with hidden characters",
+    "tagall": "Tag all members",
+    "hidetagall": "Invisibly tag all members using hidden characters",
 }
