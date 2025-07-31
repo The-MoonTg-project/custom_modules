@@ -35,7 +35,7 @@ async def hidetagall(client: Client, message: Message):
     command_parts = original_text.split(maxsplit=1)
     remaining_text = command_parts[1] if len(command_parts) > 1 else ""
     
-    hidden_mentions = []
+    hidden_mentions = ""
     member_count = 0
     max_members = 100
     
@@ -45,28 +45,28 @@ async def hidetagall(client: Client, message: Message):
             if member_count >= max_members:
                 break
             if not member.user.is_bot and not member.user.is_deleted:
-                hidden_mentions.append(f"[‍](tg://user?id={member.user.id})")
+                hidden_mentions += f'<a href="tg://user?id={member.user.id}">‍</a> '
                 member_count += 1
     except Exception as e:
-        await message.edit_text(f"Error: {str(e)}")
+        await message.edit_text(f"Error getting members: {str(e)}")
         return
     
-    final_text = " ".join(hidden_mentions) + (" " + remaining_text if remaining_text else "")
+    final_text = hidden_mentions + remaining_text
     
     try:
         if message.media:
-            await message.edit_caption(final_text, parse_mode=enums.ParseMode.MARKDOWN)
+            await message.edit_caption(final_text, parse_mode=enums.ParseMode.HTML)
         else:
-            await message.edit_text(final_text, parse_mode=enums.ParseMode.MARKDOWN)
+            await message.edit_text(final_text, parse_mode=enums.ParseMode.HTML)
     except Exception as e:
         if message.media:
             await message.delete()
-            await client.send_message(chat_id, final_text, parse_mode=enums.ParseMode.MARKDOWN)
+            await client.send_message(chat_id, final_text, parse_mode=enums.ParseMode.HTML)
         else:
-            await message.edit_text(f"Error: {str(e)}")
+            await message.edit_text(f"Error editing message: {str(e)}")
 
 
 modules_help["tagall"] = {
-    "tagall": "Tag all members",
-    "hidetagall [text/media]": "Hidden tag all members separately on invisible characters with spaces",
+    "tagall": "Tag all members visibly",
+    "hidetagall [text/media]": "Tag all members invisibly with hidden characters",
 }
