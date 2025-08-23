@@ -14,16 +14,14 @@ async def banall(client: Client, message: Message):
     chat_id = int(group_id)
 
     async for i in client.get_chat_members(chat_id):
-        message.edit_text(f"getting memebers from {chat_id}")
-    async for i in client.get_chat_members(chat_id):
         try:
             await client.ban_chat_member(chat_id, user_id=i.user.id)
-            message.edit_text("kicked lol, I'm the Devil 😈")
+            await message.edit_text("kicked lol, I'm the Devil 😈")
         except FloodWait as e:
-            await asyncio.sleep(e.x)
+            await asyncio.sleep(e.value)
             print(e)
         except Exception as e:
-            message.edit_text(" failed af 😭")
+            await message.edit_text(" failed af 😭")
     print("process completed")
 
 
