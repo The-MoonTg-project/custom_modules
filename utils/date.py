@@ -12,7 +12,7 @@ import requests
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from utils.misc import modules_help, prefix
-from utils.scripts import make_carbon
+# from utils.scripts import make_carbon
 
 
 def get_history_data():
@@ -90,32 +90,32 @@ async def date(_, message: Message):
 #         await message.edit(f"An error occurred: {str(e)}")
 
 
-@Client.on_message(filters.command("calendar", prefix) & filters.me)
-async def send_calendar(_, message: Message):
-    command_parts = message.text.split(" ")
-    if len(command_parts) == 2:
-        try:
-            year = int(command_parts[1])
-        except ValueError:
-            await message.edit(
-                "✦ ɪɴᴠᴀʟɪᴅ ʏᴇᴀʀ ғᴏʀᴍᴀᴛ. ᴘʟᴇᴀsᴇ ᴜsᴇ {prefix}calendar <year>"
-            )
-            return
-    else:
-        year = datetime.now().year
+# @Client.on_message(filters.command("calendar", prefix) & filters.me)
+# async def send_calendar(_, message: Message):
+#     command_parts = message.text.split(" ")
+#     if len(command_parts) == 2:
+#         try:
+#             year = int(command_parts[1])
+#         except ValueError:
+#             await message.edit(
+#                 "✦ ɪɴᴠᴀʟɪᴅ ʏᴇᴀʀ ғᴏʀᴍᴀᴛ. ᴘʟᴇᴀsᴇ ᴜsᴇ {prefix}calendar <year>"
+#             )
+#             return
+#     else:
+#         year = datetime.now().year
 
-    m = await message.edit("✦ ɢᴇɴᴇʀᴀᴛɪɴɢ ᴄᴀʟᴇɴᴅᴀʀ...")
+#     m = await message.edit("✦ ɢᴇɴᴇʀᴀᴛɪɴɢ ᴄᴀʟᴇɴᴅᴀʀ...")
 
-    cal = calendar.TextCalendar()
-    full_year_calendar = cal.formatyear(year, 2, 1, 1, 3)
-    carbon_image = await make_carbon(full_year_calendar)
+#     cal = calendar.TextCalendar()
+#     full_year_calendar = cal.formatyear(year, 2, 1, 1, 3)
+#     carbon_image = await make_carbon(full_year_calendar)
 
-    await message.reply_photo(
-        photo=carbon_image, caption=f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ {year} ᴄᴀʟᴇɴᴅᴀʀ."
-    )
-    if os.path.exists("carbon.png"):
-        os.remove("carbon.png")
-    await m.delete()
+#     await message.reply_photo(
+#         photo=carbon_image, caption=f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ {year} ᴄᴀʟᴇɴᴅᴀʀ."
+#     )
+#     if os.path.exists("carbon.png"):
+#         os.remove("carbon.png")
+#     await m.delete()
 
 
 @Client.on_message(filters.command("history", prefix) & filters.me)
@@ -149,6 +149,6 @@ async def today_history(client, message: Message):
 modules_help["date"] = {
     "date": " Show Current Date and Calendar",
     # "holidays": "Show Current holiday",
-    "calender": " Calender for full year",
+    # "calender": " Calender for full year",
     "history": "get the today history",
 }
