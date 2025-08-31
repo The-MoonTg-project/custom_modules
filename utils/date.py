@@ -53,7 +53,7 @@ def format_history(data):
 async def date(_, message: Message):
     month = datetime.now().month
     year = datetime.now().year
-    date = datetime.now().strftime("Date - %B %d, %Y\Time - %H:%M:%S")
+    date = datetime.now().strftime("Date - %B %d, %Y\\Time - %H:%M:%S")
     cal = calendar.month(year, month)
     await message.edit_text(f"<code>{date}\n{cal}</code>")
 
