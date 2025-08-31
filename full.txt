@@ -119,7 +119,6 @@ utils/files
 utils/fwdall
 utils/gcast
 utils/getmsg
-utils/google
 utils/imgbb
 utils/in
 utils/ipinfo
