@@ -30,11 +30,11 @@ from utils.scripts import format_exc, format_module_help, progress, import_libra
 
 lexica = import_library("lexica", "lexica-api")
 
-from lexica import AsyncClient, Client
+from lexica import AsyncClient, Client as LClient
 
 
 def ImageModels():
-    models = Client().models["models"]["image"]
+    models = LClient().models["models"]["image"]
     dict_models = {}
     for model in models:
         model_id = model["id"]
