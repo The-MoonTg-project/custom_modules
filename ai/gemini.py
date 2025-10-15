@@ -12,11 +12,9 @@ from utils.scripts import format_exc, import_library
 from utils.config import gemini_key
 from utils.rentry import paste as rentry_paste
 
-genai = import_library("google.generativeai", "google-generativeai")
+genai = import_library("google.genai", "google-genai")
 
-genai.configure(api_key=gemini_key)
-
-model = genai.GenerativeModel("gemini-2.0-flash")
+client = genai.Client(api_key=gemini_key)
 
 
 @Client.on_message(filters.command("gemini", prefix) & filters.me)
@@ -34,8 +32,7 @@ async def say(client: Client, message: Message):
             )
             return
 
-        chat = model.start_chat()
-        response = chat.send_message(prompt)
+        response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
 
         await message.edit_text(
             f"**Question:**`{prompt}`\n**Answer:** {response.text}",
