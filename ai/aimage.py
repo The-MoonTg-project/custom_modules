@@ -23,9 +23,9 @@ generation_config_cook = {
     "max_output_tokens": 1024,
 }
 
-model = genai.GenerativeModel("gemini-1.5-flash-latest")
+model = genai.GenerativeModel("gemini-2.0-flash")
 model_cook = genai.GenerativeModel(
-    model_name="gemini-1.5-flash-latest", generation_config=generation_config_cook
+    model_name="gemini-2.0-flash", generation_config=generation_config_cook
 )
 
 
