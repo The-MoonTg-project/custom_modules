@@ -18,7 +18,7 @@ client = genai.Client(api_key=gemini_key)
 
 
 @Client.on_message(filters.command("gemini", prefix) & filters.me)
-async def say(client: Client, message: Message):
+async def say(_client: Client, message: Message):
     try:
         await message.edit_text("<code>Please Wait...</code>")
 
@@ -51,7 +51,7 @@ async def say(client: Client, message: Message):
                 "<b>Error:</b> <code>Failed to paste to rentry</code>"
             )
             return
-        await client.send_message(
+        await _client.send_message(
             "me",
             f"Here's your edit code for Url: {rentry_url}\nEdit code:  <code>{edit_code}</code>",
             disable_web_page_preview=True,
