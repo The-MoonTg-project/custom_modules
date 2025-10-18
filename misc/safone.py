@@ -26,7 +26,7 @@ from pyrogram.errors import MediaCaptionTooLong, MessageTooLong
 from utils.misc import prefix, modules_help
 from utils.scripts import format_exc
 
-url = "https://api.safone.co"
+url = "https://api.safone.vip"
 
 headers = {
     "Accept-Language": "en-US,en;q=0.9",
