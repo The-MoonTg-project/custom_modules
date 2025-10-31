@@ -7,7 +7,7 @@ from utils.misc import modules_help, prefix
 
 API_URL = "https://api.deline.web.id/tools/whatmusic?url="
 
-@Client.on_message(filters.command(["shazam"], prefix))
+@Client.on_message(filters.command("shazam", prefix))
 async def shazam_music(client, message: Message):
     reply = message.reply_to_message
     if not (reply and (reply.audio or reply.voice)):
