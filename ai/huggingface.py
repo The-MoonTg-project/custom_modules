@@ -5,12 +5,9 @@ import aiohttp
 import asyncio
 import logging
 from PIL import Image
-
 from pyrogram import filters, Client, enums
 from pyrogram.types import Message
-
 from concurrent.futures import ThreadPoolExecutor
-
 from utils.db import db
 from utils.misc import modules_help, prefix
 from utils.scripts import format_exc
@@ -18,32 +15,25 @@ from utils.scripts import format_exc
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 async def query_huggingface(payload):
     api_key = db.get("custom.hf", "api_key", None)
     model = db.get("custom.hf", "current_model", None)
-
+    
     if not api_key:
-        raise ValueError(
-            f"API key not set. Use {prefix}set_hf api <api_key> to set it."
-        )
+        raise ValueError(f"API key not set. Use {prefix}set_hf api <api_key> to set it.")
     if not model:
-        raise ValueError(
-            f"Model not set. Use {prefix}set_hf model <model_name> to set it."
-        )
-
+        raise ValueError(f"Model not set. Use {prefix}set_hf model <model_name> to set it.")
+    
     api_url = f"https://api-inference.huggingface.co/models/{model}"
     headers = {"Authorization": f"Bearer {api_key}"}
     timeout = aiohttp.ClientTimeout(total=120)
     start_time = time.time()
     retries = 3
-
+    
     for attempt in range(1, retries + 1):
         try:
             async with aiohttp.ClientSession(timeout=timeout) as session:
-                async with session.post(
-                    api_url, headers=headers, json=payload
-                ) as response:
+                async with session.post(api_url, headers=headers, json=payload) as response:
                     fetch_time = int((time.time() - start_time) * 1000)
                     if response.status != 200:
                         error_text = await response.text()
@@ -55,9 +45,7 @@ async def query_huggingface(payload):
             if attempt == retries:
                 raise
         except asyncio.CancelledError:
-            logger.error(
-                "Request was cancelled. Ensure the task is not being forcefully terminated."
-            )
+            logger.error("Request was cancelled. Ensure the task is not being forcefully terminated.")
             raise
         except aiohttp.ClientError as e:
             logger.error(f"Network Error: {e}")
@@ -65,15 +53,11 @@ async def query_huggingface(payload):
                 raise
         finally:
             await asyncio.sleep(2)
-
-
+            
 async def save_image(image_bytes, path):
     loop = asyncio.get_event_loop()
     with ThreadPoolExecutor() as pool:
-        await loop.run_in_executor(
-            pool, lambda: Image.open(io.BytesIO(image_bytes)).save(path)
-        )
-
+        await loop.run_in_executor(pool, lambda: Image.open(io.BytesIO(image_bytes)).save(path))
 
 @Client.on_message(filters.command(["set_hf"], prefix) & filters.me)
 async def manage_huggingface(_, message: Message):
@@ -84,9 +68,7 @@ async def manage_huggingface(_, message: Message):
     if subcommand == "api":
         if arg:
             db.set("custom.hf", "api_key", arg)
-            return await message.edit_text(
-                f"Hugging Face API key set successfully.\nAPI Key: {arg}"
-            )
+            return await message.edit_text(f"Hugging Face API key set successfully.\nAPI Key: {arg}")
         return await message.edit_text(f"Usage: {prefix}hf api <api_key>")
 
     if subcommand == "model":
@@ -96,9 +78,7 @@ async def manage_huggingface(_, message: Message):
                 models.append(arg)
                 db.set("custom.hf", "models", models)
             db.set("custom.hf", "current_model", arg)
-            return await message.edit_text(
-                f"Model '{arg}' added and set as the current model."
-            )
+            return await message.edit_text(f"Model '{arg}' added and set as the current model.")
         return await message.edit_text(f"Usage: {prefix}hf model <model_name>")
 
     if subcommand == "select":
@@ -118,9 +98,7 @@ async def manage_huggingface(_, message: Message):
                     return await message.edit_text(f"Model set to '{models[index]}'.")
                 return await message.edit_text("Invalid model number.")
             except ValueError:
-                return await message.edit_text(
-                    "Invalid model number. Use a valid integer."
-                )
+                return await message.edit_text("Invalid model number. Use a valid integer.")
         return await message.edit_text(f"Usage: {prefix}hf select <model_number|all>")
 
     if subcommand == "delete" and arg:
@@ -131,9 +109,7 @@ async def manage_huggingface(_, message: Message):
                 removed_model = models.pop(index)
                 db.set("custom.hf", "models", models)
                 if db.get("custom.hf", "current_model") == removed_model:
-                    db.set(
-                        "custom.hf", "current_model", models[0] if models else "None"
-                    )
+                    db.set("custom.hf", "current_model", models[0] if models else "None")
                 return await message.edit_text(f"Model '{removed_model}' deleted.")
             return await message.edit_text("Invalid model number.")
         except ValueError:
@@ -143,13 +119,10 @@ async def manage_huggingface(_, message: Message):
     models = db.get("custom.hf", "models", [])
     current_model = db.get("custom.hf", "current_model", "Not set")
     model_list = "\n".join(
-        [
-            f"{'*' if m == current_model or current_model == 'all' else ''}{i + 1}. {m}"
-            for i, m in enumerate(models)
-        ]
+        [f"{'*' if m == current_model or current_model == 'all' else ''}{i + 1}. {m}" for i, m in enumerate(models)]
     )
     settings = (
-        f"<b>Hugging Face settings:</b>\n"
+        f"<b>Hugging Face settings:</b>\n\n"
         f"<b>API Key:</b>\n<code>{api_key if api_key else 'Not set'}</code>\n\n"
         f"<b>Available Models:</b>\n<code>{model_list}</code>"
     )
@@ -159,21 +132,14 @@ async def manage_huggingface(_, message: Message):
     )
     await message.edit_text(usage_message)
 
-
-@Client.on_message(filters.command(["hf", "hface", "huggingface"], prefix))
-async def imgflux_(_, message: Message):
+@Client.on_message(filters.command(["hf", "hugging", "face", "huggingface"], prefix))
+async def imgflux_(client: Client, message: Message):
     prompt = message.text.split(" ", 1)[1] if len(message.command) > 1 else None
     if not prompt:
-        usage_message = (
-            f"<b>Usage:</b> <code>{prefix}{message.command[0]} [custom prompt]</code>"
-        )
-        return await (
-            message.edit_text if message.from_user.is_self else message.reply_text
-        )(usage_message)
+        usage_message = f"<b>Usage:</b> <code>{prefix}{message.command[0]} [custom prompt]</code>"
+        return await (message.edit_text if message.from_user.is_self else message.reply_text)(usage_message)
 
-    processing_message = await (
-        message.edit_text if message.from_user.is_self else message.reply_text
-    )("Processing...")
+    processing_message = await (message.edit_text if message.from_user.is_self else message.reply_text)("Processing...")
 
     try:
         current_model = db.get("custom.hf", "current_model", None)
@@ -195,9 +161,7 @@ async def imgflux_(_, message: Message):
             generated_images.append((image_path, model, fetch_time))
 
         if not generated_images:
-            return await processing_message.edit_text(
-                "Failed to generate an image for all models."
-            )
+            return await processing_message.edit_text("Failed to generate an image for all models.")
 
         for image_path, model_name, fetch_time in generated_images:
             caption = (
@@ -205,9 +169,7 @@ async def imgflux_(_, message: Message):
                 f"**Prompt used:**\n> {prompt}\n\n"
                 f"**Fetching Time:** {fetch_time} ms"
             )
-            await message.reply_photo(
-                image_path, caption=caption, parse_mode=enums.ParseMode.MARKDOWN
-            )
+            await message.reply_photo(image_path, caption=caption, parse_mode=enums.ParseMode.MARKDOWN)
             os.remove(image_path)
 
     except Exception as e:
@@ -215,7 +177,6 @@ async def imgflux_(_, message: Message):
         await processing_message.edit_text(format_exc(e))
     finally:
         await processing_message.delete()
-
 
 modules_help["huggingface"] = {
     "hf [prompt]*": "Generate an AI image using Hugging Face model(s).",
