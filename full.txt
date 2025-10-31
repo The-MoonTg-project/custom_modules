@@ -90,6 +90,7 @@ misc/switch
 misc/transcribeyt
 music/lastfm
 music/musicbot
+music/shazam
 music/song
 music/tiktok
 music/voice_chat
