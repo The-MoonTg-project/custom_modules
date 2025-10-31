@@ -7,8 +7,10 @@ ai/blackbox
 ai/cdxl
 ai/chatbot
 ai/cohere
+ai/copilot
 ai/flux
 ai/gemini
+ai/gemini_web
 ai/gpt
 ai/grokai
 ai/huggingface
