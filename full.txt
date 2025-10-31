@@ -92,6 +92,7 @@ music/lastfm
 music/musicbot
 music/shazam
 music/song
+music/spotify
 music/tiktok
 music/voice_chat
 music/yt_preview
