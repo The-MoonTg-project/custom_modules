@@ -22,6 +22,7 @@ ai/sdxl
 anime/anilist
 anime/anime
 anime/neko
+dl/aiodl
 dl/aria2p
 dl/ebook
 dl/repo
@@ -91,6 +92,7 @@ misc/summary
 misc/switch
 misc/transcribeyt
 music/lastfm
+music/lyrics
 music/musicbot
 music/shazam
 music/song
