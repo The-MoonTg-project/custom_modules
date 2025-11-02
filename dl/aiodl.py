@@ -12,7 +12,7 @@ API_URL = "https://api.deline.web.id/downloader/aio?url="
 def sanitize_title(title: str) -> str:
     return re.sub(r'[\\/*?:"<>|]', "_", title).strip()[:50]
 
-@Client.on_message(filters.command(["aio"], prefix))
+@Client.on_message(filters.command("aio", prefix))
 async def aio_video(client: Client, message: Message):
     chat_id = message.chat.id
     if len(message.command) > 1:
@@ -83,7 +83,7 @@ async def aio_video(client: Client, message: Message):
     except Exception as e:
         await ms.edit_text(f"<code>Error:</code> {str(e)}")
 
-@Client.on_message(filters.command(["aioa"], prefix))
+@Client.on_message(filters.command("aioa", prefix))
 async def aio_audio(client: Client, message: Message):
     chat_id = message.chat.id
     if len(message.command) > 1:
@@ -152,7 +152,7 @@ async def aio_audio(client: Client, message: Message):
     except Exception as e:
         await ms.edit_text(f"<code>Error:</code> {str(e)}")
 
-modules_help["aio_downloader"] = {
+modules_help["aiodl"] = {
     "aio [video link]": "Download high-quality video from the provided link",
     "aioa [video link]": "Download audio from the provided link",
 }
