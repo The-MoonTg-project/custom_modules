@@ -24,7 +24,7 @@ from modules.url import generate_screenshot
 from utils.scripts import with_reply, no_prefix
 
 np = no_prefix(prefix)
-BASE_URL = "https://delirius-apiofc.vercel.app"
+BASE_URL = "https://api.delirius.store"
 GOOGLE_SEARCH_URL = f"{BASE_URL}/search/googlesearch?query="
 YOUTUBE_SEARCH_URL = f"{BASE_URL}/search/ytsearch?q="
 MOVIE_SEARCH_URL = f"{BASE_URL}/search/movie?query="
