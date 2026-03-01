@@ -30,7 +30,7 @@ async def spotify_download(client: Client, message: Message):
 
     try:
         search_result = requests.get(
-            f"https://delirius-apiofc.vercel.app/search/spotify?q={query}&limit=1"
+            f"https://api.delirius.store/search/spotify?q={query}&limit=1"
         ).json()
         if not (search_result.get("status") and search_result.get("data")):
             raise ValueError("No results found")
@@ -45,7 +45,7 @@ async def spotify_download(client: Client, message: Message):
 
     try:
         download_result = requests.get(
-            f"https://delirius-apiofc.vercel.app/download/spotifydl?url={song_details['url']}"
+            f"https://api.delirius.store/download/spotifydl?url={song_details['url']}"
         ).json()
         if not download_result.get("status"):
             raise ValueError("Failed to fetch download link")
