@@ -6,7 +6,7 @@ import aiohttp, asyncio
 from utils.misc import modules_help, prefix
 
 SEARCH_API = "https://api.nekolabs.web.id/discovery/pinterest/search?q="
-DOWNLOAD_API = "https://delirius-apiofc.vercel.app/download/pinterestdl?url="
+DOWNLOAD_API = "https://api.delirius.store/download/pinterestdl?url="
 
 def resize_image(image_bytes):
     try:
