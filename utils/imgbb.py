@@ -15,7 +15,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from utils.db import db
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 BASE_URL = "https://api.imgbb.com/1/upload"
 SUPPORTED_MIME_TYPES = [

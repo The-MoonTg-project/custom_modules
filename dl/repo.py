@@ -4,7 +4,7 @@ import re
 import os
 import requests
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command(["repod", "rp"], prefix) & filters.me)

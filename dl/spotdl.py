@@ -10,7 +10,7 @@ from urllib.parse import parse_qs, urlparse
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_module_help, import_library, format_exc, progress
 
 pytubefix = import_library("pytubefix")

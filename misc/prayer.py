@@ -3,7 +3,7 @@ from pyrogram.types import Message
 import aiohttp
 from datetime import datetime
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 # Aladhan API credentials
 ALADHAN_API_URL = "https://api.aladhan.com/v1/timingsByCity"

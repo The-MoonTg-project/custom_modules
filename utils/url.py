@@ -30,7 +30,7 @@ from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 
 from utils.config import apiflash_key
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc, humanbytes, progress, import_library
 
 pySmartDL = import_library("pySmartDL")

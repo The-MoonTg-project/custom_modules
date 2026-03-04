@@ -5,7 +5,7 @@ from aiohttp import ClientSession, FormData
 
 from pyrogram import Client, filters
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 def id_generator() -> str:

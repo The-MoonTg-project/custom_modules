@@ -3,7 +3,7 @@ from pyrogram.types import Message, InputMediaPhoto
 from io import BytesIO
 from PIL import Image
 import aiohttp, asyncio
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 SEARCH_API = "https://api.nekolabs.web.id/discovery/pinterest/search?q="
 DOWNLOAD_API = "https://api.delirius.store/download/pinterestdl?url="

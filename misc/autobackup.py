@@ -4,7 +4,7 @@ from pyrogram.types import Message
 from os import listdir
 
 # noinspection PyUnresolvedReferences
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 # noinspection PyUnresolvedReferences
 from utils.scripts import format_exc

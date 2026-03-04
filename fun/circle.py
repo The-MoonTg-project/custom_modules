@@ -7,7 +7,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 # noinspection PyUnresolvedReferences
 from utils.scripts import import_library, format_exc

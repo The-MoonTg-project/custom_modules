@@ -7,7 +7,7 @@ import io
 import os
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from utils.misc import modules_help, requirements_list, prefix
+from utils import modules_help, requirements_list, prefix
 from utils.scripts import import_library
 
 logging = import_library("logging")

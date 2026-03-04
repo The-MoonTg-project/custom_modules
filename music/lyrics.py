@@ -1,7 +1,7 @@
 import aiohttp
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 API_URL = "https://api.deline.web.id/tools/lyrics?title="
 

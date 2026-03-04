@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 import requests
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 def get_bug_track_info(package_info):

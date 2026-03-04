@@ -4,7 +4,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 
 from utils.scripts import format_exc, import_library
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 import_library("lxml_html_clean")
 import_library("newspaper", "newspaper3k")

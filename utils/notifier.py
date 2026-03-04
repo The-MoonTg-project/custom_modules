@@ -5,7 +5,7 @@ from pyrogram.types import Message, InputMediaPhoto
 
 
 from utils.db import db
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 def set_or_get_previous_profile(chat_id):

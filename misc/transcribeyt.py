@@ -4,7 +4,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 from pyrogram.errors import MessageTooLong
 import os
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 # Replace with your Gladia API key

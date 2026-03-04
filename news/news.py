@@ -3,7 +3,7 @@ import requests
 import random
 from pyrogram import Client, filters
 from utils.scripts import format_exc
-from utils.misc import prefix, modules_help
+from utils import prefix, modules_help
 
 
 NEWS_URL = "https://sugoi-api.vercel.app/news?keyword={}"

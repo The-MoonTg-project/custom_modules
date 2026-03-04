@@ -1,5 +1,5 @@
 from utils.scripts import import_library
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 from bs4 import BeautifulSoup

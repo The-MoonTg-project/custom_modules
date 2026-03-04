@@ -4,7 +4,7 @@ import requests
 
 from pyrogram import Client, filters
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_small_module_help
 
 

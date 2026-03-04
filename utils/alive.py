@@ -1,5 +1,5 @@
 from pyrogram import Client, filters
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 import time
 from sys import version_info
 from pyrogram import __version__ as __pyro_version__

@@ -3,7 +3,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 import os
 from utils.db import db
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 OCR_SPACE_URL = "https://api.ocr.space/parse/image"
 

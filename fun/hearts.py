@@ -4,7 +4,7 @@ import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.errors.exceptions.flood_420 import FloodWait
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 R = "❤️"
 W = "🤍"

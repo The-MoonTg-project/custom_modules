@@ -20,7 +20,7 @@ from pyrogram.types import Message
 
 from utils.db import db
 from utils.scripts import format_exc
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command("fban", prefix) & filters.me)

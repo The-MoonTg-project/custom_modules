@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from utils.misc import prefix, modules_help
+from utils import prefix, modules_help
 
 from requests import get
 from bs4 import BeautifulSoup

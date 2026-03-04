@@ -10,7 +10,7 @@ from pyrogram.enums.chat_type import ChatType
 import requests
 
 # noinspection PyUnresolvedReferences
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 # noinspection PyUnresolvedReferences
 from utils.scripts import import_library

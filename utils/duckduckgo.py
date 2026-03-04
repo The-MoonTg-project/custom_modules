@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from utils.misc import modules_help, requirements_list, prefix
+from utils import modules_help, requirements_list, prefix
 
 
 @Client.on_message(filters.command("duck", prefix) & filters.me)

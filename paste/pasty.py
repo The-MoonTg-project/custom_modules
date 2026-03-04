@@ -2,7 +2,7 @@ import json
 import requests
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0",

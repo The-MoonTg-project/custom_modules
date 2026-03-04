@@ -17,7 +17,7 @@ from humanize import naturalsize
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import import_library
 
 bs4 = import_library("beautifulsoup4", "BeautifulSoup")

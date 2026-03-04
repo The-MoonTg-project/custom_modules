@@ -4,7 +4,7 @@ import shutil
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from utils.misc import prefix, modules_help
+from utils import prefix, modules_help
 from utils.scripts import restart
 
 @Client.on_message(filters.command("in", prefix) & filters.me)

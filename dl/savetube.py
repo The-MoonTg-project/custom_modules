@@ -3,7 +3,7 @@ import os
 import re
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 SEARCH_API = "https://api.nekorinn.my.id/search/youtube?q={}"
 DL_API = "https://api.nekorinn.my.id/downloader/savetube?url={}&format={}"

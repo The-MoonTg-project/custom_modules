@@ -6,7 +6,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import Message, InputMediaPhoto
 from pyrogram.errors import MediaCaptionTooLong
 
-from utils.misc import prefix, modules_help
+from utils import prefix, modules_help
 from utils.scripts import format_exc
 
 url = "https://api.safone.co"

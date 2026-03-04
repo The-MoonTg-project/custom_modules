@@ -12,7 +12,7 @@ from requests import get
 from PIL import Image, ImageFont, ImageDraw
 from textwrap import wrap
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command("amogus", prefix) & filters.me)

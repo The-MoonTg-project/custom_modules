@@ -18,7 +18,7 @@ from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.types.user_and_chats.user import Link
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 def custom_mention(user, custom_text):

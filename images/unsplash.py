@@ -7,7 +7,7 @@ import aiohttp
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 import requests
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 class AioHttp:

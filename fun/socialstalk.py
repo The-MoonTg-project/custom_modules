@@ -5,7 +5,7 @@ from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 import io
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 TIKTOK_API_URL = "https://api.maher-zubair.tech/stalk/tiktok?q="
 INSTAGRAM_API_URL = "https://tools.betabotz.eu.org/tools/stalk-ig?q="

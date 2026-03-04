@@ -3,7 +3,7 @@ import re
 import aiohttp
 import asyncio
 from bs4 import BeautifulSoup as bs
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from pyrogram import Client, filters
 from pyrogram.types import Message
 

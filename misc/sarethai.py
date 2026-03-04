@@ -19,7 +19,7 @@ import requests
 import asyncio
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from modules.url import generate_screenshot
 from utils.scripts import with_reply, no_prefix
 

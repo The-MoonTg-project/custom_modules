@@ -12,7 +12,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 from utils.scripts import edit_or_reply, ReplyCheck
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 async def amongus_gen(text: str, clr: int) -> str:

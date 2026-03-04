@@ -7,7 +7,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 from pyrogram.errors import MessageTooLong
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc, import_library
 from utils.config import gemini_key
 from utils.rentry import paste as rentry_paste

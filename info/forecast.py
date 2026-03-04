@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 
 import requests
 
-from utils.misc import prefix, modules_help
+from utils import prefix, modules_help
 
 
 BASE_URL = "https://www.samirxpikachu.run.place/weather/"

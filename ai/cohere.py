@@ -9,7 +9,7 @@ import cohere
 
 co = cohere.Client(cohere_key)
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc
 from utils.db import db
 from utils.rentry import paste as rentry_paste

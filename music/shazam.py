@@ -3,7 +3,7 @@ import requests
 from urllib.parse import quote
 from pyrogram import Client, filters, enums
 from pyrogram.types import Message
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 API_URL = "https://api.deline.web.id/tools/whatmusic?url="
 

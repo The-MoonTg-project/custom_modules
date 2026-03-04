@@ -25,7 +25,7 @@ from bs4 import BeautifulSoup
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc, format_module_help, progress, import_library
 
 lexica = import_library("lexica", "lexica-api")

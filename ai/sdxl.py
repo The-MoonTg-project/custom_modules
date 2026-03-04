@@ -14,7 +14,7 @@ import stability_sdk.interfaces.gooseai.generation.generation_pb2 as generation
 from pyrogram import filters, Client as Cl
 from pyrogram.types import Message
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc
 
 # Our Host URL should not be prepended with "https" nor should it have a trailing slash.

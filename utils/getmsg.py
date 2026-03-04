@@ -30,7 +30,7 @@ from pyrogram.errors import (
 )
 from pyrogram.enums import MessageMediaType
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc
 
 class ProgressTracker:

@@ -4,7 +4,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait, RPCError
 from pyrogram.types import Message
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command(["fwdall"], prefix) & filters.me)

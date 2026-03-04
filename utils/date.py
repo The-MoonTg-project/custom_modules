@@ -3,7 +3,7 @@ from datetime import datetime
 import requests
 from pyrogram import Client, filters
 from datetime import datetime
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 import os
 from pyrogram.errors import MessageTooLong
 
@@ -11,7 +11,7 @@ import requests
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 # from utils.scripts import make_carbon
 
 

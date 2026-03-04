@@ -4,7 +4,7 @@ import aiohttp
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import import_library
 from utils.db import db
 

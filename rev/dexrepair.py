@@ -24,7 +24,7 @@ import hashlib
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 # ref: https://source.android.com/docs/core/runtime/dex-format#embedded-in-header_item
 DEX_MAGIC_035 = b"dex\n035\0"

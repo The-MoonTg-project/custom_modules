@@ -4,7 +4,7 @@ from pathlib import Path
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 from gemini_webapi import GeminiClient, GeneratedImage, WebImage
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.db import db
 
 TEMP_IMAGE_DIR = "./temp_gemini_images"

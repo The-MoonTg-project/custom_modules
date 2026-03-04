@@ -6,7 +6,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc, restart
 from utils.db import db
 from utils import config
@@ -121,7 +121,7 @@ async def backupmods(client: Client, message: Message):
             "<b>Backing up modules...</b>", parse_mode=enums.ParseMode.HTML
         )
 
-        from utils.misc import modules_help
+        from utils import modules_help
 
         for mod in modules_help:
             if os.path.isfile(f"modules/custom_modules/{mod}.py"):
@@ -143,7 +143,7 @@ async def backupmod(client: Client, message: Message):
     try:
         if not os.path.exists("backups/"):
             os.mkdir("backups/")
-        from utils.misc import modules_help
+        from utils import modules_help
 
         try:
             mod = message.text.split(maxsplit=1)[1].split(".")[0]
@@ -182,7 +182,7 @@ async def restoremod(client: Client, message: Message):
     try:
         if not os.path.exists("backups/"):
             os.mkdir("backups/")
-        from utils.misc import modules_help
+        from utils import modules_help
 
         try:
             mod = message.text.split(maxsplit=1)[1].split(".")[0]

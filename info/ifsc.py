@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 import requests
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc
 
 API_BASE_URL = "https://ifsc.razorpay.com/"

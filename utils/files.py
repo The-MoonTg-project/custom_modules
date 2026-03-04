@@ -4,7 +4,7 @@ import aiofiles
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 # In-memory storage for file lists
 bot_data = {"file_lists": {}}

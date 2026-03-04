@@ -2,7 +2,7 @@ from contextlib import suppress
 from pyrogram import Client, filters, ContinuePropagation, enums
 from pyrogram.types import Message
 from pyrogram.errors import MsgIdInvalid
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.db import db
 
 

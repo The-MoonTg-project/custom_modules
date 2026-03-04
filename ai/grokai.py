@@ -1,7 +1,7 @@
 import requests
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.db import db
 
 GROK_API_URL = "https://api.x.ai/v1/chat/completions"

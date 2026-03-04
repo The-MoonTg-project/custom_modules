@@ -1,6 +1,6 @@
 from pyrogram import Client, filters, errors, enums
 from pyrogram.types import Message
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.db import db
 
 

@@ -18,7 +18,7 @@ import os
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-from utils.misc import modules_help
+from utils import modules_help
 from utils.scripts import prefix, import_library, with_reply
 
 import_library("markitdown")

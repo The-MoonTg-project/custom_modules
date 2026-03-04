@@ -8,7 +8,7 @@ from pyrogram.types import Message
 from pyrogram.errors import MessageTooLong, MediaEmpty
 
 from utils.scripts import format_exc
-from utils.misc import prefix, modules_help
+from utils import prefix, modules_help
 from utils.db import db
 
 API_URL = "https://api.nasa.gov/"

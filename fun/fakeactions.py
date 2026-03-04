@@ -3,7 +3,7 @@ from asyncio import sleep
 from pyrogram import Client, filters, enums
 from pyrogram.raw import functions
 from pyrogram.types import Message, InputReplyToMessage
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc
 
 commands = {

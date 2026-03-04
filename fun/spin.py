@@ -10,7 +10,7 @@ from pyrogram import Client, enums, filters, types
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc, import_library, resize_image
 
 Image = import_library("PIL", "pillow").Image

@@ -1,7 +1,7 @@
 import requests
 from dns import resolver
 from pyrogram import Client, filters
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import import_library
 
 whois = import_library("whois", "python-whois")

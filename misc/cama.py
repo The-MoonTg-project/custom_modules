@@ -3,7 +3,7 @@ import requests
 
 from utils.scripts import format_exc, import_library
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 
 pcp = import_library("pubchempy")
 

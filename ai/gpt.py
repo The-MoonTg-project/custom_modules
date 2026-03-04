@@ -4,7 +4,7 @@ from pyrogram.types import Message
 
 from datetime import datetime as dt
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc, import_library
 
 g4f = import_library("g4f")

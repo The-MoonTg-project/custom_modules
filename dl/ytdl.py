@@ -15,7 +15,7 @@ from urllib.parse import parse_qs, urlparse
 from yt_dlp import YoutubeDL
 from yt_dlp.utils import DownloadError, ExtractorError
 
-from utils.misc import modules_help, prefix
+from utils import modules_help, prefix
 from utils.scripts import format_exc, progress, resize_image
 
 ydv_opts = {
