@@ -116,6 +116,7 @@ utils/calculator
 utils/compress
 utils/currency
 utils/date
+utils/direct
 utils/domaininfo
 utils/dub
 utils/duckduckgo
@@ -145,5 +146,6 @@ utils/tagall
 utils/time
 utils/translator
 utils/uplud
+utils/url
 utils/wikipedia
 utils/xiaomi
