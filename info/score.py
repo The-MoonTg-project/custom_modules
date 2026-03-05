@@ -9,8 +9,6 @@ from utils import modules_help, prefix
 bs4 = import_library("bs4", "beautifulsoup4")
 from bs4 import BeautifulSoup
 
-aiohttp = import_library("aiohttp")
-
 
 def get_text(message: Message) -> Union[str, None]:
     """Extract Text From Commands"""

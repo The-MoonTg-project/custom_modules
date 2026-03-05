@@ -10,12 +10,7 @@ from pyrogram.enums.chat_type import ChatType
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
-from utils.scripts import import_library
-
-# noinspection PyUnresolvedReferences
 from utils import modules_help, prefix
-
-psutil = import_library("psutil")
 
 
 def b2mb(b):
@@ -193,11 +188,6 @@ async def serverinfo_cmd(_: Client, message: Message):
 
     try:
         inf.append(find_lib("aiohttp"))
-    except Exception:
-        inf.append("n/a")
-
-    try:
-        inf.append(find_lib("GitPython"))
     except Exception:
         inf.append("n/a")
 
