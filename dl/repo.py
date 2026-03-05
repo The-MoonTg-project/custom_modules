@@ -23,6 +23,8 @@ async def repo_download(client: Client, message: Message):
 
     await message.edit_text(f"<code>Fetching repository info for {repo}...</code>")
 
+    zip_filename = None
+
     async with aiohttp.ClientSession() as session:
         try:
             async with session.get(f"https://api.github.com/repos/{repo}") as resp:
@@ -72,7 +74,7 @@ async def repo_download(client: Client, message: Message):
         except Exception as e:
             await message.edit_text(format_exc(e))
         finally:
-            if os.path.exists(zip_filename):
+            if zip_filename and os.path.exists(zip_filename):
                 os.remove(zip_filename)
 
 
