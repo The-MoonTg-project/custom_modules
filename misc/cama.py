@@ -1,6 +1,5 @@
+import aiohttp
 from pyrogram import Client, filters
-import requests
-
 from utils.scripts import format_exc, import_library
 
 from utils import modules_help, prefix
@@ -10,7 +9,7 @@ pcp = import_library("pubchempy")
 INATURALIST_API_URL = "https://api.inaturalist.org/v1/observations"
 
 
-def get_marine_life_details(species_name):
+async def get_marine_life_details(species_name):
     params = {
         "taxon_name": species_name,
         "quality_grade": "research",
@@ -18,36 +17,36 @@ def get_marine_life_details(species_name):
         "per_page": 1,
     }
 
-    response = requests.get(INATURALIST_API_URL, params=params)
-
-    if response.status_code == 200:
-        data = response.json()
-        if data["total_results"] > 0:
-            observation = data["results"][0]
-            species = observation["taxon"]["name"]
-            common_name = observation["taxon"]["preferred_common_name"]
-            photo_url = (
-                observation["photos"][0]["url"]
-                if observation["photos"]
-                else "No photo available"
-            )
-            description = (
-                observation["description"]
-                if "description" in observation
-                else "No description available."
-            )
-            return {
-                "species": species,
-                "common_name": common_name,
-                "photo_url": photo_url,
-                "description": description,
-            }
-        else:
-            return {"error": "No marine life found for this species."}
-    else:
-        return {
-            "error": f"Error {response.status_code}: Unable to connect to iNaturalist API."
-        }
+    async with aiohttp.ClientSession() as session:
+        async with session.get(INATURALIST_API_URL, params=params) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                if data["total_results"] > 0:
+                    observation = data["results"][0]
+                    species = observation["taxon"]["name"]
+                    common_name = observation["taxon"]["preferred_common_name"]
+                    photo_url = (
+                        observation["photos"][0]["url"]
+                        if observation["photos"]
+                        else "No photo available"
+                    )
+                    description = (
+                        observation["description"]
+                        if "description" in observation
+                        else "No description available."
+                    )
+                    return {
+                        "species": species,
+                        "common_name": common_name,
+                        "photo_url": photo_url,
+                        "description": description,
+                    }
+                else:
+                    return {"error": "No marine life found for this species."}
+            else:
+                return {
+                    "error": f"Error {resp.status}: Unable to connect to iNaturalist API."
+                }
 
 
 @Client.on_message(filters.command("camistry", prefix) & filters.me)
@@ -89,7 +88,7 @@ async def marine_life_command(_, message):
         return
 
     species_name = " ".join(message.command[1:])
-    marine_life = get_marine_life_details(species_name)
+    marine_life = await get_marine_life_details(species_name)
 
     if "error" in marine_life:
         await message.edit_text(marine_life["error"])

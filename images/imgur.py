@@ -1,8 +1,7 @@
-import os
 import base64
-import requests
+import os
 
-
+import aiohttp
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
@@ -21,11 +20,14 @@ async def imgur(_, message: Message):
             data = file.read()
             base64_data = base64.b64encode(data)
         # Set API endpoint and headers for image upload
-        url = "https://api.imgur.com/3/image"
-        headers = {"Authorization": "Client-ID a10ad04550b0648"}
+        api_url = "https://api.imgur.com/3/image"
+        api_headers = {"Authorization": "Client-ID a10ad04550b0648"}
         # Upload image to Imgur and get URL
-        response = requests.post(url, headers=headers, data={"image": base64_data})
-        result = response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                api_url, headers=api_headers, data={"image": base64_data}
+            ) as resp:
+                result = await resp.json()
         await msg.edit_text(result["data"]["link"])
     elif message.reply_to_message and message.reply_to_message.animation:
         # Download the animation (GIF)
@@ -35,11 +37,14 @@ async def imgur(_, message: Message):
             data = file.read()
             base64_data = base64.b64encode(data)
         # Set API endpoint and headers for animation upload
-        url = "https://api.imgur.com/3/image"
-        headers = {"Authorization": "Client-ID a10ad04550b0648"}
+        api_url = "https://api.imgur.com/3/image"
+        api_headers = {"Authorization": "Client-ID a10ad04550b0648"}
         # Upload animation to Imgur and get URL
-        response = requests.post(url, headers=headers, data={"image": base64_data})
-        result = response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                api_url, headers=api_headers, data={"image": base64_data}
+            ) as resp:
+                result = await resp.json()
         await msg.edit_text(result["data"]["link"])
     else:
         await msg.edit_text(

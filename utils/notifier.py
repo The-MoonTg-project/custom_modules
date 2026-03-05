@@ -1,10 +1,10 @@
-import os
 import json
+import os
+
 from pyrogram import Client, filters
-from pyrogram.types import Message, InputMediaPhoto
-
-
+from pyrogram.types import InputMediaPhoto, Message
 from utils.db import db
+
 from utils import modules_help, prefix
 
 
@@ -92,7 +92,6 @@ async def track_profile_changes(client: Client, message: Message):
                 file_name=f"previous_profiles/{chat_id}/current.jpg",
             )
         else:
-
             await client.download_media(
                 current_info.get("photo"),
                 file_name=f"previous_profiles/{chat_id}/current.jpg",
@@ -103,7 +102,6 @@ async def track_profile_changes(client: Client, message: Message):
 
     if changes:
         if "Profile Picture" in changes[0]:
-
             change_msg = f"<b>Profile changes detected</b>\nFirst Name: {message.chat.first_name}\nLast Name: {message.chat.last_name}\nID: <code>{chat_id}</code>\nUsername: @{message.chat.username}"
             await client.send_message(LOG_GROUP_CHAT_ID, change_msg)
             if not os.path.exists(f"previous_profiles/{chat_id}/previous.jpg"):

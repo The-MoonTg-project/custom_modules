@@ -17,13 +17,13 @@
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from utils.scripts import import_library
 
 from utils import modules_help, prefix
-from utils.scripts import import_library
 
 import_library("apksearch")
 
-from apksearch import APKPure, APKMirror, AppTeka, APKCombo, APKFab, APKad, Aptoide
+from apksearch import APKad, APKCombo, APKFab, APKMirror, APKPure, AppTeka, Aptoide
 
 
 def search_apkmirror(query: str) -> str:

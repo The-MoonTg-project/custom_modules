@@ -1,13 +1,13 @@
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
-
 from os import listdir
 
-# noinspection PyUnresolvedReferences
-from utils import modules_help, prefix
+from pyrogram import Client, enums, filters
+from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
 from utils.scripts import format_exc
+
+# noinspection PyUnresolvedReferences
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command(["lback"], prefix) & filters.me)
@@ -48,7 +48,7 @@ async def backup_database_cmd(_: Client, message: Message):
         await message.edit("[😇] Database not found.")
     except Exception as ex:
         await message.edit_text(
-            "Failed to back up the database!\n\n" f"{format_exc(ex)}",
+            f"Failed to back up the database!\n\n{format_exc(ex)}",
             parse_mode=enums.ParseMode.HTML,
         )
 

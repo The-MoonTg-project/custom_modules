@@ -3,7 +3,7 @@
 # Licensed under the Raphielscape Public License, Version 1.d (the "License");
 # you may not use this file except in compliance with the License.
 #
-""" Userbot module containing various sites direct links generators"""
+"""Userbot module containing various sites direct links generators"""
 
 import json
 import re
@@ -11,16 +11,16 @@ import urllib.parse
 from random import choice
 from subprocess import PIPE, Popen
 
-import requests
+import aiohttp
 from humanize import naturalsize
-
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
-from utils import modules_help, prefix
 from utils.scripts import import_library
 
+from utils import modules_help, prefix
+
 bs4 = import_library("beautifulsoup4", "BeautifulSoup")
+from bs4 import BeautifulSoup
 
 
 def subprocess_run(cmd):
@@ -62,25 +62,25 @@ async def direct_link_generator(_, m: Message):
         await m.edit(reply, parse_mode=enums.ParseMode.MARKDOWN)
     for link in links:
         if "drive.google.com" in link:
-            reply += gdrive(link)
+            reply += await gdrive(link)
         elif "yadi.sk" in link:
-            reply += yandex_disk(link)
+            reply += await yandex_disk(link)
         elif "cloud.mail.ru" in link:
             reply += cm_ru(link)
         elif "mediafire.com" in link:
-            reply += mediafire(link)
+            reply += await mediafire(link)
         elif "sourceforge.net" in link:
-            reply += sourceforge(link)
+            reply += await sourceforge(link)
         elif "osdn.net" in link:
-            reply += osdn(link)
+            reply += await osdn(link)
         elif "androidfilehost.com" in link:
-            reply += androidfilehost(link)
+            reply += await androidfilehost(link)
         else:
             reply += re.findall(r"\bhttps?://(.*?[^/]+)", link)[0] + " is not supported"
     await m.edit(reply, parse_mode=enums.ParseMode.MARKDOWN)
 
 
-def gdrive(url: str) -> str:
+async def gdrive(url: str) -> str:
     """GDrive direct links generator"""
     drive = "https://drive.google.com"
     try:
@@ -97,43 +97,48 @@ def gdrive(url: str) -> str:
     elif link.find("uc?id=") != -1:
         file_id = link.split("uc?id=")[1].strip()
     url = f"{drive}/uc?export=download&id={file_id}"
-    download = requests.get(url, stream=True, allow_redirects=False)
-    cookies = download.cookies
-    try:
-        # In case of small file size, Google downloads directly
-        dl_url = download.headers["location"]
-        page = BeautifulSoup(download.content, "html.parser")
-        if "accounts.google.com" in dl_url:  # non-public file
-            reply += "`Link is not public!`\n"
-            return reply
-        name = "Direct Download Link"
-    except KeyError:
-        # In case of download warning page
-        page = BeautifulSoup(download.content, "html.parser")
-        if download.headers is not None:
-            dl_url = download.headers.get("location")
-    page_element = page.find("a", {"id": "uc-download-link"})
-    if page_element is not None:
-        export = drive + page_element.get("href")
-        name = page.find("span", {"class": "uc-name-size"}).text
-        response = requests.get(
-            export, stream=True, allow_redirects=False, cookies=cookies
-        )
-        dl_url = response.headers["location"]
-        if "accounts.google.com" in dl_url:
-            name = page.find("span", {"class": "uc-name-size"}).text
-            reply += "Link is not public!"
-            return reply
-        if "=sharing" in dl_url:
-            name = page.find("span", {"class": "uc-name-size"}).text
-            reply += "```Provide GDrive Link not directc sharing of GDrive!```"
-            return reply
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, allow_redirects=False) as download:
+            cookies = download.cookies
+            content = await download.read()
+            headers = download.headers
+            try:
+                # In case of small file size, Google downloads directly
+                dl_url = headers["location"]
+                page = BeautifulSoup(content, "html.parser")
+                if "accounts.google.com" in dl_url:  # non-public file
+                    reply += "`Link is not public!`\n"
+                    return reply
+                name = "Direct Download Link"
+            except KeyError:
+                # In case of download warning page
+                page = BeautifulSoup(content, "html.parser")
+                if headers is not None:
+                    dl_url = headers.get("location")
+            page_element = page.find("a", {"id": "uc-download-link"})
+            if page_element is not None:
+                export = drive + page_element.get("href")
+                name = page.find("span", {"class": "uc-name-size"}).text
+                async with session.get(
+                    export, allow_redirects=False, cookies=cookies
+                ) as response:
+                    dl_url = response.headers["location"]
+                    if "accounts.google.com" in dl_url:
+                        name = page.find("span", {"class": "uc-name-size"}).text
+                        reply += "Link is not public!"
+                        return reply
+                    if "=sharing" in dl_url:
+                        name = page.find("span", {"class": "uc-name-size"}).text
+                        reply += (
+                            "```Provide GDrive Link not directc sharing of GDrive!```"
+                        )
+                        return reply
 
     reply += f"[{name}]({dl_url})\n"
     return reply
 
 
-def yandex_disk(url: str) -> str:
+async def yandex_disk(url: str) -> str:
     """Yandex.Disk direct links generator
     Based on https://github.com/wldhx/yadisk-direct"""
     reply = ""
@@ -144,7 +149,10 @@ def yandex_disk(url: str) -> str:
         return reply
     api = "https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key={}"
     try:
-        dl_url = requests.get(api.format(link)).json()["href"]
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api.format(link)) as resp:
+                data = await resp.json()
+        dl_url = data["href"]
         name = dl_url.split("filename=")[1].split("&disposition")[0]
         reply += f"[{name}]({dl_url})\n"
     except KeyError:
@@ -179,7 +187,7 @@ def cm_ru(url: str) -> str:
     return reply
 
 
-def mediafire(url: str) -> str:
+async def mediafire(url: str) -> str:
     """MediaFire direct links generator"""
     try:
         link = re.findall(r"\bhttps?://.*mediafire\.com\S+", url)[0]
@@ -187,7 +195,10 @@ def mediafire(url: str) -> str:
         reply = "`No MediaFire links found`\n"
         return reply
     reply = ""
-    page = BeautifulSoup(requests.get(link).content, "lxml")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(link) as resp:
+            content = await resp.read()
+    page = BeautifulSoup(content, "lxml")
     info = page.find("a", {"aria-label": "Download file"})
     dl_url = info.get("href")
     size = re.findall(r"\(.*\)", info.text)[0]
@@ -196,7 +207,7 @@ def mediafire(url: str) -> str:
     return reply
 
 
-def sourceforge(url: str) -> str:
+async def sourceforge(url: str) -> str:
     """SourceForge direct links generator"""
     try:
         link = re.findall(r"\bhttps?://.*sourceforge\.net\S+", url)[0]
@@ -210,18 +221,21 @@ def sourceforge(url: str) -> str:
         f"https://sourceforge.net/settings/mirror_choices?"
         f"projectname={project}&filename={file_path}"
     )
-    page = BeautifulSoup(requests.get(mirrors).content, "html.parser")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(mirrors) as resp:
+            content = await resp.read()
+    page = BeautifulSoup(content, "html.parser")
     info = page.find("ul", {"id": "mirrorList"}).findAll("li")
     for mirror in info[1:]:
         name = re.findall(r"\((.*)\)", mirror.text.strip())[0]
         dl_url = (
-            f'https://{mirror["id"]}.dl.sourceforge.net/project/{project}/{file_path}'
+            f"https://{mirror['id']}.dl.sourceforge.net/project/{project}/{file_path}"
         )
         reply += f"[{name}]({dl_url}) "
     return reply
 
 
-def osdn(url: str) -> str:
+async def osdn(url: str) -> str:
     """OSDN direct links generator"""
     osdn_link = "https://osdn.net"
     try:
@@ -229,7 +243,10 @@ def osdn(url: str) -> str:
     except IndexError:
         reply = "`No OSDN links found`\n"
         return reply
-    page = BeautifulSoup(requests.get(link, allow_redirects=True).content, "lxml")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(link, allow_redirects=True) as resp:
+            content = await resp.read()
+    page = BeautifulSoup(content, "lxml")
     info = page.find("a", {"class": "mirror_link"})
     link = urllib.parse.unquote(osdn_link + info["href"])
     reply = f"Mirrors for __{link.split('/')[-1]}__\n"
@@ -242,7 +259,7 @@ def osdn(url: str) -> str:
     return reply
 
 
-def androidfilehost(url: str) -> str:
+async def androidfilehost(url: str) -> str:
     """AFH direct links generator"""
     try:
         link = re.findall(r"\bhttps?://.*androidfilehost.*fid.*\S+", url)[0]
@@ -250,36 +267,38 @@ def androidfilehost(url: str) -> str:
         reply = "`No AFH links found`\n"
         return reply
     fid = re.findall(r"\?fid=(.*)", link)[0]
-    session = requests.Session()
-    user_agent = useragent()
+    user_agent = await useragent()
     headers = {"user-agent": user_agent}
-    res = session.get(link, headers=headers, allow_redirects=True)
-    headers = {
-        "origin": "https://androidfilehost.com",
-        "accept-encoding": "gzip, deflate, br",
-        "accept-language": "en-US,en;q=0.9",
-        "user-agent": user_agent,
-        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "x-mod-sbb-ctype": "xhr",
-        "accept": "*/*",
-        "referer": f"https://androidfilehost.com/?fid={fid}",
-        "authority": "androidfilehost.com",
-        "x-requested-with": "XMLHttpRequest",
-    }
-    data = {"submit": "submit", "action": "getdownloadmirrors", "fid": f"{fid}"}
-    mirrors = None
     reply = ""
     error = "`Error: Can't find Mirrors for the link`\n"
-    try:
-        req = session.post(
-            "https://androidfilehost.com/libs/otf/mirrors.otf.php",
-            headers=headers,
-            data=data,
-            cookies=res.cookies,
-        )
-        mirrors = req.json()["MIRRORS"]
-    except (json.decoder.JSONDecodeError, TypeError):
-        reply += error
+    mirrors = None
+    async with aiohttp.ClientSession() as session:
+        async with session.get(link, headers=headers, allow_redirects=True) as res:
+            cookies = res.cookies
+        headers = {
+            "origin": "https://androidfilehost.com",
+            "accept-encoding": "gzip, deflate, br",
+            "accept-language": "en-US,en;q=0.9",
+            "user-agent": user_agent,
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "x-mod-sbb-ctype": "xhr",
+            "accept": "*/*",
+            "referer": f"https://androidfilehost.com/?fid={fid}",
+            "authority": "androidfilehost.com",
+            "x-requested-with": "XMLHttpRequest",
+        }
+        data = {"submit": "submit", "action": "getdownloadmirrors", "fid": f"{fid}"}
+        try:
+            async with session.post(
+                "https://androidfilehost.com/libs/otf/mirrors.otf.php",
+                headers=headers,
+                data=data,
+                cookies=cookies,
+            ) as req:
+                result = await req.json()
+                mirrors = result["MIRRORS"]
+        except (json.decoder.JSONDecodeError, TypeError):
+            reply += error
     if not mirrors:
         reply += error
         return reply
@@ -290,21 +309,26 @@ def androidfilehost(url: str) -> str:
     return reply
 
 
-def useragent():
+async def useragent():
     """
     useragent random setter
     """
-    useragents = BeautifulSoup(
-        requests.get(
-            "https://developers.whatismybrowser.com/"
-            "useragents/explore/operating_system_name/android/"
-        ).content,
-        "lxml",
-    ).findAll("td", {"class": "useragent"})
-    if not useragents:
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                "https://developers.whatismybrowser.com/"
+                "useragents/explore/operating_system_name/android/"
+            ) as resp:
+                content = await resp.read()
+        useragents = BeautifulSoup(content, "lxml").findAll(
+            "td", {"class": "useragent"}
+        )
+        if not useragents:
+            return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+        user_agent = choice(useragents)
+        return user_agent.text
+    except Exception:
         return "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-    user_agent = choice(useragents)
-    return user_agent.text
 
 
 modules_help["direct"] = {

@@ -2,8 +2,8 @@
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
-
 from utils.scripts import format_exc, import_library
+
 from utils import modules_help, prefix
 
 import_library("lxml_html_clean")
@@ -11,7 +11,6 @@ import_library("newspaper", "newspaper3k")
 nltk = import_library("nltk")
 from newspaper import Article
 from newspaper.article import ArticleException
-
 
 nltk.download("all")
 
@@ -45,7 +44,7 @@ async def summarize_article(_, message: Message):
         response = f"""
         <b>Article Summary</b>
         <b>Title:</b> <code>{article.title}</code>
-        <b>Authors:</b> <code>{', '.join(article.authors) if article.authors else 'N/A'}</code>
+        <b>Authors:</b> <code>{", ".join(article.authors) if article.authors else "N/A"}</code>
         <b>Summary:</b>
         <pre>{article.summary}</pre>
         """

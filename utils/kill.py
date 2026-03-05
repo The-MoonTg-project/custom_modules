@@ -1,11 +1,12 @@
 import os
+from os import remove
+
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from utils.scripts import format_exc
 
 # noinspection PyUnresolvedReferences
 from utils import modules_help, prefix
-from utils.scripts import format_exc
-from os import remove
 
 
 @Client.on_message(filters.me & filters.command("killme", prefix))

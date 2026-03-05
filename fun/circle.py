@@ -3,15 +3,14 @@ import os
 from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFilter, ImageOps
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
-from utils import modules_help, prefix
+from utils.scripts import format_exc, import_library
 
 # noinspection PyUnresolvedReferences
-from utils.scripts import import_library, format_exc
-
+from utils import modules_help, prefix
 
 VideoFileClip = import_library("moviepy", "moviepy==2.2.1").VideoFileClip
 

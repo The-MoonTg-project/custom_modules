@@ -14,17 +14,17 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
-import requests
-import aiofiles
 import base64
+import os
 
+import aiofiles
+import aiohttp
 from pyrogram import Client, enums, filters
-from pyrogram.types import Message, InputMediaPhoto
 from pyrogram.errors import MediaCaptionTooLong, MessageTooLong
-
-from utils import prefix, modules_help
+from pyrogram.types import InputMediaPhoto, Message
 from utils.scripts import format_exc
+
+from utils import modules_help, prefix
 
 url = "https://api.safone.vip"
 
@@ -42,6 +42,7 @@ headers = {
     "sec-ch-ua-mobile": "?0",
     "sec-ch-ua-platform": '"Linux"',
 }
+
 
 async def make_carbon(code):
     url = "https://carbonara.solopov.dev/api/cook"
@@ -61,25 +62,33 @@ async def make_carbon(code):
 
     return output_image
 
+
 async def telegraph(title, user_name, content):
     formatted_content = "<br>".join(content.split("\n"))
     formatted_content = "<p>" + formatted_content + "</p>"
 
     data = {"title": title, "content": formatted_content, "author_name": user_name}
 
-    response = requests.post(
-        url=f"{url}/telegraph/text", headers=headers, json=data, timeout=5
-    )
-
-    result = response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            url=f"{url}/telegraph/text",
+            headers=headers,
+            json=data,
+            timeout=aiohttp.ClientTimeout(total=5),
+        ) as resp:
+            result = await resp.json()
 
     return result["url"]
 
 
 async def voice_characters():
-    response = requests.get(url=f"{url}/speech/characters", headers=headers, timeout=5)
-
-    result = response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            url=f"{url}/speech/characters",
+            headers=headers,
+            timeout=aiohttp.ClientTimeout(total=5),
+        ) as resp:
+            result = await resp.json()
 
     return ", ".join(result["characters"])
 
@@ -93,10 +102,11 @@ async def make_rayso(code: str, title: str, theme: str):
         "language": "auto",
         "darkMode": False,
     }
-    response = requests.post(f"{url}/rayso", data=data, headers=headers)
-    if response.status_code != 200:
-        return None
-    result = response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{url}/rayso", data=data, headers=headers) as resp:
+            if resp.status != 200:
+                return None
+            result = await resp.json()
     try:
         if result["error"] is not None:
             return None
@@ -117,12 +127,16 @@ async def asq(_, message: Message):
         await message.edit_text("Query not provided!")
         return
     await message.edit_text("Processing...")
-    response = requests.get(url=f"{url}/asq?query={query}", headers=headers, timeout=5)
-    if response.status_code != 200:
-        await message.edit_text("Something went wrong!")
-        return
-
-    result = response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            url=f"{url}/asq?query={query}",
+            headers=headers,
+            timeout=aiohttp.ClientTimeout(total=5),
+        ) as resp:
+            if resp.status != 200:
+                await message.edit_text("Something went wrong!")
+                return
+            result = await resp.json()
 
     ans = result["answer"]
     await message.edit_text(
@@ -138,12 +152,14 @@ async def sgemini(_, message: Message):
         await message.edit_text("prompt not provided!")
         return
     await message.edit_text("Processing...")
-    response = requests.get(url=f"{url}/bard?query={prompt}", headers=headers)
-    if response.status_code != 200:
-        await message.edit_text("Something went wrong!")
-        return
-
-    result = response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            url=f"{url}/bard?query={prompt}", headers=headers
+        ) as resp:
+            if resp.status != 200:
+                await message.edit_text("Something went wrong!")
+                return
+            result = await resp.json()
 
     ans = result["message"]
     await message.edit_text(
@@ -163,18 +179,22 @@ async def app(client: Client, message: Message):
                 "What should i search? You didn't provided me with any value to search"
             )
 
-        response = requests.get(
-            url=f"{url}/apps?query={query}&limit=1", headers=headers, timeout=5
-        )
-        if response.status_code != 200:
-            await message.edit_text("Something went wrong")
-            return
-
-        result = response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url=f"{url}/apps?query={query}&limit=1",
+                headers=headers,
+                timeout=aiohttp.ClientTimeout(total=5),
+            ) as resp:
+                if resp.status != 200:
+                    await message.edit_text("Something went wrong")
+                    return
+                result = await resp.json()
 
         try:
             coverImage_url = result["results"][0]["icon"]
-            coverImage = requests.get(url=coverImage_url).content
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url=coverImage_url) as resp:
+                    coverImage = await resp.read()
             async with aiofiles.open("coverImage.jpg", mode="wb") as f:
                 await f.write(coverImage)
 
@@ -234,14 +254,14 @@ async def tsearch(client: Client, message: Message):
                 "What should i search? You didn't provided me with any value to search"
             )
 
-        response = requests.get(
-            url=f"{url}/torrent?query={query}&limit={limit}", headers=headers
-        )
-        if response.status_code != 200:
-            await message.edit_text("Something went wrong")
-            return
-
-        result = response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url=f"{url}/torrent?query={query}&limit={limit}", headers=headers
+            ) as resp:
+                if resp.status != 200:
+                    await message.edit_text("Something went wrong")
+                    return
+                result = await resp.json()
 
         coverImage_url = result["results"][0]["thumbnail"]
         description = result["results"][0]["description"]
@@ -278,7 +298,9 @@ async def tsearch(client: Client, message: Message):
         )
 
         if coverImage_url is not None:
-            coverImage = requests.get(url=coverImage_url).content
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url=coverImage_url) as resp:
+                    coverImage = await resp.read()
             async with aiofiles.open("coverImage.jpg", mode="wb") as f:
                 await f.write(coverImage)
 
@@ -355,12 +377,14 @@ async def tts(client: Client, message: Message):
             return
 
         data = {"text": prompt, "character": character}
-        response = requests.post(url=f"{url}/speech", headers=headers, json=data)
-        if response.status_code != 200:
-            await message.edit_text("Something went wrong")
-            return
-
-        result = response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url=f"{url}/speech", headers=headers, json=data
+            ) as resp:
+                if resp.status != 200:
+                    await message.edit_text("Something went wrong")
+                    return
+                result = await resp.json()
         audio_data = result["audio"]
         audio_data = base64.b64decode(audio_data)
         async with aiofiles.open(f"{prompt}.mp3", mode="wb") as f:
@@ -434,12 +458,12 @@ async def ccgen(_, message: Message):
         await message.edit_text("Code not provided!")
         return
     await message.edit_text("Processing...")
-    response = requests.get(url=f"{url}/ccgen?bins={bins}", headers=headers)
-    if response.status_code != 200:
-        await message.edit_text("Something went wrong")
-        return
-
-    result = response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=f"{url}/ccgen?bins={bins}", headers=headers) as resp:
+            if resp.status != 200:
+                await message.edit_text("Something went wrong")
+                return
+            result = await resp.json()
 
     cards = result["results"][0]["cards"]
     cards_str = "\n".join([f'"{card}"' for card in cards])

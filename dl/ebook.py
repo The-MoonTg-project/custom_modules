@@ -16,11 +16,9 @@
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from utils.scripts import import_library
 
 from utils import modules_help, prefix
-
-
-from utils.scripts import import_library
 
 libgen_api = import_library("libgen_api", "libgen-api")
 from libgen_api import LibgenSearch

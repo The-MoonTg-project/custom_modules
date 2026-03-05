@@ -14,11 +14,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import requests
-from pyrogram import Client, filters, enums
+import aiohttp
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
 from utils.scripts import format_exc, import_library
+
 from utils import modules_help, prefix
 
 bs4 = import_library("bs4", "beautifulsoup4")
@@ -46,8 +46,12 @@ async def convert(_, message: Message):
         else:
             link = f"https://ru.investing.com/currencies/{name}-usd"
 
-        full_page = requests.get(link, headers=headers, timeout=3)
-        soup = BeautifulSoup(full_page.content, "html.parser")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                link, headers=headers, timeout=aiohttp.ClientTimeout(total=3)
+            ) as resp:
+                content = await resp.read()
+        soup = BeautifulSoup(content, "html.parser")
         rub = soup.find("span", class_="text-2xl")
         await message.edit(f"<b>{name} now is </b><code> {rub} </code><b> $</b>")
     except Exception as e:

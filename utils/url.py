@@ -17,33 +17,29 @@
 import asyncio
 import math
 import mimetypes
-
 import os
 import time
 from datetime import datetime
 from io import BytesIO
 from urllib.parse import unquote
 
-import requests
+import aiohttp
 import urllib3
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
 from utils.config import apiflash_key
+from utils.scripts import (
+    format_exc,
+    generate_screenshot,
+    humanbytes,
+    import_library,
+    progress,
+)
+
 from utils import modules_help, prefix
-from utils.scripts import format_exc, humanbytes, progress, import_library
 
 pySmartDL = import_library("pySmartDL")
 from pySmartDL import SmartDL
-
-
-def generate_screenshot(url):
-    api_url = f"https://api.apiflash.com/v1/urltoimage?access_key={apiflash_key}&url={url}&format=png"
-    response = requests.get(api_url)
-    if response.status_code == 200:
-        return BytesIO(response.content)
-    return None
-
 
 http = urllib3.PoolManager()
 
@@ -82,11 +78,16 @@ async def urldl(client: Client, message: Message):
 
     c_time = time.time()
 
-    resp = requests.head(link, allow_redirects=True, timeout=5)
-    if resp.status_code != 200:
-        return await message.edit("<b>Failed to fetch request header information</b>")
+    async with aiohttp.ClientSession() as session:
+        async with session.head(
+            link, allow_redirects=True, timeout=aiohttp.ClientTimeout(total=5)
+        ) as resp:
+            if resp.status != 200:
+                return await message.edit(
+                    "<b>Failed to fetch request header information</b>"
+                )
+            content_type = resp.headers.get("Content-Type", "").split(";")[0]
 
-    content_type = resp.headers.get("Content-Type").split(";")[0]
     extension = mimetypes.guess_extension(content_type)
 
     # Check if the file is an executable binary
@@ -218,28 +219,31 @@ async def upload_cmd(_, message: Message):
         return
 
     await message.edit("<b>Uploading...</b>")
-    with open(file_name, "rb") as f:
-        response = requests.post(
-            "https://x0.at",
-            files={"file": f},
-        )
 
-    if response.ok:
+    async with aiohttp.ClientSession() as session:
+        with open(file_name, "rb") as f:
+            form = aiohttp.FormData()
+            form.add_field("file", f)
+            async with session.post("https://x0.at", data=form) as resp:
+                response_ok = resp.status == 200
+                response_text = await resp.text()
+
+    if response_ok:
         file_size_mb = os.path.getsize(file_name) / 1024 / 1024
         file_age = int(
             min_file_age
             + (max_file_age - min_file_age) * ((1 - (file_size_mb / max_size_mb)) ** 2)
         )
-        url = response.text.replace("https://", "")
+        url = response_text.replace("https://", "")
         await message.edit(
             f"<b>Your URL: {url}\nYour file will remain live for {file_age} days</b>",
             disable_web_page_preview=True,
         )
     else:
         await message.edit(
-            f"<b>API returned an error!\n{response.text}\n Not allowed</b>"
+            f"<b>API returned an error!\n{response_text}\n Not allowed</b>"
         )
-        print(response.text)
+        print(response_text)
     if os.path.exists(file_name):
         os.remove(file_name)
 
@@ -264,7 +268,7 @@ async def webshot(client: Client, message: Message):
     await message.edit("<b>Generating screenshot...</b>")
 
     try:
-        screenshot_data = generate_screenshot(url)
+        screenshot_data = await generate_screenshot(url)
         if screenshot_data:
             await message.delete()
             await client.send_photo(

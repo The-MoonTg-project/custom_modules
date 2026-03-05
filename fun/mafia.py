@@ -1,13 +1,12 @@
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
-from utils import modules_help, prefix
+from utils.db import db
 from utils.scripts import format_exc
 
 # noinspection PyUnresolvedReferences
-from utils.db import db
-
+from utils import modules_help, prefix
 
 now_status = db.get("custom.mafia", "status", False)
 

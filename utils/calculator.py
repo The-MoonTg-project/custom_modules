@@ -1,6 +1,6 @@
 import asyncio
 
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 
 from utils import modules_help, prefix
@@ -19,12 +19,12 @@ async def calc(_, message: Message):
             for x in range(0, len(result), 4096):
                 if i == 0:
                     await message.edit(
-                        f"<i>{args}</i><b>=</b><code>{result[x:x + 4000]}</code>",
+                        f"<i>{args}</i><b>=</b><code>{result[x : x + 4000]}</code>",
                         parse_mode=enums.ParseMode.HTML,
                     )
                 else:
                     await message.reply(
-                        f"<code>{result[x:x + 4096]}</code>",
+                        f"<code>{result[x : x + 4096]}</code>",
                         parse_mode=enums.ParseMode.HTML,
                     )
                 i += 1

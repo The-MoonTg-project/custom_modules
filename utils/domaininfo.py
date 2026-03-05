@@ -1,8 +1,9 @@
-import requests
+import aiohttp
 from dns import resolver
 from pyrogram import Client, filters
-from utils import modules_help, prefix
 from utils.scripts import import_library
+
+from utils import modules_help, prefix
 
 whois = import_library("whois", "python-whois")
 
@@ -37,11 +38,12 @@ def get_dns_records(domain_name):
     return records
 
 
-def get_ip_geolocation(ip):
+async def get_ip_geolocation(ip):
     """Get IP geolocation information."""
     try:
-        response = requests.get(f"https://ipinfo.io/{ip}/json")
-        return response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://ipinfo.io/{ip}/json") as resp:
+                return await resp.json()
     except Exception as e:
         print(f"Failed to get IP geolocation: {e}")
         return None
@@ -62,7 +64,9 @@ async def get_domain_info(_, message):
                 if "A" in dns_records and isinstance(dns_records["A"], list)
                 else None
             )
-            ip_geolocation = get_ip_geolocation(ip_address) if ip_address else None
+            ip_geolocation = (
+                await get_ip_geolocation(ip_address) if ip_address else None
+            )
             creation_date = (
                 domain_info.creation_date[0]
                 if isinstance(domain_info.creation_date, list)

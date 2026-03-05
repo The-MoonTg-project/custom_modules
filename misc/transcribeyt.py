@@ -1,11 +1,12 @@
-import requests
-import time
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
-from pyrogram.errors import MessageTooLong
+import asyncio
 import os
-from utils import modules_help, prefix
 
+import aiohttp
+from pyrogram import Client, enums, filters
+from pyrogram.errors import MessageTooLong
+from pyrogram.types import Message
+
+from utils import modules_help, prefix
 
 # Replace with your Gladia API key
 gladia_key = "your key "
@@ -13,12 +14,14 @@ gladia_url = "https://api.gladia.io/v2/transcription/"
 
 
 # Function to make fetch requests to the Gladia API
-def make_fetch_request(url, headers, method="GET", data=None):
-    if method == "POST":
-        response = requests.post(url, headers=headers, json=data)
-    else:
-        response = requests.get(url, headers=headers)
-    return response.json()
+async def make_fetch_request(url, headers, method="GET", data=None):
+    async with aiohttp.ClientSession() as session:
+        if method == "POST":
+            async with session.post(url, headers=headers, json=data) as resp:
+                return await resp.json()
+        else:
+            async with session.get(url, headers=headers) as resp:
+                return await resp.json()
 
 
 @Client.on_message(filters.command("transcribeyt", prefix) & filters.me)
@@ -43,7 +46,9 @@ async def transcribe_audio(_, message: Message):
 
     # Send initial request to Gladia API
     status_message = await message.reply("- Sending initial request to Gladia API...")
-    initial_response = make_fetch_request(gladia_url, headers, "POST", request_data)
+    initial_response = await make_fetch_request(
+        gladia_url, headers, "POST", request_data
+    )
 
     # Check if the response contains the result_url
     if "result_url" not in initial_response:
@@ -57,7 +62,7 @@ async def transcribe_audio(_, message: Message):
 
     # Polling for transcription result
     while True:
-        poll_response = make_fetch_request(result_url, headers)
+        poll_response = await make_fetch_request(result_url, headers)
 
         if poll_response.get("status") == "done":
             transcription = (
@@ -92,7 +97,7 @@ async def transcribe_audio(_, message: Message):
                     )
 
                     # Clean up by removing the file
-                    os.remove("transcription.html")
+                    os.remove("transcription.txt")
             else:
                 await status_message.edit(
                     "Transcription completed, but no transcript was found."
@@ -102,7 +107,7 @@ async def transcribe_audio(_, message: Message):
             await status_message.edit(
                 f"Transcription status: {poll_response.get('status')}"
             )
-            time.sleep(30)  # Wait for a few seconds before polling again
+            await asyncio.sleep(30)  # Wait for a few seconds before polling again
 
 
 modules_help["transcribeyt"] = {

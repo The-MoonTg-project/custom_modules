@@ -1,8 +1,8 @@
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+from utils.scripts import format_exc
 
 from utils import modules_help, prefix
-from utils.scripts import format_exc
 
 
 @Client.on_message(filters.command(["block"], prefix) & filters.me)

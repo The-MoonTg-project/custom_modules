@@ -1,7 +1,8 @@
+import aiohttp
 from pyrogram import Client, filters
-import requests
-from utils import modules_help, prefix
 from utils.scripts import format_exc
+
+from utils import modules_help, prefix
 
 API_BASE_URL = "https://ifsc.razorpay.com/"
 
@@ -10,9 +11,10 @@ API_BASE_URL = "https://ifsc.razorpay.com/"
 async def fetch_ifsc_details(_, message):
     try:
         ifsc_code = message.text.split(" ")[1]
-        response = requests.get(f"{API_BASE_URL}{ifsc_code}")
-        response.raise_for_status()
-        data = response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{API_BASE_URL}{ifsc_code}") as resp:
+                resp.raise_for_status()
+                data = await resp.json()
 
         if "IFSC" in data:
             details = [
@@ -34,7 +36,7 @@ async def fetch_ifsc_details(_, message):
             await message.edit_text(info)
         else:
             await message.edit_text("Invalid IFSC Code 😕")
-    except requests.exceptions.RequestException:
+    except aiohttp.ClientError:
         await message.edit_text("Please provide valid IFSC Code")
     except IndexError:
         await message.edit_text("Please provide an IFSC Code")

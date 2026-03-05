@@ -4,13 +4,12 @@
 
 from io import BytesIO
 from random import randint
-
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
-
-from requests import get
-from PIL import Image, ImageFont, ImageDraw
 from textwrap import wrap
+
+import aiohttp
+from PIL import Image, ImageDraw, ImageFont
+from pyrogram import Client, enums, filters
+from pyrogram.types import Message
 
 from utils import modules_help, prefix
 
@@ -27,8 +26,14 @@ async def amogus(client: Client, message: Message):
     clr = randint(1, 12)
 
     url = "https://raw.githubusercontent.com/The-MoonTg-project/AmongUs/master/"
-    font = ImageFont.truetype(BytesIO(get(url + "bold.ttf").content), 60)
-    imposter = Image.open(BytesIO(get(f"{url}{clr}.png").content))
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url + "bold.ttf") as resp:
+            font_data = await resp.read()
+        async with session.get(f"{url}{clr}.png") as resp:
+            imposter_data = await resp.read()
+
+    font = ImageFont.truetype(BytesIO(font_data), 60)
+    imposter = Image.open(BytesIO(imposter_data))
 
     text_ = "\n".join(["\n".join(wrap(part, 30)) for part in text.split("\n")])
     bbox = ImageDraw.Draw(Image.new("RGB", (1, 1))).multiline_textbbox(

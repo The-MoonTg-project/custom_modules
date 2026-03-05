@@ -1,8 +1,10 @@
-import requests
+import os
+
+import aiohttp
 from pyrogram import Client, filters
 from pyrogram.types import Message
-import os
 from utils.db import db
+
 from utils import modules_help, prefix
 
 OCR_SPACE_URL = "https://api.ocr.space/parse/image"
@@ -36,25 +38,27 @@ async def ocr_space(_, message: Message):
 
     photo = await message.reply_to_message.download()
     try:
-        with open(photo, "rb") as image_file:
-            response = requests.post(
-                OCR_SPACE_URL,
-                files={"file": image_file},
-                data={"apikey": OCR_SPACE_API_KEY},
-                timeout=10,  # Optional timeout
-            )
-
-        if response.status_code == 200:
-            result = response.json()
-            if result["IsErroredOnProcessing"]:
-                await message.edit(
-                    "Error occurred during OCR processing. Please try again."
-                )
-            else:
-                parsed_text = result["ParsedResults"][0]["ParsedText"]
-                await message.edit(f"Extracted Text:\n{parsed_text}")
-        else:
-            await message.edit("An error occurred, please try again later.")
+        async with aiohttp.ClientSession() as session:
+            with open(photo, "rb") as image_file:
+                form = aiohttp.FormData()
+                form.add_field("file", image_file)
+                form.add_field("apikey", OCR_SPACE_API_KEY)
+                async with session.post(
+                    OCR_SPACE_URL,
+                    data=form,
+                    timeout=aiohttp.ClientTimeout(total=10),
+                ) as resp:
+                    if resp.status == 200:
+                        result = await resp.json()
+                        if result["IsErroredOnProcessing"]:
+                            await message.edit(
+                                "Error occurred during OCR processing. Please try again."
+                            )
+                        else:
+                            parsed_text = result["ParsedResults"][0]["ParsedText"]
+                            await message.edit(f"Extracted Text:\n{parsed_text}")
+                    else:
+                        await message.edit("An error occurred, please try again later.")
     except Exception as e:
         await message.edit("An unexpected error occurred.")
         print(f"Error: {e}")

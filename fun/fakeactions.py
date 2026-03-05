@@ -1,10 +1,11 @@
 from asyncio import sleep
 
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.raw import functions
-from pyrogram.types import Message, InputReplyToMessage
-from utils import modules_help, prefix
+from pyrogram.types import InputReplyToMessage, Message
 from utils.scripts import format_exc
+
+from utils import modules_help, prefix
 
 commands = {
     "ftype": enums.ChatAction.TYPING,
@@ -62,11 +63,11 @@ async def fakeactions_handler(client: Client, message: Message):
                 await sleep(0.1)
     except AttributeError:
         return await client.send_message(
-            "me", f"Error in <b>fakeactions</b>" "reply to message is required"
+            "me", f"Error in <b>fakeactions</b>reply to message is required"
         )
     except Exception as e:
         return await client.send_message(
-            "me", f"Error in <b>fakeactions</b>" f" module:\n" + format_exc(e)
+            "me", f"Error in <b>fakeactions</b> module:\n" + format_exc(e)
         )
 
 

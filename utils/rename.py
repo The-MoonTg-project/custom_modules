@@ -19,9 +19,9 @@ import time
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from utils.scripts import format_exc, progress
 
 from utils import modules_help, prefix
-from utils.scripts import format_exc, progress
 
 
 @Client.on_message(filters.command("rename", prefix) & filters.me)

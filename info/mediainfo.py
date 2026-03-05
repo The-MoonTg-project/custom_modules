@@ -2,17 +2,17 @@
 # If you're on heroku then make sure to install `mediainfo` buildpacks
 # Others installations like docker users doesn't need to install anything
 
-import os
-import time
 import datetime
+import os
 import subprocess
-import requests
+import time
 
-from pyrogram import Client, filters, enums
+import aiohttp
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+from utils.scripts import edit_or_reply, format_exc, progress
 
-from utils import prefix, modules_help
-from utils.scripts import format_exc, progress, edit_or_reply
+from utils import modules_help, prefix
 
 
 async def telegraph(content):
@@ -21,11 +21,15 @@ async def telegraph(content):
     data = {"content": content}
 
     try:
-        response = requests.post(url, json=data, headers=headers, timeout=5)
-        response.raise_for_status()
-        paste_id = response.json().get("id")
-        if paste_id:
-            return f"https://pasty.lus.pm/{paste_id}.txt"
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url, json=data, headers=headers, timeout=aiohttp.ClientTimeout(total=5)
+            ) as resp:
+                resp.raise_for_status()
+                result = await resp.json()
+                paste_id = result.get("id")
+                if paste_id:
+                    return f"https://pasty.lus.pm/{paste_id}.txt"
     except Exception:
         pass
 

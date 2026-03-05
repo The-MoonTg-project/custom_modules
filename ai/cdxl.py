@@ -1,10 +1,11 @@
-import base64, os
+import base64
+import os
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from utils.scripts import format_exc, import_library
 
 from utils import modules_help, prefix
-from utils.scripts import format_exc, import_library
 
 clarifai = import_library("clarifai")
 

@@ -1,15 +1,18 @@
 import os
-import requests
+
+import aiohttp
 from bs4 import BeautifulSoup
 from pyrogram import Client, filters
 from pyrogram.types import Message
+
 from utils import modules_help, prefix
 
 
-def fetch_data(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    return response.text
+async def fetch_data(url):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            resp.raise_for_status()
+            return await resp.text()
 
 
 # Pyrogram command handler for the job commandx
@@ -18,8 +21,8 @@ async def gov_job(client: Client, message: Message):
     await message.edit_text("Fetching job information...")
 
     try:
-        html_data = fetch_data("https://www.sarkariresult.com/latestjob.php")
-    except requests.exceptions.HTTPError:
+        html_data = await fetch_data("https://www.sarkariresult.com/latestjob.php")
+    except aiohttp.ClientError:
         return await message.edit_text("API URL refused connection")
     soup = BeautifulSoup(html_data, "html.parser")
 

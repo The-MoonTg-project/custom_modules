@@ -4,10 +4,10 @@ from pyrogram import Client, enums, filters
 from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
-from utils import modules_help, prefix
+from utils.scripts import format_exc
 
 # noinspection PyUnresolvedReferences
-from utils.scripts import format_exc
+from utils import modules_help, prefix
 
 now = {}
 

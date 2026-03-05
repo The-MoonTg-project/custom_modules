@@ -1,5 +1,5 @@
+import aiohttp
 from pyrogram import Client, filters
-import requests
 
 from utils import modules_help, prefix
 
@@ -51,36 +51,38 @@ async def pypi_info(_, message):
     package_name = message.command[1]
 
     # Fetch data from PyPI
-    response = requests.get(f"https://pypi.org/pypi/{package_name}/json")
+    async with aiohttp.ClientSession() as session:
+        async with session.get(f"https://pypi.org/pypi/{package_name}/json") as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                package_info = data["info"]
 
-    if response.status_code == 200:
-        data = response.json()
-        package_info = data["info"]
+                reply_message = (
+                    f"<b>Package Information:</b>\n"
+                    f"<b>Package Name:</b> {package_info['name']}\n"
+                    f"<b>Version:</b> {package_info['version']}\n"
+                    f"<b>Summary:</b> {package_info['summary']}\n"
+                    f"<b>Home Page:</b> <a href='{package_info['home_page']}'>{package_info['home_page']}</a>\n"
+                    f"<b>Author:</b> {package_info['author']}\n"
+                    f"<b>License:</b> {package_info['license']}\n"
+                    f"<b>Description:</b> {package_info['description']}\n"
+                    f"<b>Keywords:</b> {', '.join(package_info['keywords'].split()) if package_info['keywords'] else 'None'}\n"
+                    f"<b>Bug Tracker:</b> {get_bug_track_info(package_info)}\n"
+                    f"<b>Requirements:</b> {get_requirements(data)}\n"
+                )
+                # Add package URLs
+                if "project_urls" in package_info and package_info["project_urls"]:
+                    reply_message += "<b>Project URLs:</b>\n"
+                    for label, url in package_info["project_urls"].items():
+                        reply_message += (
+                            f"- <b>{label}:</b> <a href='{url}'>{url}</a>\n"
+                        )
 
-        reply_message = (
-            f"<b>Package Information:</b>\n"
-            f"<b>Package Name:</b> {package_info['name']}\n"
-            f"<b>Version:</b> {package_info['version']}\n"
-            f"<b>Summary:</b> {package_info['summary']}\n"
-            f"<b>Home Page:</b> <a href='{package_info['home_page']}'>{package_info['home_page']}</a>\n"
-            f"<b>Author:</b> {package_info['author']}\n"
-            f"<b>License:</b> {package_info['license']}\n"
-            f"<b>Description:</b> {package_info['description']}\n"
-            f"<b>Keywords:</b> {', '.join(package_info['keywords'].split()) if package_info['keywords'] else 'None'}\n"
-            f"<b>Bug Tracker:</b> {get_bug_track_info(package_info)}\n"
-            f"<b>Requirements:</b> {get_requirements(data)}\n"
-        )
-        # Add package URLs
-        if "project_urls" in package_info and package_info["project_urls"]:
-            reply_message += "<b>Project URLs:</b>\n"
-            for label, url in package_info["project_urls"].items():
-                reply_message += f"- <b>{label}:</b> <a href='{url}'>{url}</a>\n"
-
-        await message.edit_text(reply_message)
-    else:
-        await message.edit_text(
-            "Package not found. Please check the package name and try again."
-        )
+                await message.edit_text(reply_message)
+            else:
+                await message.edit_text(
+                    "Package not found. Please check the package name and try again."
+                )
 
 
 modules_help["pypi"] = {"pypi [request]": "To get the pypi package ."}

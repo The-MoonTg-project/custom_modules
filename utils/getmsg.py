@@ -14,30 +14,31 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import time
-import os
 import datetime
+import os
+import time
 from typing import Union
 
 from pyrogram import Client, filters
-from pyrogram.types import Message
+from pyrogram.enums import MessageMediaType
 from pyrogram.errors import (
     ChatForwardsRestricted,
-    PeerIdInvalid,
+    FloodWait,
     MessageIdInvalid,
     MessageTooLong,
-    FloodWait
+    PeerIdInvalid,
 )
-from pyrogram.enums import MessageMediaType
+from pyrogram.types import Message
+from utils.scripts import format_exc
 
 from utils import modules_help, prefix
-from utils.scripts import format_exc
+
 
 class ProgressTracker:
     def __init__(self):
         self.last_update = 0
         self.update_interval = 1
-        
+
     def should_update(self):
         now = time.time()
         if now - self.last_update >= self.update_interval:
@@ -45,7 +46,9 @@ class ProgressTracker:
             return True
         return False
 
+
 progress_tracker = ProgressTracker()
+
 
 async def safe_edit(xx: Message, text: str):
     try:
@@ -56,12 +59,13 @@ async def safe_edit(xx: Message, text: str):
     except Exception:
         pass
 
+
 def calculate_eta(current: int, total: int, start_time: float) -> str:
     try:
         elapsed = time.time() - start_time
         if elapsed < 0.1 or total == 0:
             return "N/A"
-        
+
         speed = current / elapsed
         remaining = total - current
         eta = remaining / speed
@@ -69,17 +73,20 @@ def calculate_eta(current: int, total: int, start_time: float) -> str:
     except:
         return "N/A"
 
+
 @Client.on_message(filters.command("getmsg", prefix) & filters.me)
 async def get_restricted_msg(client: Client, message: Message):
     if len(message.command) < 2:
         return await message.edit("❗ Please provide a link!")
-    
+
     link = message.command[1]
     xx = await message.edit("🔄 Initializing...")
-    
+
     chat, msg_id = get_chat_and_msgid(link)
     if not (chat and msg_id):
-        return await xx.edit("❌ Invalid link format!\nExample: https://t.me/c/1524685769/40392")
+        return await xx.edit(
+            "❌ Invalid link format!\nExample: https://t.me/c/1524685769/40392"
+        )
 
     try:
         msg = await client.get_messages(chat, msg_id)
@@ -104,7 +111,7 @@ async def get_restricted_msg(client: Client, message: Message):
         try:
             # Download with progress
             dl_start = time.time()
-            
+
             async def dl_progress(current, total):
                 text = (
                     f"⬇️ Downloading...\n"
@@ -117,7 +124,7 @@ async def get_restricted_msg(client: Client, message: Message):
 
             # Upload with original formatting
             upload_start = time.time()
-            
+
             async def up_progress(current, total):
                 text = (
                     f"⬆️ Uploading...\n"
@@ -129,7 +136,7 @@ async def get_restricted_msg(client: Client, message: Message):
             common_args = {
                 "caption": msg.caption or "",
                 "caption_entities": msg.caption_entities or [],
-                "progress": up_progress
+                "progress": up_progress,
             }
 
             if msg.media == MessageMediaType.VIDEO:
@@ -140,20 +147,13 @@ async def get_restricted_msg(client: Client, message: Message):
                     width=msg.video.width,
                     height=msg.video.height,
                     supports_streaming=True,
-                    **common_args
+                    **common_args,
                 )
             elif msg.media == MessageMediaType.PHOTO:
-                await client.send_photo(
-                    message.chat.id,
-                    media_path,
-                    **common_args
-                )
+                await client.send_photo(message.chat.id, media_path, **common_args)
             else:
                 await client.send_document(
-                    message.chat.id,
-                    media_path,
-                    force_document=False,
-                    **common_args
+                    message.chat.id, media_path, force_document=False, **common_args
                 )
 
             await xx.delete()
@@ -169,8 +169,7 @@ async def get_restricted_msg(client: Client, message: Message):
         # Handle text messages with formatting
         try:
             await xx.edit(
-                f"📝 **Message content:**\n\n{msg.text}",
-                entities=msg.entities or []
+                f"📝 **Message content:**\n\n{msg.text}", entities=msg.entities or []
             )
         except MessageTooLong:
             txt_path = os.path.abspath("message.txt")
@@ -180,7 +179,7 @@ async def get_restricted_msg(client: Client, message: Message):
                 await client.send_document(
                     message.chat.id,
                     txt_path,
-                    caption="Original message formatting preserved in file"
+                    caption="Original message formatting preserved in file",
                 )
                 await xx.delete()
             finally:
@@ -189,6 +188,7 @@ async def get_restricted_msg(client: Client, message: Message):
                         os.remove(txt_path)
                     except Exception as e:
                         print(f"Error deleting text file: {e}")
+
 
 def get_chat_and_msgid(link: str) -> Union[tuple, tuple[None, None]]:
     try:
@@ -204,6 +204,7 @@ def get_chat_and_msgid(link: str) -> Union[tuple, tuple[None, None]]:
             return int(chat_part) if chat_part.isdigit() else chat_part, msg_id
     except (ValueError, IndexError, AttributeError):
         return None, None
+
 
 modules_help["getmsg"] = {
     "getmsg [link]": "Fetch messages with full formatting preservation and cleanup",

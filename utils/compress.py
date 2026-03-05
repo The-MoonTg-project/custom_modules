@@ -1,23 +1,23 @@
+import asyncio
 import math
 import os
 import re
-import time
 import shutil
-import asyncio
+import time
+from subprocess import PIPE, Popen
+
 from pyrogram import Client, filters
 from pyrogram.types import Message
-
-from subprocess import Popen, PIPE
-
-from utils import modules_help, prefix
 from utils.scripts import (
+    edit_or_reply,
+    format_exc,
     humanbytes,
     time_formatter,
     with_reply,
-    format_exc,
-    edit_or_reply,
 )
 from utils.scripts import progress as pg
+
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command("compress", prefix) & filters.me)

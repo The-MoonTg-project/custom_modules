@@ -1,16 +1,13 @@
-from pyrogram import Client, filters
-from pyrogram.types import Message
-
-from utils import prefix, modules_help
-
-
-from pyrogram import Client, filters
-from pyrogram.types import Message
-from pyrogram.errors import MessageNotModified
 import os
+
 import pygments
 from pygments.formatters import ImageFormatter
 from pygments.lexers import Python3Lexer
+from pyrogram import Client, filters
+from pyrogram.errors import MessageNotModified
+from pyrogram.types import Message
+
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command("ncode", prefix) & filters.me)

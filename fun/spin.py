@@ -8,10 +8,10 @@ import aiohttp
 from modules.squotes import render_message
 from pyrogram import Client, enums, filters, types
 from pyrogram.types import Message
+from utils.scripts import format_exc, import_library, resize_image
 
 # noinspection PyUnresolvedReferences
 from utils import modules_help, prefix
-from utils.scripts import format_exc, import_library, resize_image
 
 Image = import_library("PIL", "pillow").Image
 np = import_library("numpy")
@@ -75,7 +75,7 @@ async def quote_cmd(client: Client, message: types.Message):
     response = await aiohttp.ClientSession().post(url, json=params)
     if response.status != 200:
         return await message.edit(
-            f"<b>Quotes API error!</b>\n" f"<code>{response.text}</code>",
+            f"<b>Quotes API error!</b>\n<code>{response.text}</code>",
             parse_mode=enums.ParseMode.HTML,
         )
 

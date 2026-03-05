@@ -3,14 +3,14 @@
 # YOu can check it out for uses example
 import os
 
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
+from pyrogram import Client, enums, filters
 from pyrogram.errors import MessageTooLong
-
-from utils import modules_help, prefix
-from utils.scripts import format_exc, import_library
+from pyrogram.types import Message
 from utils.config import gemini_key
 from utils.rentry import paste as rentry_paste
+from utils.scripts import format_exc, import_library
+
+from utils import modules_help, prefix
 
 genai = import_library("google.genai", "google-genai")
 
@@ -32,7 +32,9 @@ async def say(_client: Client, message: Message):
             )
             return
 
-        response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash", contents=prompt
+        )
 
         await message.edit_text(
             f"**Question:**`{prompt}`\n**Answer:** {response.text}",

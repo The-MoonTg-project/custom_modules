@@ -1,83 +1,81 @@
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
-import re
 import os
-import requests
+
+import aiohttp
+from pyrogram import Client, filters
+from pyrogram.types import Message
+from utils.scripts import format_exc
 
 from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command(["repod", "rp"], prefix) & filters.me)
-async def github_repo(client: Client, message: Message):
-    try:
-        if len(message.command) > 1:
-            repo_input = message.command[1]
-        elif message.reply_to_message:
-            repo_input = message.reply_to_message.text
-        else:
-            await message.edit(
-                f"<b>Usage: </b><code>{prefix}repo [link/reply to link]</code>",
-                parse_mode=enums.ParseMode.HTML,
-            )
-            return
-        user, repo = None, None
-        match = re.search(
-            r"github\.com(?:/|:)([\w.-]+)/([\w.-]+)(?:\.git)?", repo_input
+async def repo_download(client: Client, message: Message):
+    if len(message.command) < 2:
+        return await message.edit_text(
+            f"<b>Usage:</b> <code>{prefix}repo [owner/repo]</code>"
         )
-        if match:
-            user, repo = match.groups()
-        elif "/" in repo_input:
-            user, repo = repo_input.split("/")
 
-        if not user or not repo:
-            await message.edit(
-                "Could not parse the repository reference. Please provide a valid format."
+    repo = message.text.split(maxsplit=1)[1]
+    if "/" not in repo:
+        return await message.edit_text(
+            "Please provide a valid repository in the format owner/repo"
+        )
+
+    await message.edit_text(f"<code>Fetching repository info for {repo}...</code>")
+
+    async with aiohttp.ClientSession() as session:
+        try:
+            async with session.get(f"https://api.github.com/repos/{repo}") as resp:
+                if resp.status != 200:
+                    return await message.edit_text(
+                        f"Repository not found or API error (status {resp.status})"
+                    )
+                data = await resp.json()
+
+            repo_name = data.get("name", "")
+            description = data.get("description", "N/A")
+            stars = data.get("stargazers_count", 0)
+            forks = data.get("forks_count", 0)
+            language = data.get("language", "N/A")
+            default_branch = data.get("default_branch", "main")
+
+            info = (
+                f"<b>Repository:</b> <code>{data['full_name']}</code>\n"
+                f"<b>Description:</b> {description}\n"
+                f"<b>Stars:</b> {stars} | <b>Forks:</b> {forks}\n"
+                f"<b>Language:</b> {language}\n"
+                f"<b>Default Branch:</b> {default_branch}\n"
             )
-            return
 
-        api_url = f"https://api.github.com/repos/{user}/{repo}"
-        headers = {"User-Agent": "Mozilla/5.0"}
+            await message.edit_text(f"{info}\n<code>Downloading repository...</code>")
 
-        response = requests.get(api_url, headers=headers)
-        if response.status_code == 200:
-            repo_details = response.json()
-            description = repo_details.get("description", "No description")
-            await message.edit(
-                f"<b>Downloading Repository....\n\nRepository Name: {repo_details['name']}\nDescription: {description}</b>"
+            zip_url = (
+                f"https://github.com/{repo}/archive/refs/heads/{default_branch}.zip"
             )
+            async with session.get(zip_url) as resp:
+                if resp.status != 200:
+                    return await message.edit_text("Failed to download repository")
+                zip_data = await resp.read()
 
-            default_branch = repo_details.get("default_branch", "main")
-        else:
-            await message.edit("Failed to fetch repository details")
-            return
+            zip_filename = f"{repo_name}-{default_branch}.zip"
+            with open(zip_filename, "wb") as f:
+                f.write(zip_data)
 
-        download_url = f"https://codeload.github.com/{user}/{repo}/zip/{default_branch}"
-        response = requests.get(download_url, headers=headers, allow_redirects=True)
-
-        if response.status_code == 200:
-            file_name = f"{repo}-{default_branch}.zip"
-            with open(file_name, "wb") as file:
-                file.write(response.content)
-            await message.reply_document(
-                document=file_name,
-                caption=f"<b>Repository Name:</b> <a href='{repo_input}'>{repo_details['name']}</a>\n\n<b>Description:</b> <blockquote>{description}</blockquote>",
-                parse_mode=enums.ParseMode.HTML,
+            await message.edit_text(f"{info}\n<code>Uploading...</code>")
+            await client.send_document(
+                message.chat.id,
+                zip_filename,
+                caption=info,
             )
             await message.delete()
-            os.remove(file_name)
-        else:
-            await message.edit(
-                f"Failed to download repository. HTTP Status: {response.status_code}"
-            )
-            return
 
-    except Exception as e:
-        await message.edit(
-            f"<code>[{getattr(e, 'error_code', '')}: {getattr(e, 'error_details', '')}] - {e}</code>"
-        )
+        except Exception as e:
+            await message.edit_text(format_exc(e))
+        finally:
+            if os.path.exists(zip_filename):
+                os.remove(zip_filename)
 
 
 modules_help["repo"] = {
-    "repod [link/reply to link]*": "Download GitHub repository",
-    "rp [link/reply to link]*": "Download GitHub repository",
+    "repod [owner/repo]*": "Download a GitHub repository as a zip file",
 }

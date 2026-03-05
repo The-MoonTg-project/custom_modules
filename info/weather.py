@@ -17,13 +17,13 @@
 # rewrote the module from @ Fl1yd
 from io import BytesIO
 
-import requests
-from pyrogram import Client, filters, enums
+import aiohttp
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
 from utils.db import db
-from utils import modules_help, prefix
 from utils.scripts import format_exc
+
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command(["weather", "w"], prefix) & filters.me)
@@ -38,14 +38,17 @@ async def weather(client: Client, message: Message):
     )
 
     try:
-        text_resp = requests.get(f"https://wttr.in/{city}?m?M?0?q?T&lang=en")
-        text_resp.raise_for_status()
-        caption = f"```City: {text_resp.text}```"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://wttr.in/{city}?m?M?0?q?T&lang=en") as resp:
+                resp.raise_for_status()
+                text_content = await resp.text()
+            caption = f"```City: {text_content}```"
 
-        pic_resp = requests.get(f"http://wttr.in/{city}_2&lang=en.png")
-        pic_resp.raise_for_status()
-        pic = BytesIO(pic_resp.content)
-        pic.name = f"{city}.png"
+            async with session.get(f"http://wttr.in/{city}_2&lang=en.png") as resp:
+                resp.raise_for_status()
+                pic_content = await resp.read()
+            pic = BytesIO(pic_content)
+            pic.name = f"{city}.png"
 
         await client.send_document(
             chat_id=message.chat.id, document=pic, caption=caption

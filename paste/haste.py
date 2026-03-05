@@ -1,8 +1,9 @@
-import requests
-from pyrogram import Client, filters, enums
+import aiohttp
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-from utils import modules_help, prefix
 from utils.scripts import with_reply
+
+from utils import modules_help, prefix
 
 BASE = "https://hastebin.com"
 
@@ -20,17 +21,18 @@ async def haste(client: Client, message: Message):
     await message.delete()
 
     try:
-        response = requests.post(
-            "{}/documents".format(BASE),
-            data=reply.text.encode("UTF-8"),
-            headers=headers,
-        )
-        response.raise_for_status()  # Raises an HTTPError if the response was unsuccessful
-        result = response.json()
-    except requests.exceptions.HTTPError as http_err:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{BASE}/documents",
+                data=reply.text.encode("UTF-8"),
+                headers=headers,
+            ) as resp:
+                resp.raise_for_status()
+                result = await resp.json()
+    except aiohttp.ClientResponseError as http_err:
         await message.reply(f"HTTP error occurred: {http_err}")
         return
-    except requests.exceptions.RequestException as err:
+    except aiohttp.ClientError as err:
         await message.reply(f"Error occurred: {err}")
         return
     except ValueError:

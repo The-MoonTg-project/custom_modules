@@ -1,13 +1,13 @@
 import os
-import requests
+
 import aiofiles
-
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message, InputMediaPhoto
+import aiohttp
+from pyrogram import Client, enums, filters
 from pyrogram.errors import MediaCaptionTooLong
-
-from utils import prefix, modules_help
+from pyrogram.types import InputMediaPhoto, Message
 from utils.scripts import format_exc
+
+from utils import modules_help, prefix
 
 url = "https://api.safone.co"
 
@@ -39,24 +39,26 @@ async def anime_search(client: Client, message: Message):
                 "What should i search? You didn't provided me with any value to search"
             )
 
-        response = requests.get(
-            url=f"{url}/anime/search?query={query}", headers=headers, timeout=5
-        )
-        if response.status_code != 200:
-            await message.edit_text("Something went wrong")
-            return
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url=f"{url}/anime/search?query={query}",
+                headers=headers,
+                timeout=aiohttp.ClientTimeout(total=5),
+            ) as resp:
+                if resp.status != 200:
+                    await message.edit_text("Something went wrong")
+                    return
+                result = await resp.json()
 
-        result = response.json()
-
-        averageScore = result["averageScore"]
-        try:
-            coverImage_url = result["imageUrl"]
-            coverImage = requests.get(url=coverImage_url).content
-            async with aiofiles.open("coverImage.jpg", mode="wb") as f:
-                await f.write(coverImage)
-
-        except Exception:
-            coverImage = None
+            averageScore = result["averageScore"]
+            try:
+                coverImage_url = result["imageUrl"]
+                async with session.get(url=coverImage_url) as resp:
+                    coverImage = await resp.read()
+                async with aiofiles.open("coverImage.jpg", mode="wb") as f:
+                    await f.write(coverImage)
+            except Exception:
+                coverImage = None
 
         title = result["title"]["english"]
         trailer = result["trailer"]["id"]
@@ -109,24 +111,26 @@ async def manga_search(client: Client, message: Message):
                 "What should i search? You didn't provided me with any value to search"
             )
 
-        response = requests.get(
-            url=f"{url}/anime/manga?query={query}", headers=headers, timeout=5
-        )
-        if response.status_code != 200:
-            await message.edit_text("Something went wrong")
-            return
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url=f"{url}/anime/manga?query={query}",
+                headers=headers,
+                timeout=aiohttp.ClientTimeout(total=5),
+            ) as resp:
+                if resp.status != 200:
+                    await message.edit_text("Something went wrong")
+                    return
+                result = await resp.json()
 
-        result = response.json()
-
-        averageScore = result["averageScore"]
-        try:
-            coverImage_url = result["imageUrl"]
-            coverImage = requests.get(url=coverImage_url).content
-            async with aiofiles.open("coverImage.jpg", mode="wb") as f:
-                await f.write(coverImage)
-
-        except Exception:
-            coverImage = None
+            averageScore = result["averageScore"]
+            try:
+                coverImage_url = result["imageUrl"]
+                async with session.get(url=coverImage_url) as resp:
+                    coverImage = await resp.read()
+                async with aiofiles.open("coverImage.jpg", mode="wb") as f:
+                    await f.write(coverImage)
+            except Exception:
+                coverImage = None
 
         title = result["title"]["english"]
         trailer = result["trailer"]["id"]
@@ -179,23 +183,25 @@ async def character(client: Client, message: Message):
                 "What should i search? You didn't provided me with any value to search"
             )
 
-        response = requests.get(
-            url=f"{url}/anime/character?query={query}", headers=headers, timeout=5
-        )
-        if response.status_code != 200:
-            await message.edit_text("Something went wrong")
-            return
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                url=f"{url}/anime/character?query={query}",
+                headers=headers,
+                timeout=aiohttp.ClientTimeout(total=5),
+            ) as resp:
+                if resp.status != 200:
+                    await message.edit_text("Something went wrong")
+                    return
+                result = await resp.json()
 
-        result = response.json()
-
-        try:
-            coverImage_url = result["image"]["large"]
-            coverImage = requests.get(url=coverImage_url).content
-            async with aiofiles.open("coverImage.jpg", mode="wb") as f:
-                await f.write(coverImage)
-
-        except Exception:
-            coverImage = None
+            try:
+                coverImage_url = result["image"]["large"]
+                async with session.get(url=coverImage_url) as resp:
+                    coverImage = await resp.read()
+                async with aiofiles.open("coverImage.jpg", mode="wb") as f:
+                    await f.write(coverImage)
+            except Exception:
+                coverImage = None
 
         age = result["age"]
         description = result["description"]

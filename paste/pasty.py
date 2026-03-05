@@ -1,7 +1,9 @@
 import json
-import requests
+
+import aiohttp
 from pyrogram import Client, filters
 from pyrogram.types import Message
+
 from utils import modules_help, prefix
 
 HEADERS = {
@@ -9,15 +11,17 @@ HEADERS = {
     "content-type": "application/json",
 }
 
+
 async def p_paste(text, extension=None):
     url = "https://pasty.lus.pm/api/v1/pastes"
     data = {"content": text}
     try:
-        r = requests.post(url, data=json.dumps(data), headers=HEADERS)
-        r.raise_for_status()
-        resp = r.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json=data, headers=HEADERS) as resp:
+                resp.raise_for_status()
+                result = await resp.json()
         ext = extension or "txt"
-        paste_id = resp.get("id")
+        paste_id = result.get("id")
         if not paste_id:
             return {"error": "No paste ID returned"}
         return {
@@ -28,14 +32,17 @@ async def p_paste(text, extension=None):
     except Exception as e:
         return {"error": str(e)}
 
+
 async def spacebin_paste(text, extension="txt"):
     url = "https://spaceb.in/api/"
     try:
-        data = {"content": text}
-        files = {"extension": (None, extension)}
-        r = requests.post(url, data=data, files=files)
-        r.raise_for_status()
-        result = r.json()
+        async with aiohttp.ClientSession() as session:
+            form = aiohttp.FormData()
+            form.add_field("content", text)
+            form.add_field("extension", extension)
+            async with session.post(url, data=form) as resp:
+                resp.raise_for_status()
+                result = await resp.json()
         if result.get("error"):
             return {"error": result["error"]}
         payload = result.get("payload", {})
@@ -49,6 +56,7 @@ async def spacebin_paste(text, extension="txt"):
         }
     except Exception as e:
         return {"error": str(e)}
+
 
 async def get_text_from_message(message):
     reply = message.reply_to_message
@@ -67,6 +75,7 @@ async def get_text_from_message(message):
     if not text:
         return None, "<b>No text found to paste</b>"
     return text, None
+
 
 async def handle_paste(message, service):
     args = message.text.split(maxsplit=2)
@@ -91,13 +100,16 @@ async def handle_paste(message, service):
             disable_web_page_preview=True,
         )
 
+
 @Client.on_message(filters.command("pasty", prefix) & filters.me)
 async def pasty_cmd(_, message: Message):
     await handle_paste(message, "pasty")
 
+
 @Client.on_message(filters.command("spacebin", prefix) & filters.me)
 async def spacebin_cmd(_, message: Message):
     await handle_paste(message, "spacebin")
+
 
 modules_help["pasty"] = {
     "pasty [.ext] [text/reply]": "Paste to pasty.lus.pm (default ext: txt)",

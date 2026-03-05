@@ -1,22 +1,24 @@
-import os
 import io
+import os
 import time
-import requests
-from pyrogram import filters, Client
-from pyrogram.types import Message
 
-from utils import modules_help, prefix
+import aiohttp
+from pyrogram import Client, filters
+from pyrogram.types import Message
 from utils.scripts import format_exc, progress
 
+from utils import modules_help, prefix
 
-def schellwithflux(args):
+
+async def schellwithflux(args):
     API_URL = "https://randydev-ryuzaki-api.hf.space/api/v1/akeno/fluxai"
     payload = {"user_id": 1191668125, "args": args}  # Please don't edit here
-    response = requests.post(API_URL, json=payload)
-    if response.status_code != 200:
-        print(f"Error status {response.status_code}")
-        return None
-    return response.content
+    async with aiohttp.ClientSession() as session:
+        async with session.post(API_URL, json=payload) as resp:
+            if resp.status != 200:
+                print(f"Error status {resp.status}")
+                return None
+            return await resp.read()
 
 
 @Client.on_message(filters.command("fluxai", prefix) & filters.me)
@@ -25,7 +27,7 @@ async def imgfluxai_(client: Client, message: Message):
     if not question:
         return await message.reply_text("Please provide a question for Flux.")
     try:
-        image_bytes = schellwithflux(question)
+        image_bytes = await schellwithflux(question)
         if image_bytes is None:
             return await message.reply_text("Failed to generate an image.")
         pro = await message.reply_text("Generating image, please wait...")

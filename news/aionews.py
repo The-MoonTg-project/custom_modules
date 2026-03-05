@@ -1,11 +1,12 @@
-import os
-import requests
 import asyncio
-from pyrogram import Client, filters, enums
+import os
+
+import aiohttp
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+from utils.scripts import generate_screenshot
 
 from utils import modules_help, prefix
-from modules.url import generate_screenshot
 
 API_CONFIGS = {
     "currents": {
@@ -59,7 +60,7 @@ SCREENSHOT_API_URL = "https://api.screenshotone.com/take?access_key=sEfJjC_6S1D9
 def format_headlines(articles, api_config):
     return articles, "\n\n".join(
         [
-            f"{i+1}. **{article['title']}**\n{article.get('description', 'No description')}\nPublished on: {article.get(api_config['date_key'], 'Unknown date')}\n[Read More]({article.get(api_config['url_key'], '#')})"
+            f"{i + 1}. **{article['title']}**\n{article.get('description', 'No description')}\nPublished on: {article.get(api_config['date_key'], 'Unknown date')}\n[Read More]({article.get(api_config['url_key'], '#')})"
             for i, article in enumerate(articles[:10])
         ]
     )
@@ -84,7 +85,7 @@ async def send_long_message(message, text):
 
 async def send_screenshot(client, message, url):
     screenshot_url = SCREENSHOT_API_URL.format(query=url)
-    screenshot_data = generate_screenshot(url)
+    screenshot_data = await generate_screenshot(url)
     if screenshot_data:
         await client.send_photo(
             chat_id=message.chat.id,
@@ -101,33 +102,34 @@ async def fetch_news(api_name, country_code, message):
         api_config["params_key"]: country_code,
         "apiKey" if api_name != "gnews" else "token": api_config["api_key"],
     }
-    response = requests.get(api_config["url"], params=params)
-    if response.status_code == 200:
-        news_data = response.json()
-        status = news_data[api_config["status_key"]]
-        if (
-            status == api_config["status_ok_value"]
-            if isinstance(api_config["status_ok_value"], str)
-            else api_config["status_ok_value"](status)
-        ):
-            articles, headlines = format_headlines(
-                news_data[api_config["results_key"]], api_config
-            )
-            search_message = await send_long_message(
-                message,
-                f"**Top {api_name.capitalize()} Headlines for {country_code.upper()}:**\n\n{headlines}",
-            )
-            global news_search_results
-            news_search_results[f"{message.chat.id}_{api_name}"] = {
-                "results": articles,
-                "message_id": search_message.id,
-            }
-        else:
-            await message.edit(
-                f"No {api_name.capitalize()} articles found for {country_code}."
-            )
+    async with aiohttp.ClientSession() as session:
+        async with session.get(api_config["url"], params=params) as resp:
+            if resp.status != 200:
+                await message.edit("An error occurred, please try again later.")
+                return
+            news_data = await resp.json()
+    status = news_data[api_config["status_key"]]
+    if (
+        status == api_config["status_ok_value"]
+        if isinstance(api_config["status_ok_value"], str)
+        else api_config["status_ok_value"](status)
+    ):
+        articles, headlines = format_headlines(
+            news_data[api_config["results_key"]], api_config
+        )
+        search_message = await send_long_message(
+            message,
+            f"**Top {api_name.capitalize()} Headlines for {country_code.upper()}:**\n\n{headlines}",
+        )
+        global news_search_results
+        news_search_results[f"{message.chat.id}_{api_name}"] = {
+            "results": articles,
+            "message_id": search_message.id,
+        }
     else:
-        await message.edit("An error occurred, please try again later.")
+        await message.edit(
+            f"No {api_name.capitalize()} articles found for {country_code}."
+        )
 
 
 @Client.on_message(filters.command(["aionews"], prefix) & filters.me)

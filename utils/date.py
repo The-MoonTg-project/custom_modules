@@ -1,30 +1,26 @@
 import calendar
-from datetime import datetime
-import requests
-from pyrogram import Client, filters
-from datetime import datetime
-from utils import modules_help, prefix
 import os
-from pyrogram.errors import MessageTooLong
+from datetime import datetime
 
-import requests
-
+import aiohttp
 from pyrogram import Client, filters
+from pyrogram.errors import MessageTooLong
 from pyrogram.types import Message
+
 from utils import modules_help, prefix
-# from utils.scripts import make_carbon
 
 
-def get_history_data():
+async def get_history_data():
     today = datetime.now().strftime("%m/%d")
     url = f"http://history.muffinlabs.com/date"
 
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        return data["data"]
-    else:
-        return None
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                return data["data"]
+            else:
+                return None
 
 
 def format_history(data):
@@ -58,70 +54,10 @@ async def date(_, message: Message):
     await message.edit_text(f"<code>{date}\n{cal}</code>")
 
 
-# TODO: A better way to do this without 3rd party API
-# @Client.on_message(filters.command("holidays", prefix) & filters.me)
-# async def get_holidays(_, message: Message):
-#     try:
-#         country = "IN"
-#         year = datetime.now().year
-
-#         if len(message.command) > 1:
-#             try:
-#                 year = int(message.command[1])
-#             except ValueError:
-#                 await message.edit("Please provide a valid year.")
-#                 return
-
-#         url = f"https://calendarific.com/api/v2/holidays?api_key={CALENDARIFIC_API_KEY}&country={country}&year={year}"
-#         response = requests.get(url)
-#         data = response.json()
-
-#         if data["meta"]["code"] == 200:
-#             holidays = data["response"]["holidays"]
-#             message_text = f"Holidays for {year}:\n"
-#             for holiday in holidays:
-#                 date = holiday["date"]["iso"]
-#                 name = holiday["name"]
-#                 message_text += f"{date}: {name}\n"
-#             await message.edit(message_text)
-#         else:
-#             await message.edit("Failed to retrieve holidays. Please try again later.")
-#     except Exception as e:
-#         await message.edit(f"An error occurred: {str(e)}")
-
-
-# @Client.on_message(filters.command("calendar", prefix) & filters.me)
-# async def send_calendar(_, message: Message):
-#     command_parts = message.text.split(" ")
-#     if len(command_parts) == 2:
-#         try:
-#             year = int(command_parts[1])
-#         except ValueError:
-#             await message.edit(
-#                 "✦ ɪɴᴠᴀʟɪᴅ ʏᴇᴀʀ ғᴏʀᴍᴀᴛ. ᴘʟᴇᴀsᴇ ᴜsᴇ {prefix}calendar <year>"
-#             )
-#             return
-#     else:
-#         year = datetime.now().year
-
-#     m = await message.edit("✦ ɢᴇɴᴇʀᴀᴛɪɴɢ ᴄᴀʟᴇɴᴅᴀʀ...")
-
-#     cal = calendar.TextCalendar()
-#     full_year_calendar = cal.formatyear(year, 2, 1, 1, 3)
-#     carbon_image = await make_carbon(full_year_calendar)
-
-#     await message.reply_photo(
-#         photo=carbon_image, caption=f"✦ ʜᴇʀᴇ ɪs ʏᴏᴜʀ {year} ᴄᴀʟᴇɴᴅᴀʀ."
-#     )
-#     if os.path.exists("carbon.png"):
-#         os.remove("carbon.png")
-#     await m.delete()
-
-
 @Client.on_message(filters.command("history", prefix) & filters.me)
 async def today_history(client, message: Message):
     try:
-        history_data = get_history_data()
+        history_data = await get_history_data()
 
         if history_data:
             events_text = format_history(history_data)
@@ -148,7 +84,5 @@ async def today_history(client, message: Message):
 
 modules_help["date"] = {
     "date": " Show Current Date and Calendar",
-    # "holidays": "Show Current holiday",
-    # "calender": " Calender for full year",
     "history": "get the today history",
 }

@@ -1,13 +1,12 @@
 import json
 
-import requests
+import aiohttp
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
-from utils import modules_help, prefix
 from utils.scripts import format_exc
 
-# Define the URL and headers
+from utils import modules_help, prefix
+
 url = "https://armconverter.com/api/convert"
 headers = {
     "accept": "*/*",
@@ -29,7 +28,6 @@ headers = {
 
 @Client.on_message(filters.command("asm", prefix) & filters.me)
 async def asm(_, message: Message):
-
     if len(message.command) > 1:
         asm_code = message.text.split(maxsplit=1)[1]
     else:
@@ -38,47 +36,47 @@ async def asm(_, message: Message):
 
     try:
         await message.edit_text("<code>Processing...</code>")
-        # Define the data to be sent
         data = {
             "asm": f"{asm_code}",
             "offset": "",
             "arch": ["arm64", "arm", "armbe", "thumb", "thumbbe"],
         }
 
-        # Send the request
-        response = requests.post(url, headers=headers, data=json.dumps(data), timeout=5)
-
-        # Check if the request was successful
-        if response.status_code == 200:
-            response_data = response.json()
-            # print(response_data)
-            result = ""
-            for arch, hex_data in response_data["hex"].items():
-                if hex_data[0]:
-                    if hex_data[1] == "":
-                        return await message.edit_text(
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url,
+                headers=headers,
+                data=json.dumps(data),
+                timeout=aiohttp.ClientTimeout(total=5),
+            ) as resp:
+                if resp.status == 200:
+                    response_data = await resp.json()
+                    result = ""
+                    for arch, hex_data in response_data["hex"].items():
+                        if hex_data[0]:
+                            if hex_data[1] == "":
+                                return await message.edit_text(
+                                    "<b>ERROR:</b> <code>Invalid operand/mnemonic</code>"
+                                )
+                            result += f"{arch}: <code>{hex_data[1]}</code>\n"
+                    if result == "":
+                        await message.edit_text(
                             "<b>ERROR:</b> <code>Invalid operand/mnemonic</code>"
                         )
-                    result += f"{arch}: <code>{hex_data[1]}</code>\n"
-            if result == "":
-                await message.edit_text(
-                    "<b>ERROR:</b> <code>Invalid operand/mnemonic</code>"
-                )
-            else:
-                await message.edit_text(
-                    f"<b>INPUT:</b> <code>{asm_code}</code>\n<b>OUTPUT:</b> \n{result}"
-                )
-        else:
-            await message.edit_text(
-                f"Request failed with status code {response.status_code}"
-            )
+                    else:
+                        await message.edit_text(
+                            f"<b>INPUT:</b> <code>{asm_code}</code>\n<b>OUTPUT:</b> \n{result}"
+                        )
+                else:
+                    await message.edit_text(
+                        f"Request failed with status code {resp.status}"
+                    )
     except Exception as e:
         await message.edit_text(format_exc(e))
 
 
 @Client.on_message(filters.command("disasm", prefix) & filters.me)
 async def disasm(_, message: Message):
-
     if len(message.command) > 1:
         hex_code = message.text.split(maxsplit=1)[1]
     else:
@@ -87,36 +85,37 @@ async def disasm(_, message: Message):
 
     try:
         await message.edit_text("<code>Processing...</code>")
-        # Define the data to be sent
         data = {
             "hex": f"{hex_code}",
             "offset": "",
             "arch": ["arm64", "arm", "armbe", "thumb", "thumbbe"],
         }
 
-        # Send the request
-        response = requests.post(url, headers=headers, data=json.dumps(data), timeout=5)
-
-        # Check if the request was successful
-        if response.status_code == 200:
-            response_data = response.json()
-            # print(response_data)
-            result = ""
-            for arch, asm_data in response_data["asm"].items():
-                if asm_data[0]:
-                    result += f"{arch}: <code>{asm_data[1]}</code>\n"
-            if result == "":
-                await message.edit_text(
-                    "<b>ERROR:</b> <code>Invalid operand/mnemonic</code>"
-                )
-            else:
-                await message.edit_text(
-                    f"<b>INPUT:</b> <code>{hex_code}</code>\n</b>OUTPUT:</b> \n{result}"
-                )
-        else:
-            await message.edit_text(
-                f"Request failed with status code {response.status_code}"
-            )
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                url,
+                headers=headers,
+                data=json.dumps(data),
+                timeout=aiohttp.ClientTimeout(total=5),
+            ) as resp:
+                if resp.status == 200:
+                    response_data = await resp.json()
+                    result = ""
+                    for arch, asm_data in response_data["asm"].items():
+                        if asm_data[0]:
+                            result += f"{arch}: <code>{asm_data[1]}</code>\n"
+                    if result == "":
+                        await message.edit_text(
+                            "<b>ERROR:</b> <code>Invalid operand/mnemonic</code>"
+                        )
+                    else:
+                        await message.edit_text(
+                            f"<b>INPUT:</b> <code>{hex_code}</code>\n</b>OUTPUT:</b> \n{result}"
+                        )
+                else:
+                    await message.edit_text(
+                        f"Request failed with status code {resp.status}"
+                    )
     except Exception as e:
         await message.edit_text(format_exc(e))
 

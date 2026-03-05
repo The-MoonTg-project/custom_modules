@@ -1,8 +1,10 @@
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
-from utils import modules_help, prefix
-from utils.scripts import format_exc
 import asyncio
+
+from pyrogram import Client, enums, filters
+from pyrogram.types import Message
+from utils.scripts import format_exc
+
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command("dice", prefix) & filters.me)

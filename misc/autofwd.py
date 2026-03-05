@@ -15,11 +15,11 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from pyrogram import Client, filters
-from pyrogram.types import Message
 from pyrogram.errors import MessageTooLong
+from pyrogram.types import Message
+from utils.db import db
 
 from utils import modules_help, prefix
-from utils.db import db
 
 
 def addtrg(channel_id):

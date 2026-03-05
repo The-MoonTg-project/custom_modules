@@ -16,13 +16,14 @@
 
 from io import BytesIO
 
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
-from utils import modules_help, prefix
 from utils.scripts import format_exc, import_library
 
+from utils import modules_help, prefix
+
 gTTS = import_library("gtts").gTTS
+
 
 @Client.on_message(filters.command("tts", prefix) & filters.me)
 async def tts(client: Client, message: Message):
@@ -49,7 +50,8 @@ async def tts(client: Client, message: Message):
     except Exception as e:
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
+
 modules_help["tts"] = {
     "tts [lang]* [text]*": "Say text",
-    "tts [lang]* replied message": "Say text"
+    "tts [lang]* replied message": "Say text",
 }

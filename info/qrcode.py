@@ -1,9 +1,11 @@
 from io import BytesIO
+
 from aiohttp import ClientSession
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-from utils import modules_help, prefix
 from utils.scripts import format_exc
+
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command("readqr", prefix) & filters.me)

@@ -1,13 +1,13 @@
 import random
 from io import BytesIO
 
-from pyrogram import Client, filters, enums
+import aiohttp
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-
-from utils import modules_help, prefix
 from utils.scripts import import_library
 
-requests = import_library("requests")
+from utils import modules_help, prefix
+
 PIL = import_library("PIL", "pillow")
 
 from PIL import Image, ImageDraw, ImageFont
@@ -18,13 +18,17 @@ async def demotivator(client: Client, message: Message):
     await message.edit(
         "<code>Process of demotivation...</code>", parse_mode=enums.ParseMode.HTML
     )
-    font = requests.get(
-        "https://github.com/The-MoonTg-project/files/blob/main/Times%20New%20Roman.ttf?raw=true"
-    )
-    f = font.content
-    template_dem = requests.get(
-        "https://raw.githubusercontent.com/files/main/demotivator.png"
-    )
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            "https://github.com/The-MoonTg-project/files/blob/main/Times%20New%20Roman.ttf?raw=true"
+        ) as resp:
+            f = await resp.read()
+        async with session.get(
+            "https://raw.githubusercontent.com/files/main/demotivator.png"
+        ) as resp:
+            template_dem_content = await resp.read()
+
     if message.reply_to_message:
         words = ["random", "text", "typing", "fuck"]
         if message.reply_to_message.photo:
@@ -38,7 +42,7 @@ async def demotivator(client: Client, message: Message):
                 if len(message.text.split()) > 1
                 else random.choice(words)
             )
-            im = Image.open(BytesIO(template_dem.content))
+            im = Image.open(BytesIO(template_dem_content))
             im.paste(resize_photo, (65, 48))
             text_font = ImageFont.truetype(BytesIO(f), 22)
             text_draw = ImageDraw.Draw(im)
@@ -60,7 +64,7 @@ async def demotivator(client: Client, message: Message):
                     if len(message.text.split()) > 1
                     else random.choice(words)
                 )
-                im = Image.open(BytesIO(template_dem.content))
+                im = Image.open(BytesIO(template_dem_content))
                 im.paste(resize_photo, (65, 48))
                 text_font = ImageFont.truetype(BytesIO(f), 22)
                 text_draw = ImageDraw.Draw(im)

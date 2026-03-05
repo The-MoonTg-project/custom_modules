@@ -1,10 +1,10 @@
-import requests
-
 import random
+
+import aiohttp
 from pyrogram import Client, filters
 from utils.scripts import format_exc
-from utils import prefix, modules_help
 
+from utils import modules_help, prefix
 
 NEWS_URL = "https://sugoi-api.vercel.app/news?keyword={}"
 
@@ -18,8 +18,9 @@ async def enews(_, message):
     await message.edit_text("Fetching news...")
 
     try:
-        response = requests.get(url)
-        news_data = response.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                news_data = await resp.json()
 
         if "error" in news_data:
             error_message = news_data["error"]

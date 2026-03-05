@@ -1,15 +1,15 @@
 import io
 from textwrap import wrap
 
+import aiohttp
 from pyrogram import Client, filters
 from pyrogram.types import Message
-
-from utils import modules_help, prefix
 from utils.scripts import import_library
 
-requests = import_library("requests")
+from utils import modules_help, prefix
+
 PIL = import_library("PIL", "pillow")
-from PIL import Image, ImageFont, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 
 @Client.on_message(filters.command(["j", "jac"], prefix) & filters.me)
@@ -21,15 +21,18 @@ async def jac(client: Client, message: Message):
     else:
         text = " "
     await message.delete()
-    ufr = requests.get(
-        "https://github.com/The-MoonTg-project/files/blob/main/CascadiaCodePL.ttf?raw=true"
-    )
-    f = ufr.content
-    pic = requests.get(
-        "https://raw.githubusercontent.com/The-MoonTg-project/files/main/jac.jpg"
-    )
-    pic.raw.decode_content = True
-    img = Image.open(io.BytesIO(pic.content)).convert("RGB")
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            "https://github.com/The-MoonTg-project/files/blob/main/CascadiaCodePL.ttf?raw=true"
+        ) as resp:
+            f = await resp.read()
+        async with session.get(
+            "https://raw.githubusercontent.com/The-MoonTg-project/files/main/jac.jpg"
+        ) as resp:
+            pic_content = await resp.read()
+
+    img = Image.open(io.BytesIO(pic_content)).convert("RGB")
     W, H = img.size
     text = "\n".join(wrap(text, 19))
     t = text + "\n"

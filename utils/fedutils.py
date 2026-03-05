@@ -15,11 +15,12 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import asyncio
+
 from pyrogram import Client, filters
 from pyrogram.types import Message
-
 from utils.db import db
 from utils.scripts import format_exc
+
 from utils import modules_help, prefix
 
 
@@ -27,11 +28,11 @@ from utils import modules_help, prefix
 async def fban_cmd(client: Client, message: Message):
     try:
         msg = await message.edit("<b>🌙 Starting Federation Ban...</b>")
-        
+
         args = message.text.split()
         if len(args) < 2 and not message.reply_to_message:
             return await msg.edit("❌ Reply to user or provide ID/username and reason")
-        
+
         if message.reply_to_message:
             target_user = message.reply_to_message.from_user
             target = target_user.id
@@ -97,7 +98,7 @@ async def fban_cmd(client: Client, message: Message):
 async def unfban_cmd(client: Client, message: Message):
     try:
         msg = await message.edit("<b>🌙 Starting Federation Unban...</b>")
-        
+
         args = message.text.split()
         if len(args) < 2 and not message.reply_to_message:
             return await msg.edit("❌ Reply to user or provide ID/username and reason")
@@ -167,7 +168,7 @@ async def unfban_cmd(client: Client, message: Message):
 async def set_fban_group(_, message: Message):
     if len(message.command) < 2:
         return await message.edit(f"❌ Usage: `{prefix}set_fban_group <group_id>`")
-    
+
     try:
         group_id = int(message.command[1])
         db.set("core.ats", "FBAN_GROUP_ID", group_id)
@@ -182,10 +183,10 @@ async def set_fban_group(_, message: Message):
 async def add_fed(_, message: Message):
     if len(message.command) < 2:
         return await message.edit(f"❌ Usage: `{prefix}addfed <fed_id>`")
-    
+
     fed_id = message.command[1]
     current_feds = db.get("core.ats", "FED_IDS", [])
-    
+
     if fed_id in current_feds:
         await message.edit("❌ This federation is already in the list")
     else:
@@ -198,10 +199,10 @@ async def add_fed(_, message: Message):
 async def del_fed(_, message: Message):
     if len(message.command) < 2:
         return await message.edit(f"❌ Usage: `{prefix}delfed <fed_id>`")
-    
+
     fed_id = message.command[1]
     current_feds = db.get("core.ats", "FED_IDS", [])
-    
+
     if fed_id not in current_feds:
         await message.edit("❌ Federation not found in list")
     else:
@@ -215,7 +216,7 @@ async def list_fed(_, message: Message):
     current_feds = db.get("core.ats", "FED_IDS", [])
     if not current_feds:
         return await message.edit("❌ No federations in list")
-    
+
     fed_list = "\n".join([f"• `{fed}`" for fed in current_feds])
     await message.edit(f"<b>📜 Federation List:</b>\n{fed_list}")
 
@@ -226,5 +227,5 @@ modules_help["fedutils"] = {
     "set_fban_group [group_id]*": "Set group for FBAN operations",
     "addfed [fed_id]*": "Add federation to ban list",
     "delfed [fed_id]*": "Remove federation from ban list",
-    "listfed": "Show current federation list"
+    "listfed": "Show current federation list",
 }

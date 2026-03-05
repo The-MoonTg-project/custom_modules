@@ -1,10 +1,10 @@
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
+import random
 
-from utils import modules_help, prefix
+from pyrogram import Client, enums, filters
+from pyrogram.types import Message
 from utils.scripts import with_reply
 
-import random
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command("prus", prefix) & filters.me)

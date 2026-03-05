@@ -1,20 +1,19 @@
-from datetime import datetime
 import os
 import platform
 import sys
 import time
+from datetime import datetime
 
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
+import aiohttp
+from pyrogram import Client, enums, filters
 from pyrogram.enums.chat_type import ChatType
-import requests
-
-# noinspection PyUnresolvedReferences
-from utils import modules_help, prefix
+from pyrogram.types import Message
 
 # noinspection PyUnresolvedReferences
 from utils.scripts import import_library
 
+# noinspection PyUnresolvedReferences
+from utils import modules_help, prefix
 
 psutil = import_library("psutil")
 
@@ -25,9 +24,8 @@ def b2mb(b):
 
 def find_lib(lib: str) -> str:
     try:
-        ver = (
-            os.popen(f"python3 -m pip freeze | awk '/^{lib}==/'").read().split("==")[1]
-        )
+        cmd = f"python3 -m pip freeze | awk '/^{lib}==/'"
+        ver = os.popen(cmd).read().split("==")[1]
         if "\n" in ver:
             return ver.split("\n")[0]
         return ver
@@ -146,7 +144,9 @@ async def serverinfo_cmd(_: Client, message: Message):
 
     try:
         if message.chat.type == enums.ChatType.PRIVATE:
-            ip = requests.get("https://api.ipify.org?format=text").text
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://api.ipify.org?format=text") as resp:
+                    ip = await resp.text()
         else:
             ip = "***"
         inf.append(escape_html(ip))

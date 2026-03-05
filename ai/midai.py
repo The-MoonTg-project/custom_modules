@@ -1,16 +1,16 @@
+import aiohttp
 from pyrogram import Client, filters
 
-import requests
-
-from utils import prefix, modules_help
+from utils import modules_help, prefix
 
 
-def get_completion(prompt):
+async def get_completion(prompt):
     url = "https://www.samirxpikachu.run.place/Mixtral/142B"
     params = {"prompt": prompt}
 
-    response = requests.get(url, params=params)
-    response_json = response.json()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params=params) as resp:
+            response_json = await resp.json()
 
     return {
         "content": response_json.get("content", "No response from LLM"),
@@ -31,7 +31,7 @@ async def handle_message(client, message):
     prompt_text = message.text.split(maxsplit=1)[1]
 
     # Get completion from the LLM
-    completion = get_completion(prompt_text)
+    completion = await get_completion(prompt_text)
 
     # Prepare the response message
     response_message = (

@@ -7,22 +7,26 @@
 # (at your option) any later version.
 
 import asyncio
-import requests
-from pyrogram import Client, enums, filters
-from pyrogram.types import Message
-from pyrogram.errors import MessageTooLong
-from utils import modules_help, prefix
-from utils.scripts import format_exc, format_module_help
-from utils.db import db
 import os
+
+import aiohttp
+from pyrogram import Client, enums, filters
+from pyrogram.errors import MessageTooLong
+from pyrogram.types import Message
+from utils.db import db
+from utils.scripts import format_exc, format_module_help
+
+from utils import modules_help, prefix
 
 BASE_URL = "https://api.fda.gov/drug/label.json"
 
 
-def get_drug_info(drug, api_key):
+async def get_drug_info(drug, api_key):
     url = f"{BASE_URL}?api_key={api_key}&search={drug}&limit=1"
-    response = requests.get(url)
-    data = response.json()["results"][0]
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            result = await resp.json()
+    data = result["results"][0]
 
     drug_info = {
         "Warning": data.get("disclaimer", [""])[0],
@@ -42,10 +46,12 @@ def get_drug_info(drug, api_key):
     return drug_info
 
 
-def get_ingredient_info(drug, api_key):
+async def get_ingredient_info(drug, api_key):
     url = f"{BASE_URL}?api_key={api_key}&search=active_ingredient:{drug}&limit=1"
-    response = requests.get(url)
-    data = response.json()["results"][0]
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            result = await resp.json()
+    data = result["results"][0]
 
     ingredient_info = {
         "Warning": data.get("disclaimer", [""])[0],
@@ -62,22 +68,23 @@ def get_ingredient_info(drug, api_key):
     return ingredient_info
 
 
-def get_nutrition_info(food_item, api_key):
+async def get_nutrition_info(food_item, api_key):
     url = f"https://api.nal.usda.gov/fdc/v1/foods/search?query={food_item}&api_key={api_key}"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        if data["foods"]:
-            food = data["foods"][0]
-            nutrients = {
-                nutrient["nutrientName"]: nutrient["value"]
-                for nutrient in food["foodNutrients"]
-            }
-            return nutrients
-        else:
-            return "No information found for the specified food item."
-    else:
-        return "Failed to fetch information from the USDA API."
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                if data["foods"]:
+                    food = data["foods"][0]
+                    nutrients = {
+                        nutrient["nutrientName"]: nutrient["value"]
+                        for nutrient in food["foodNutrients"]
+                    }
+                    return nutrients
+                else:
+                    return "No information found for the specified food item."
+            else:
+                return "Failed to fetch information from the USDA API."
 
 
 @Client.on_message(filters.command("setmedapi", prefix) & filters.me)
@@ -104,7 +111,7 @@ async def medinfo(_, message: Message):
     )
 
     try:
-        drug_info = get_drug_info(drug, api)
+        drug_info = await get_drug_info(drug, api)
         if not drug_info:
             return await message.edit_text("No information found for the given drug.")
 
@@ -176,7 +183,7 @@ async def druginfo(_, message: Message):
     )
 
     try:
-        drug_info = get_ingredient_info(drug, api)
+        drug_info = await get_ingredient_info(drug, api)
         if not drug_info:
             return await message.edit_text("No information found for the given drug.")
 
@@ -241,7 +248,7 @@ async def nutrition_info(_, message: Message):
     )
     try:
         if food_item:
-            info = get_nutrition_info(food_item, api)
+            info = await get_nutrition_info(food_item, api)
             if isinstance(info, dict):
                 response = f"<u><b>Nutrition information for {food_item}:</b></u>\n"
                 for nutrient, value in info.items():

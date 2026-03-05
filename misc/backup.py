@@ -1,15 +1,13 @@
 import os
-
 import shutil
 
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+from utils.db import db
+from utils.scripts import format_exc, restart
 
 # noinspection PyUnresolvedReferences
-from utils import modules_help, prefix
-from utils.scripts import format_exc, restart
-from utils.db import db
-from utils import config
+from utils import config, modules_help, prefix
 
 if config.db_type in ["mongodb", "mongo"]:
     import bson

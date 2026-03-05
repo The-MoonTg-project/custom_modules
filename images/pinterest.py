@@ -1,12 +1,16 @@
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message, InputMediaPhoto
+import asyncio
 from io import BytesIO
+
+import aiohttp
 from PIL import Image
-import aiohttp, asyncio
+from pyrogram import Client, enums, filters
+from pyrogram.types import InputMediaPhoto, Message
+
 from utils import modules_help, prefix
 
 SEARCH_API = "https://api.nekolabs.web.id/discovery/pinterest/search?q="
 DOWNLOAD_API = "https://api.delirius.store/download/pinterestdl?url="
+
 
 def resize_image(image_bytes):
     try:
@@ -23,6 +27,7 @@ def resize_image(image_bytes):
     except Exception:
         return image_bytes
 
+
 async def download_image(url):
     try:
         async with aiohttp.ClientSession() as session:
@@ -32,6 +37,7 @@ async def download_image(url):
                     return resize_image(img_bytes)
     except:
         return None
+
 
 async def download_video(url, path="pinterest.mp4"):
     try:
@@ -44,15 +50,13 @@ async def download_video(url, path="pinterest.mp4"):
     except:
         return None
 
+
 @Client.on_message(filters.command("pinterest", prefix) & filters.me)
 async def pinterest_handler(client: Client, message: Message):
     if len(message.command) < 2:
         await message.edit(
-            "Usage:\n"
-            "`pinterest <number> <query>`\n"
-            "or\n"
-            "`pinterest <Pinterest link>`",
-            parse_mode=enums.ParseMode.MARKDOWN
+            "Usage:\n`pinterest <number> <query>`\nor\n`pinterest <Pinterest link>`",
+            parse_mode=enums.ParseMode.MARKDOWN,
         )
         return
 
@@ -96,7 +100,7 @@ async def pinterest_handler(client: Client, message: Message):
                 "`pinterest <number> <query>`\n"
                 "or\n"
                 "`pinterest <Pinterest link>`",
-                parse_mode=enums.ParseMode.MARKDOWN
+                parse_mode=enums.ParseMode.MARKDOWN,
             )
             return
         num_pics = max(1, min(30, int(message.command[1])))
@@ -124,6 +128,7 @@ async def pinterest_handler(client: Client, message: Message):
         return
 
     semaphore = asyncio.Semaphore(5)
+
     async def safe_download(u):
         async with semaphore:
             return await download_image(u)
@@ -137,13 +142,14 @@ async def pinterest_handler(client: Client, message: Message):
 
     await status.edit("Uploading images...")
     for i in range(0, len(media), 10):
-        batch = media[i:i + 10]
+        batch = media[i : i + 10]
         try:
             await message.reply_media_group(batch)
             await asyncio.sleep(1)
         except:
             continue
     await status.delete()
+
 
 modules_help["pinterest"] = {
     "pinterest <number> <query>": "Search Pinterest and get images.",

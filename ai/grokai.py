@@ -1,8 +1,9 @@
-import requests
+import aiohttp
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-from utils import modules_help, prefix
 from utils.db import db
+
+from utils import modules_help, prefix
 
 GROK_API_URL = "https://api.x.ai/v1/chat/completions"
 
@@ -26,14 +27,18 @@ async def set_grok_api(_, message: Message):
     }
 
     try:
-        test_response = requests.post(
-            GROK_API_URL, headers=headers, json=test_payload, timeout=10
-        )
-        test_response.raise_for_status()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                GROK_API_URL,
+                headers=headers,
+                json=test_payload,
+                timeout=aiohttp.ClientTimeout(total=10),
+            ) as resp:
+                resp.raise_for_status()
         db.set("custom.grok", "api_key", new_api_key)
         await message.edit_text("Grok API key set and validated successfully!")
 
-    except requests.exceptions.RequestException:
+    except aiohttp.ClientError:
         await message.edit_text("Failed to validate the API key. Please try again.")
 
 
@@ -66,10 +71,13 @@ async def fetch_grok_response(query: str, message: Message, reply=False):
     }
 
     try:
-        response = requests.post(GROK_API_URL, headers=headers, json=payload)
-        response.raise_for_status()
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                GROK_API_URL, headers=headers, json=payload
+            ) as resp:
+                resp.raise_for_status()
+                data = await resp.json()
 
-        data = response.json()
         response_text = (
             data.get("choices", [{}])[0]
             .get("message", {})
@@ -82,7 +90,7 @@ async def fetch_grok_response(query: str, message: Message, reply=False):
             response_content, parse_mode=enums.ParseMode.MARKDOWN
         )
 
-    except requests.exceptions.RequestException as e:
+    except aiohttp.ClientError as e:
         await response_msg.edit_text(f"An error occurred: {str(e)}")
 
 

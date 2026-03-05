@@ -16,10 +16,10 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import hashlib
 import os
 import struct
 import zlib
-import hashlib
 
 from pyrogram import Client, filters
 from pyrogram.types import Message

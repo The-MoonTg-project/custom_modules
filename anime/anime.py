@@ -1,11 +1,12 @@
-from pyrogram import Client, filters, enums
+from io import BytesIO
+
+from aiohttp import ClientSession
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+from utils.scripts import format_exc
 
 # noinspection PyUnresolvedReferences
 from utils import modules_help, prefix
-from utils.scripts import format_exc
-from aiohttp import ClientSession
-from io import BytesIO
 
 session = ClientSession()
 
@@ -26,7 +27,9 @@ class Post:
                 else (
                     self.source
                     if self.source and "pximg" not in self.source
-                    else await self.pximg if self.source else None
+                    else await self.pximg
+                    if self.source
+                    else None
                 )
             )
         )
@@ -55,7 +58,7 @@ async def anime_handler(client: Client, message: Message):
         img = await ra.image
         await message.reply_photo(
             photo=img,
-            caption=f'<b>{ra.tag_string_general if ra.tag_string_general else "Untitled"}</b>',
+            caption=f"<b>{ra.tag_string_general if ra.tag_string_general else 'Untitled'}</b>",
             parse_mode=enums.ParseMode.HTML,
         )
         return await message.delete()

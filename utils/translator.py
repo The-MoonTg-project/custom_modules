@@ -1,11 +1,10 @@
 import json
 
-import requests
-
+import aiohttp
 from pyrogram import Client, filters
+from utils.scripts import format_small_module_help
 
 from utils import modules_help, prefix
-from utils.scripts import format_small_module_help
 
 
 @Client.on_message(filters.command(["trans", "tr"], prefix) & filters.me)
@@ -29,24 +28,26 @@ async def translatedl(_client, message):
 
         # Use the Google Translate API endpoint
         url = "https://clients5.google.com/translate_a/t"
-        params = {
-            "client": "dict-chrome-ex",
-            "sl": "auto",
-            "tl": dtarget,
-            "q": dtext
-        }
+        params = {"client": "dict-chrome-ex", "sl": "auto", "tl": dtarget, "q": dtext}
 
-        response = requests.get(url, params=params)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params) as resp:
+                if resp.status != 200:
+                    await message.edit_text(
+                        f"<b>Error:</b> API returned status code {resp.status}"
+                    )
+                    return
 
-        if response.status_code != 200:
-            await message.edit_text(f"<b>Error:</b> API returned status code {response.status_code}")
-            return
-
-        # Parse the JSON response
-        data = json.loads(response.text)
+                # Parse the JSON response
+                data = await resp.json()
 
         # Based on actual response format [["translated_text", "detected_language"]]
-        if isinstance(data, list) and len(data) > 0 and isinstance(data[0], list) and len(data[0]) > 0:
+        if (
+            isinstance(data, list)
+            and len(data) > 0
+            and isinstance(data[0], list)
+            and len(data[0]) > 0
+        ):
             translated_text = data[0][0]
             # Check if language detection is included
             source_lang = data[0][1] if len(data[0]) > 1 else "auto"

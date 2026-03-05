@@ -1,7 +1,9 @@
 import asyncio
 from collections import deque
-from pyrogram import Client, filters, enums
+
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+
 from utils import modules_help, prefix
 
 mention = (
@@ -32,7 +34,6 @@ async def stupid(_, message: Message):
     ]
 
     for i in animation_ttl:
-
         await asyncio.sleep(animation_interval)
         await message.edit_text(
             animation_chars[i % 14], parse_mode=enums.ParseMode.HTML
@@ -41,7 +42,6 @@ async def stupid(_, message: Message):
 
 @Client.on_message(filters.command("bombs", prefix) & filters.me)
 async def bombs(_, message: Message):
-
     await message.edit_text("▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n")
     await asyncio.sleep(0.5)
     await message.edit_text("💣💣💣💣 \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n▪️▪️▪️▪️ \n")
@@ -66,7 +66,6 @@ async def bombs(_, message: Message):
 
 @Client.on_message(filters.command("call", prefix) & filters.me)
 async def cell(_, message: Message):
-
     animation_interval = 3
     animation_ttl = range(0, 18)
     await message.edit_text("Calling Pavel Durov (ceo of telegram)......")
@@ -97,7 +96,6 @@ async def cell(_, message: Message):
 
 @Client.on_message(filters.command("wtf", prefix) & filters.me)
 async def wtf(_, message: Message):
-
     animation_interval = 0.8
     animation_ttl = range(0, 5)
     await message.edit_text("wtf")
@@ -109,7 +107,6 @@ async def wtf(_, message: Message):
         "What The F Brah\nhttps://telegra.ph//file/f3b760e4a99340d331f9b.jpg",
     ]
     for i in animation_ttl:
-
         await asyncio.sleep(animation_interval)
         await message.edit_text(animation_chars[i % 5], parse_mode=enums.ParseMode.HTML)
 

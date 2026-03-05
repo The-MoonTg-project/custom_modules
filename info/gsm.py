@@ -1,18 +1,17 @@
+import aiohttp
 from pyrogram import Client, filters
 
-import requests
-
-from utils import prefix, modules_help
+from utils import modules_help, prefix
 
 
-def fetch_gsm_data(query):
+async def fetch_gsm_data(query):
     url = "https://www.samirxpikachu.run.place/phonelink"
     querystring = {"search": query}
-    response = requests.get(url, params=querystring)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        return None
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params=querystring) as resp:
+            if resp.status == 200:
+                return await resp.json()
+    return None
 
 
 @Client.on_message(filters.command("gsm", prefix) & filters.me)
@@ -23,7 +22,7 @@ async def gsmsearch(client, message):
 
     await message.edit_text("Searching...")
     query = message.text.split(None, 1)[1]  # Extract the query from the command
-    results = fetch_gsm_data(query)
+    results = await fetch_gsm_data(query)
 
     if results:
         for item in results:

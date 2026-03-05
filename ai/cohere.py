@@ -1,7 +1,8 @@
 import asyncio
 from json import tool
-from utils.scripts import import_library
+
 from utils.config import cohere_key
+from utils.scripts import import_library
 
 cohere = import_library("cohere")
 
@@ -9,15 +10,14 @@ import cohere
 
 co = cohere.Client(cohere_key)
 
-from utils import modules_help, prefix
-from utils.scripts import format_exc
+from pyrogram import Client, enums, filters
+from pyrogram.errors import MessageTooLong
+from pyrogram.types import Message
 from utils.db import db
 from utils.rentry import paste as rentry_paste
+from utils.scripts import format_exc
 
-
-from pyrogram import Client, filters, enums
-from pyrogram.types import Message
-from pyrogram.errors import MessageTooLong
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command("cohere", prefix) & filters.me)

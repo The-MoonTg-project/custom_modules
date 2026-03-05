@@ -6,7 +6,7 @@ import shutil
 import aiohttp
 from pyrogram import Client, enums, filters
 from pyrogram.types import Message
-import requests
+
 from utils import modules_help, prefix
 
 
@@ -33,6 +33,11 @@ class AioHttp:
             async with session.get(link, headers=headers) as resp:
                 return await resp.json()
 
+    async def get_content(self, link):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(link) as resp:
+                return await resp.read()
+
 
 @Client.on_message(filters.command("unsplash", prefix) & filters.me)
 async def unsplash(client: Client, message: Message):
@@ -55,7 +60,7 @@ async def unsplash(client: Client, message: Message):
                 for ia in range(len(images), count):
                     img = data["results"][ia]["urls"]["raw"]
                     if img.startswith("https://images.unsplash.com/photo"):
-                        image_content = requests.get(img).content
+                        image_content = await AioHttp().get_content(img)
                         with open(f"{unsplash_dir}/unsplash_{ia}.jpg", "wb") as f:
                             f.write(image_content)
                         imgr = f"{unsplash_dir}/unsplash_{ia}.jpg"

@@ -1,11 +1,13 @@
 import asyncio
 import os
 from datetime import datetime
-from pyrogram import Client, filters, enums
+
+from pyrogram import Client, enums, filters
 from pyrogram.raw import functions
 from pyrogram.types import Message
-from utils import modules_help, prefix
 from utils.scripts import format_exc
+
+from utils import modules_help, prefix
 
 
 @Client.on_message(filters.command("joindate", prefix) & filters.me)
@@ -18,7 +20,9 @@ async def joindate(client: Client, message: Message):
         joined_date = (
             m.joined_date.timestamp()
             if m.joined_date
-            else cgetmsg.date.timestamp() if cgetmsg.date else 0
+            else cgetmsg.date.timestamp()
+            if cgetmsg.date
+            else 0
         )
         members.append(
             (

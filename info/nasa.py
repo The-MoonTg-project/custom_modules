@@ -1,15 +1,15 @@
+import os
 from datetime import datetime
 from io import BytesIO
-import os
-import requests
 
+import aiohttp
 from pyrogram import Client, filters
+from pyrogram.errors import MediaEmpty, MessageTooLong
 from pyrogram.types import Message
-from pyrogram.errors import MessageTooLong, MediaEmpty
-
-from utils.scripts import format_exc
-from utils import prefix, modules_help
 from utils.db import db
+from utils.scripts import format_exc
+
+from utils import modules_help, prefix
 
 API_URL = "https://api.nasa.gov/"
 
@@ -27,7 +27,9 @@ async def nasa_apod(client: Client, message: Message):
             "api_key": api_key if api_key else "DEMO_KEY",
             "thumbs": True,
         }
-        response = requests.get(f"{API_URL}planetary/apod", params=params).json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{API_URL}planetary/apod", params=params) as resp:
+                response = await resp.json()
     except Exception as e:
         return await message.edit_text(format_exc(e))
     if response.get("error"):
@@ -57,7 +59,11 @@ async def nasa_donki(_, message: Message):
             "api_key": api_key if api_key else "DEMO_KEY",
             "type": "all",
         }
-        response = requests.get(f"{API_URL}DONKI/notifications", params=params).json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{API_URL}DONKI/notifications", params=params
+            ) as resp:
+                response = await resp.json()
         print(response)
         if isinstance(response, list):
             response = response[0]
@@ -78,8 +84,10 @@ async def nasa_exoplanet(_, message: Message):
     try:
         await message.edit_text("Fetching number of exoplanets...")
         url = "https://exoplanetarchive.ipac.caltech.edu/TAP/sync?query=select+count(pl_name)+from+ps+where+default_flag=1&format=json"
-        response = requests.get(url)
-        count = response.json()[0]["count(pl_name)"]
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                data = await resp.json()
+        count = data[0]["count(pl_name)"]
         await message.edit_text(f"There are {count} confirmed exoplanets!")
     except Exception as e:
         return await message.edit_text(format_exc(e))
@@ -106,14 +114,17 @@ async def nasa_earthi(client: Client, message: Message):
             "lon": lon,
             "lat": lat,
         }
-        response = requests.get(f"{API_URL}/planetary/earth/imagery", params=params)
-        image_data = BytesIO(response.content)
-        if response.status_code == 200:
-            await client.send_photo(
-                message.chat.id,
-                photo=image_data,
-                reply_to_message_id=message.reply_to_message_id,
-            )
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{API_URL}/planetary/earth/imagery", params=params
+            ) as resp:
+                image_data = BytesIO(await resp.read())
+                if resp.status == 200:
+                    await client.send_photo(
+                        message.chat.id,
+                        photo=image_data,
+                        reply_to_message_id=message.reply_to_message_id,
+                    )
     except MediaEmpty:
         await message.edit_text("No imagery for specified date!")
     except Exception as e:
@@ -134,14 +145,19 @@ async def nasa_earthpic(client: Client, message: Message):
         params = {
             "api_key": api_key if api_key else "DEMO_KEY",
         }
-        response = requests.get(f"{API_URL}/EPIC/api/natural", params=params).json()
-        if isinstance(response, list):
-            response = response[0]
-        if response.get("error"):
-            return await message.edit_text(response["error"]["message"])
-        date = response["date"].split(" ")[0].replace("-", "/")
-        image_url = f"https://api.nasa.gov/EPIC/archive/natural/{date}/png/{response['image']}.png"
-        image_data = BytesIO(requests.get(image_url, params=params).content)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"{API_URL}/EPIC/api/natural", params=params
+            ) as resp:
+                response = await resp.json()
+            if isinstance(response, list):
+                response = response[0]
+            if response.get("error"):
+                return await message.edit_text(response["error"]["message"])
+            date = response["date"].split(" ")[0].replace("-", "/")
+            image_url = f"https://api.nasa.gov/EPIC/archive/natural/{date}/png/{response['image']}.png"
+            async with session.get(image_url, params=params) as resp:
+                image_data = BytesIO(await resp.read())
         caption = (
             f"<b>Date:</b> {response['date']}\n<b>Caption:</b> {response['caption']}"
         )
@@ -219,38 +235,38 @@ async def asteroids_handler(_, message: Message):
         "end_date": end_date,
         "api_key": api_key if api_key else "DEMO_KEY",
     }
-    response = requests.get(url=url, params=params)
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url=url, params=params) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                element_count = data["element_count"]
+                near_earth_objects = data["near_earth_objects"]
 
-    if response.status_code == 200:
-        data = response.json()
-        element_count = data["element_count"]
-        near_earth_objects = data["near_earth_objects"]
+                if element_count == 0:
+                    return "❌ No asteroids found for the given date range."
 
-        if element_count == 0:
-            return "❌ No asteroids found for the given date range."
+                info = f"Asteroids from {start_date} to {end_date} 🌌:\n\n"
+                for date in near_earth_objects:
+                    for asteroid in near_earth_objects[date]:
+                        info += f"**🚀 {asteroid['name']}**\n"
+                        info += f"  - *📏 Diameter (meters):* {asteroid['estimated_diameter']['meters']['estimated_diameter_min']:.2f} - {asteroid['estimated_diameter']['meters']['estimated_diameter_max']:.2f}\n"
+                        info += f"  - *⚠️ Hazardous:* {'Yes' if asteroid['is_potentially_hazardous_asteroid'] else 'No'}\n"
+                        info += f"  - *📅 Close Approach Date:* {asteroid['close_approach_data'][0]['close_approach_date']}\n"
+                        info += f"  - *🌍 Miss Distance (km):* {float(asteroid['close_approach_data'][0]['miss_distance']['kilometers']):,.2f}\n"
+                        info += f"  - *💨 Relative Velocity (km/h):* {float(asteroid['close_approach_data'][0]['relative_velocity']['kilometers_per_hour']):,.2f}\n\n"
 
-        info = f"Asteroids from {start_date} to {end_date} 🌌:\n\n"
-        for date in near_earth_objects:
-            for asteroid in near_earth_objects[date]:
-                info += f"**🚀 {asteroid['name']}**\n"
-                info += f"  - *📏 Diameter (meters):* {asteroid['estimated_diameter']['meters']['estimated_diameter_min']:.2f} - {asteroid['estimated_diameter']['meters']['estimated_diameter_max']:.2f}\n"
-                info += f"  - *⚠️ Hazardous:* {'Yes' if asteroid['is_potentially_hazardous_asteroid'] else 'No'}\n"
-                info += f"  - *📅 Close Approach Date:* {asteroid['close_approach_data'][0]['close_approach_date']}\n"
-                info += f"  - *🌍 Miss Distance (km):* {float(asteroid['close_approach_data'][0]['miss_distance']['kilometers']):,.2f}\n"
-                info += f"  - *💨 Relative Velocity (km/h):* {float(asteroid['close_approach_data'][0]['relative_velocity']['kilometers_per_hour']):,.2f}\n\n"
-
-        with open("asteroids.txt", "w") as f:
-            f.write(info)
-        await message.reply_document(
-            "asteroids.txt",
-            caption=f"Asteroids from {start_date} to {end_date} 🌌:",
-        )
-        os.remove("asteroids.txt")
-        return
-    else:
-        return await message.edit_text(
-            "⚠️ Error fetching asteroid information. Please try again later."
-        )
+                with open("asteroids.txt", "w") as f:
+                    f.write(info)
+                await message.reply_document(
+                    "asteroids.txt",
+                    caption=f"Asteroids from {start_date} to {end_date} 🌌:",
+                )
+                os.remove("asteroids.txt")
+                return
+            else:
+                return await message.edit_text(
+                    "⚠️ Error fetching asteroid information. Please try again later."
+                )
 
 
 modules_help["nasa"] = {

@@ -4,18 +4,18 @@
 # THIS MODULE IS INCOMPATIBLE WITH LAST Moon VERSION
 # SINCE IT USE OUTDATED PACKAGE WITH BROKEN DEPENDENCIES
 # IT NEEDS TO BE REWRITED
+import aiohttp
 from pyrogram import Client, filters
-from pyrogram.types import Message, Document
+from pyrogram.types import Document, Message
+from utils.db import db
+from utils.scripts import format_exc, import_library
 
 from utils import modules_help, prefix
-from utils.scripts import import_library, format_exc
-from utils.db import db
 
 pylast = import_library("pylast")
-requests = import_library("requests")
-import pylast
-import requests
 import textwrap
+
+import pylast
 
 
 def auth_required(function):
@@ -112,7 +112,12 @@ async def example_edit(client: Client, message: Message):
                 await message.edit("<b>Nothing is playing.</b>")
                 return
     try:
-        link = f"https://song.link/i/{requests.get(f'https://itunes.apple.com/search?term={track}&country=RU&entity=song&limit=1').json()['results'][0]['trackId']}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                f"https://itunes.apple.com/search?term={track}&country=RU&entity=song&limit=1"
+            ) as resp:
+                itunes_data = await resp.json()
+        link = f"https://song.link/i/{itunes_data['results'][0]['trackId']}"
     except Exception:
         link = "#"
 

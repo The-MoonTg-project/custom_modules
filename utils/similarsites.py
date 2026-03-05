@@ -1,10 +1,10 @@
-import requests
 import os
 
+import aiohttp
 from bs4 import BeautifulSoup
-
-from pyrogram import Client, filters, enums
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+
 from utils import modules_help, prefix
 
 
@@ -26,22 +26,21 @@ async def scrape_site(url):
     # Make a GET request to the URL
     headers = get_headers()
     try:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()  # Raises an HTTPError if the response status code is 4xx or 5xx
-    except requests.exceptions.HTTPError as errh:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as resp:
+                resp.raise_for_status()
+                html_text = await resp.text()
+    except aiohttp.ClientResponseError as errh:
         print(f"HTTP Error: {errh}")
         return None
-    except requests.exceptions.ConnectionError as errc:
+    except aiohttp.ClientConnectionError as errc:
         print(f"Error Connecting: {errc}")
         return None
-    except requests.exceptions.Timeout as errt:
-        print(f"Timeout Error: {errt}")
-        return None
-    except requests.exceptions.RequestException as err:
+    except aiohttp.ClientError as err:
         print(f"Something went wrong: {err}")
         return None
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(html_text, "html.parser")
     # Find the element with the specified class
     target_element = soup.find(
         "div", class_="SimilarSitesCards__SimilarSitesCardsWrapper-hn4rvg-0 jSddga"

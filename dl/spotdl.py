@@ -2,16 +2,15 @@ import asyncio
 import os
 import shutil
 import time
-import requests
-
-from subprocess import check_call, CalledProcessError
+from subprocess import CalledProcessError, check_call
 from urllib.parse import parse_qs, urlparse
 
-from pyrogram import Client, filters, enums
+import aiohttp
+from pyrogram import Client, enums, filters
 from pyrogram.types import Message
+from utils.scripts import format_exc, format_module_help, import_library, progress
 
 from utils import modules_help, prefix
-from utils.scripts import format_module_help, import_library, format_exc, progress
 
 pytubefix = import_library("pytubefix")
 from pytubefix import YouTube
@@ -22,13 +21,15 @@ exiftool = import_library("exiftool", "pyexiftool")
 from exiftool import ExifToolHelper
 
 
-def get_thumb(file_name):
+async def get_thumb(file_name):
     with ExifToolHelper() as et:
         yt_link = et.get_metadata(file_name)[0]["ID3:Comment-xxx"]
         yt = YouTube(yt_link)
         thumb = yt.thumbnail_url
-        with open(f"{file_name}.jpg", "wb") as f:
-            f.write(requests.get(thumb).content)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(thumb) as resp:
+                with open(f"{file_name}.jpg", "wb") as f:
+                    f.write(await resp.read())
     return f"{file_name}.jpg"
 
 
@@ -60,17 +61,21 @@ async def spotdl(_, message: Message):
         if not shutil.which("ffmpeg") or message.command[0] == "sdl":
             url = "https://spotify-mp3-downloader.vercel.app/get_download_link?search="
             search_query = spoti_query.replace(" ", "%20")
-            response = requests.get(url + search_query)
-            if response.status_code == 200:
-                download_link = response.json()["download_link"]
-                song_name = get_song_name(download_link)
-                await message.reply_audio(download_link, caption=f"<b>{song_name}</b>")
-                await asyncio.sleep(0.5)
-                await m.delete()
-                return
-            else:
-                await m.edit("api request was unsuccessful.")
-                return
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url + search_query) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        download_link = data["download_link"]
+                        song_name = get_song_name(download_link)
+                        await message.reply_audio(
+                            download_link, caption=f"<b>{song_name}</b>"
+                        )
+                        await asyncio.sleep(0.5)
+                        await m.delete()
+                        return
+                    else:
+                        await m.edit("api request was unsuccessful.")
+                        return
 
         try:
             check_call(
@@ -90,7 +95,7 @@ async def spotdl(_, message: Message):
                 if filename.endswith(".mp3"):
                     try:
                         check_call("exiftool", f"shutil/{filename}")
-                        thumb = get_thumb(filename)
+                        thumb = await get_thumb(filename)
                     except CalledProcessError:
                         thumb = None
                     await message.reply_audio(

@@ -1,16 +1,17 @@
+import aiohttp
 from pyrogram import Client, filters
 from pyrogram.types import Message
 
-import requests
-
-from utils import prefix, modules_help
+from utils import modules_help, prefix
 
 
-def search_npm_packages(query):
+async def search_npm_packages(query):
     url = f"https://registry.npmjs.org/-/v1/search?text={query}&size=5"
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json().get("objects", [])
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+                return data.get("objects", [])
     return []
 
 
@@ -49,7 +50,7 @@ async def npm_command(client: Client, message: Message):
 
     query = " ".join(message.command[1:])
     m = await message.edit_text(f"Searching for NPM packages: {query}")
-    packages = search_npm_packages(query)
+    packages = await search_npm_packages(query)
 
     if not packages:
         await m.edit_text("No packages found.")

@@ -1,18 +1,19 @@
+import aiohttp
 from pyrogram import Client, filters
 
-import requests
-
-from utils import prefix, modules_help
-
+from utils import modules_help, prefix
 
 BASE_URL = "https://www.samirxpikachu.run.place/weather/"
 
 
-def get_weather_data(city):
+async def get_weather_data(city):
     """Fetches weather data from the API."""
     url = f"{BASE_URL}{city}"
-    response = requests.get(url)
-    return response.json() if response.status_code == 200 else None
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                return await resp.json()
+    return None
 
 
 def format_weather_data(data):
@@ -70,7 +71,7 @@ async def weather(client, message):
     await message.edit_text("Fetching weather data...")
     city = message.text.split(None, 1)[1]  # Extract the query from the command
 
-    data = get_weather_data(city)  # Changed from generate_image
+    data = await get_weather_data(city)
 
     weather_info = format_weather_data(data)
     await message.edit_text(weather_info)

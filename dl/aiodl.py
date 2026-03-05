@@ -1,16 +1,20 @@
 import os
 import re
 import time
+
 import aiohttp
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from utils import modules_help, prefix
 from utils.scripts import progress
+
+from utils import modules_help, prefix
 
 API_URL = "https://api.deline.web.id/downloader/aio?url="
 
+
 def sanitize_title(title: str) -> str:
     return re.sub(r'[\\/*?:"<>|]', "_", title).strip()[:50]
+
 
 @Client.on_message(filters.command("aio", prefix))
 async def aio_video(client: Client, message: Message):
@@ -27,9 +31,11 @@ async def aio_video(client: Client, message: Message):
             await message.reply_text(usage)
         return
 
-    ms = await (message.edit_text if message.from_user.id == (await client.get_me()).id else message.reply_text)(
-        "<code>Fetching video details...</code>"
-    )
+    ms = await (
+        message.edit_text
+        if message.from_user.id == (await client.get_me()).id
+        else message.reply_text
+    )("<code>Fetching video details...</code>")
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -46,7 +52,13 @@ async def aio_video(client: Client, message: Message):
             result = data.get("result", {})
             medias = result.get("medias", [])
             video_item = next(
-                (m for m in medias if m["type"] == "video" and "no_watermark" in m.get("quality", "").lower()), None
+                (
+                    m
+                    for m in medias
+                    if m["type"] == "video"
+                    and "no_watermark" in m.get("quality", "").lower()
+                ),
+                None,
             ) or next((m for m in medias if m["type"] == "video"), None)
 
             if not video_item:
@@ -83,6 +95,7 @@ async def aio_video(client: Client, message: Message):
     except Exception as e:
         await ms.edit_text(f"<code>Error:</code> {str(e)}")
 
+
 @Client.on_message(filters.command("aioa", prefix))
 async def aio_audio(client: Client, message: Message):
     chat_id = message.chat.id
@@ -98,9 +111,11 @@ async def aio_audio(client: Client, message: Message):
             await message.reply_text(usage)
         return
 
-    ms = await (message.edit_text if message.from_user.id == (await client.get_me()).id else message.reply_text)(
-        "<code>Fetching audio details...</code>"
-    )
+    ms = await (
+        message.edit_text
+        if message.from_user.id == (await client.get_me()).id
+        else message.reply_text
+    )("<code>Fetching audio details...</code>")
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -151,6 +166,7 @@ async def aio_audio(client: Client, message: Message):
 
     except Exception as e:
         await ms.edit_text(f"<code>Error:</code> {str(e)}")
+
 
 modules_help["aiodl"] = {
     "aio [video link]": "Download high-quality video from the provided link",

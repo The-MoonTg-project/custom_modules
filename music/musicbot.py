@@ -19,17 +19,16 @@ import os
 import shutil
 import subprocess
 import sys
+
 from pyrogram import Client, filters
 from pyrogram.types import Message
-from utils import config
-
-from utils import modules_help, prefix
-from utils.scripts import format_exc, run_cmd, import_library
 from utils.db import db
+from utils.scripts import format_exc, import_library, run_cmd
+
+from utils import config, modules_help, prefix
 
 import_library("psutil")
 import psutil
-
 
 ALLOWED_HANDLERS = [".", ",", "!", ";", "@", "#"]
 

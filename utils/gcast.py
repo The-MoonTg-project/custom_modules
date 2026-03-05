@@ -41,7 +41,9 @@ async def gucast(client: Client, message: Message):
     elif len(message.command) > 1:
         msg = " ".join(message.command[1:])
     else:
-        await message.edit("Provide text or reply to a message to broadcast globally to users.")
+        await message.edit(
+            "Provide text or reply to a message to broadcast globally to users."
+        )
         return
 
     await message.edit("Starting global user broadcast...")
@@ -61,5 +63,5 @@ async def gucast(client: Client, message: Message):
 
 modules_help["gcast"] = {
     "gcast [text/reply to text]*": "Broadcast message to all groups.",
-    "gucast [text/reply to text]*": "Broadcast message to all private users."
+    "gucast [text/reply to text]*": "Broadcast message to all private users.",
 }
