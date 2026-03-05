@@ -14,6 +14,7 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import os
 import random
 import subprocess
 from io import BytesIO
@@ -25,9 +26,9 @@ from pyrogram.raw.types import (
     InputMediaUploadedDocument,
 )
 from pyrogram.types import Message
+from utils.scripts import format_exc, generate_waveform, import_library
 
 from utils import modules_help, prefix
-from utils.scripts import format_exc, import_library, generate_waveform
 
 gTTS = import_library("gtts").gTTS
 
@@ -44,25 +45,26 @@ async def tts(client: Client, message: Message):
 
     try:
         tts = gTTS(text, lang=lang)
+        tts.save("voice.ogg")
 
-        voice = BytesIO()
-        tts.write_to_fp(voice)
+        with open("voice.ogg", "rb") as f:
+            data = f.read()
+
+        voice = BytesIO(data)
         voice.name = "voice.ogg"
+        waveform = generate_waveform(data)
 
-        process = subprocess.run(
-            ["mediainfo", "--Inform=Audio;%Duration%", "-"],
-            input=voice.getvalue(),
-            capture_output=True,
-        )
+        cmd = [
+            "ffprobe", "-v", "error", "-show_entries",
+            "format=duration", "-of", "default=noprint_wrappers=1:nokey=1",
+            "voice.ogg"
+        ]
+        process = subprocess.run(cmd, capture_output=True, text=True)
 
         try:
-            audio_duration = int(process.stdout.decode().strip()) // 1000
-        except ValueError:
+            audio_duration = int(float(process.stdout.strip()))
+        except (ValueError, TypeError):
             audio_duration = 0
-
-        voice.seek(0)
-
-        waveform = generate_waveform(voice.getvalue())
 
         file = await client.save_file(voice)
 
@@ -86,6 +88,10 @@ async def tts(client: Client, message: Message):
 
     except Exception as e:
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
+
+    finally:
+        if os.path.exists("voice.ogg"):
+            os.remove("voice.ogg")
 
 
 modules_help["tts"] = {
