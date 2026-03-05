@@ -43,3 +43,8 @@ modules_help["example"] = {
 #           module_name         command_name   └─ optional command arguments
 #        (only snake_case)   (only snake_case too)
 ```
+
+# NOTES
+
+- Prefer using `aiohttp` instead of `requests`
+- Use `asyncio.sleep()` instead of `time.sleep()`
