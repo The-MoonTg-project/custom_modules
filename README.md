@@ -47,4 +47,5 @@ modules_help["example"] = {
 ## NOTES
 
 - Prefer using `aiohttp` instead of `requests`
+- Prefer using `aiofiles` for file operations
 - Use `asyncio.sleep()` instead of `time.sleep()`
