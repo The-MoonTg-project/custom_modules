@@ -1,4 +1,4 @@
-<h1>Custom modules</h1>
+# Custom modules
 
 
 <p>To add your module to the bot, create a pull request in the <a href='https://github.com/The-MoonTg-project/custom_modules/'>custom_modules</a> repository</p>
@@ -44,7 +44,7 @@ modules_help["example"] = {
 #        (only snake_case)   (only snake_case too)
 ```
 
-# NOTES
+## NOTES
 
 - Prefer using `aiohttp` instead of `requests`
 - Use `asyncio.sleep()` instead of `time.sleep()`
