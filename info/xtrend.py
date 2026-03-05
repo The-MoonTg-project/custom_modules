@@ -1,10 +1,13 @@
 import random
 
 import aiohttp
-from bs4 import BeautifulSoup
 from pyrogram import Client, filters
+from utils.scripts import import_library
 
 from utils import modules_help, prefix
+
+bs4 = import_library("bs4", "beautifulsoup4")
+from bs4 import BeautifulSoup
 
 
 def get_ua():

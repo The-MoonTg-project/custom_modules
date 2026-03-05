@@ -21,12 +21,14 @@ import re
 import time
 
 import aiohttp
-from bs4 import BeautifulSoup
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from utils.scripts import format_exc, format_module_help, import_library, progress
 
 from utils import modules_help, prefix
+
+bs4 = import_library("bs4", "beautifulsoup4")
+from bs4 import BeautifulSoup
 
 lexica = import_library("lexica", "lexica-api")
 

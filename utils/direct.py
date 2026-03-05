@@ -19,7 +19,7 @@ from utils.scripts import import_library
 
 from utils import modules_help, prefix
 
-bs4 = import_library("beautifulsoup4", "BeautifulSoup")
+bs4 = import_library("bs4", "beautifulsoup4")
 from bs4 import BeautifulSoup
 
 

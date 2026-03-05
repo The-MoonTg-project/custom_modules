@@ -3,11 +3,14 @@ import datetime
 import re
 
 import aiohttp
-from bs4 import BeautifulSoup as bs
 from pyrogram import Client, filters
 from pyrogram.types import Message
+from utils.scripts import import_library
 
 from utils import modules_help, prefix
+
+bs4 = import_library("bs4", "beautifulsoup4")
+from bs4 import BeautifulSoup as bs
 
 now = datetime.datetime.now()
 current_month = now.strftime("%b").lower()
