@@ -15,12 +15,17 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import random
+import subprocess
+from io import BytesIO
 
 from pyrogram import Client, filters
+from pyrogram.raw.functions.messages import SendMedia
+from pyrogram.raw.types import DocumentAttributeAudio, InputMediaUploadedDocument
 from pyrogram.types import Message
-from utils.scripts import format_exc, import_library
 
 from utils import modules_help, prefix
+from utils.scripts import format_exc, import_library, generate_waveform
 
 tabulate = import_library("tabulate")
 edge_tts = import_library("edge_tts", "edge-tts")
@@ -28,6 +33,38 @@ edge_tts = import_library("edge_tts", "edge-tts")
 from edge_tts import Communicate, list_voices
 from edge_tts.constants import DEFAULT_VOICE
 from tabulate import tabulate
+
+
+async def send_voice(client, chat_id, voice_bytes, duration):
+    waveform = generate_waveform(voice_bytes.getvalue())
+
+    voice_bytes.seek(0)
+    file = await client.save_file(voice_bytes)
+
+    attr = DocumentAttributeAudio(duration=duration, voice=True, waveform=waveform)
+
+    media = InputMediaUploadedDocument(
+        file=file, mime_type="audio/ogg", attributes=[attr]
+    )
+
+    peer = await client.resolve_peer(chat_id)
+
+    await client.invoke(
+        SendMedia(
+            peer=peer, media=media, message="", random_id=random.randint(1, 2**63)
+        )
+    )
+
+
+async def get_duration(data: bytes):
+    process = subprocess.run(
+        ["mediainfo", "--Inform=Audio;%Duration%", "-"], input=data, capture_output=True
+    )
+
+    try:
+        return int(process.stdout.decode().strip()) // 1000
+    except:
+        return 0
 
 
 async def all_voices(*, proxy: str | None) -> None:
@@ -69,23 +106,34 @@ async def etts(client: Client, message: Message):
                 await message.reply_document("edge-voices.txt")
                 await message.delete()
                 os.remove("edge-voices.txt")
-                return
-        if lang == "d" or lang == "default":
+            return
+
+        if lang in ("d", "default"):
             lang = DEFAULT_VOICE
+
         if lang == "hi":
             lang = "hi-IN-SwaraNeural"
+
         if not text:
             await message.edit("<b>No text to speech</b>")
             return
+
         communicate = Communicate(text=text, voice=lang)
         communicate.save_sync("voice.ogg")
 
+        with open("voice.ogg", "rb") as f:
+            data = f.read()
+
+        duration = await get_duration(data)
+
+        voice = BytesIO(data)
+        voice.name = "voice.ogg"
+
         await message.delete()
-        if message.reply_to_message:
-            await message.reply_to_message.reply_audio("voice.ogg")
-        else:
-            await client.send_audio(message.chat.id, "voice.ogg")
+        await send_voice(client, message.chat.id, voice, duration)
+
         os.remove("voice.ogg")
+
     except Exception as e:
         await message.edit(format_exc(e))
 
@@ -112,16 +160,21 @@ async def estts(client: Client, message: Message):
                 await message.reply_document("edge-voices.txt")
                 await message.delete()
                 os.remove("edge-voices.txt")
-                return
-        if lang == "d" or lang == "default":
+            return
+
+        if lang in ("d", "default"):
             lang = DEFAULT_VOICE
+
         if lang == "hi":
             lang = "hi-IN-SwaraNeural"
+
         if not text:
             await message.edit("<b>No text to speech</b>")
             return
+
         communicate = Communicate(text=text, voice=lang)
         submaker = edge_tts.SubMaker()
+
         with open("voice.ogg", "wb") as file:
             for chunk in communicate.stream_sync():
                 if chunk["type"] == "audio":
@@ -132,15 +185,22 @@ async def estts(client: Client, message: Message):
         with open("voice.srt", "w", encoding="utf-8") as file:
             file.write(submaker.get_srt())
 
+        with open("voice.ogg", "rb") as f:
+            data = f.read()
+
+        duration = await get_duration(data)
+
+        voice = BytesIO(data)
+        voice.name = "voice.ogg"
+
         await message.delete()
-        if message.reply_to_message:
-            await message.reply_to_message.reply_audio("voice.ogg")
-            await message.reply_to_message.reply_document("voice.srt")
-        else:
-            await client.send_audio(message.chat.id, "voice.ogg")
-            await client.send_document(message.chat.id, "voice.srt")
+
+        await send_voice(client, message.chat.id, voice, duration)
+        await client.send_document(message.chat.id, "voice.srt")
+
         os.remove("voice.ogg")
         os.remove("voice.srt")
+
     except Exception as e:
         await message.edit(format_exc(e))
 

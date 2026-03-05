@@ -14,16 +14,22 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import random
+import subprocess
 from io import BytesIO
 
 from pyrogram import Client, enums, filters
+from pyrogram.raw.functions.messages import SendMedia
+from pyrogram.raw.types import (
+    DocumentAttributeAudio,
+    InputMediaUploadedDocument,
+)
 from pyrogram.types import Message
-from utils.scripts import format_exc, import_library
 
 from utils import modules_help, prefix
+from utils.scripts import format_exc, import_library, generate_waveform
 
 gTTS = import_library("gtts").gTTS
-
 
 @Client.on_message(filters.command("tts", prefix) & filters.me)
 async def tts(client: Client, message: Message):
@@ -38,15 +44,46 @@ async def tts(client: Client, message: Message):
 
     try:
         tts = gTTS(text, lang=lang)
+
         voice = BytesIO()
         tts.write_to_fp(voice)
         voice.name = "voice.ogg"
 
+        process = subprocess.run(
+            ["mediainfo", "--Inform=Audio;%Duration%", "-"],
+            input=voice.getvalue(),
+            capture_output=True,
+        )
+
+        try:
+            audio_duration = int(process.stdout.decode().strip()) // 1000
+        except ValueError:
+            audio_duration = 0
+
+        voice.seek(0)
+
+        waveform = generate_waveform(voice.getvalue())
+
+        file = await client.save_file(voice)
+
+        attr = DocumentAttributeAudio(
+            duration=audio_duration, voice=True, waveform=waveform
+        )
+
+        media = InputMediaUploadedDocument(
+            file=file, mime_type="audio/ogg", attributes=[attr]
+        )
+
+        peer = await client.resolve_peer(message.chat.id)
+
         await message.delete()
-        if message.reply_to_message:
-            await message.reply_to_message.reply_audio(voice)
-        else:
-            await client.send_audio(message.chat.id, voice)
+
+        await client.invoke(
+            SendMedia(
+                peer=peer, media=media, message="", random_id=random.randint(1, 2**63)
+            )
+        )
+
     except Exception as e:
         await message.edit(format_exc(e), parse_mode=enums.ParseMode.HTML)
 
