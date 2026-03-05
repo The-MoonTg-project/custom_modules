@@ -18,7 +18,7 @@ kwargs = {}
 CUSTOM_SYSTEM_PROMPT = "For the below pdf page, convert it into as accurate markdown format as possible with it's structure intact i.e, tables, charts, layouts etc. Return only the markdown with no explanation text. Do not exclude any content from the page."
 
 
-MODEL = "gemini/gemini-1.5-pro"
+MODEL = "gemini/gemini-3-flash-preview"
 
 
 @Client.on_message(filters.command("pdf2md", prefix) & filters.me)

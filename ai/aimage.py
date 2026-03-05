@@ -22,7 +22,7 @@ generation_config_cook = {
     "max_output_tokens": 1024,
 }
 
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-3-flash-preview"
 
 
 @Client.on_message(filters.command("getai", prefix) & filters.me)

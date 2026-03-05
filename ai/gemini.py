@@ -33,7 +33,7 @@ async def say(_client: Client, message: Message):
             return
 
         response = client.models.generate_content(
-            model="gemini-2.5-flash", contents=prompt
+            model="gemini-3-flash-preview", contents=prompt
         )
 
         await message.edit_text(
