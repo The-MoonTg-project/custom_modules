@@ -16,17 +16,17 @@
 
 import os
 import random
-import subprocess
 from io import BytesIO
 
 from pyrogram import Client, filters
 from pyrogram.raw.functions.messages import SendMedia
 from pyrogram.raw.types import DocumentAttributeAudio, InputMediaUploadedDocument
 from pyrogram.types import Message
-from utils.scripts import format_exc, generate_waveform, import_library
 
 from utils import modules_help, prefix
+from utils.scripts import format_exc, generate_waveform, import_library
 
+import_library("miniaudio")
 tabulate = import_library("tabulate")
 edge_tts = import_library("edge_tts", "edge-tts")
 
@@ -35,9 +35,7 @@ from edge_tts.constants import DEFAULT_VOICE
 from tabulate import tabulate
 
 
-async def send_voice(client, chat_id, voice_bytes, duration):
-    waveform = generate_waveform(voice_bytes.getvalue())
-
+async def send_voice(client, chat_id, voice_bytes, duration, waveform):
     voice_bytes.seek(0)
     file = await client.save_file(voice_bytes)
 
@@ -54,26 +52,6 @@ async def send_voice(client, chat_id, voice_bytes, duration):
             peer=peer, media=media, message="", random_id=random.randint(1, 2**63)
         )
     )
-
-
-async def get_duration(file_path: str):
-    command = [
-        "ffprobe",
-        "-v", "error",
-        "-show_entries", "format=duration",
-        "-of", "default=noprint_wrappers=1:nokey=1",
-        file_path
-    ]
-
-    try:
-        process = subprocess.run(command, capture_output=True, text=True, check=True)
-        output = process.stdout.strip()
-        if output:
-            return int(float(output))
-    except Exception:
-        pass
-
-    return 0
 
 
 async def all_voices(*, proxy: str | None) -> None:
@@ -130,16 +108,16 @@ async def etts(client: Client, message: Message):
         communicate = Communicate(text=text, voice=lang)
         communicate.save_sync("voice.ogg")
 
-        duration = await get_duration("voice.ogg")
-
         with open("voice.ogg", "rb") as f:
             data = f.read()
+
+        waveform, duration = await generate_waveform(data)
 
         voice = BytesIO(data)
         voice.name = "voice.ogg"
 
         await message.delete()
-        await send_voice(client, message.chat.id, voice, duration)
+        await send_voice(client, message.chat.id, voice, duration, waveform)
 
     except Exception as e:
         await message.edit(format_exc(e))
@@ -195,17 +173,17 @@ async def estts(client: Client, message: Message):
         with open("voice.srt", "w", encoding="utf-8") as file:
             file.write(submaker.get_srt())
 
-        duration = await get_duration("voice.ogg")
-
         with open("voice.ogg", "rb") as f:
             data = f.read()
+
+        waveform, duration = await generate_waveform(data)
 
         voice = BytesIO(data)
         voice.name = "voice.ogg"
 
         await message.delete()
 
-        await send_voice(client, message.chat.id, voice, duration)
+        await send_voice(client, message.chat.id, voice, duration, waveform)
         await client.send_document(message.chat.id, "voice.srt")
 
     except Exception as e:
