@@ -16,7 +16,6 @@
 
 import os
 import random
-import subprocess
 from io import BytesIO
 
 from pyrogram import Client, enums, filters
@@ -26,11 +25,13 @@ from pyrogram.raw.types import (
     InputMediaUploadedDocument,
 )
 from pyrogram.types import Message
-from utils.scripts import format_exc, generate_waveform, import_library
 
 from utils import modules_help, prefix
+from utils.scripts import format_exc, generate_waveform, import_library
 
+import_library("miniaudio")
 gTTS = import_library("gtts").gTTS
+
 
 @Client.on_message(filters.command("tts", prefix) & filters.me)
 async def tts(client: Client, message: Message):
@@ -52,19 +53,8 @@ async def tts(client: Client, message: Message):
 
         voice = BytesIO(data)
         voice.name = "voice.ogg"
-        waveform = generate_waveform(data)
 
-        cmd = [
-            "ffprobe", "-v", "error", "-show_entries",
-            "format=duration", "-of", "default=noprint_wrappers=1:nokey=1",
-            "voice.ogg"
-        ]
-        process = subprocess.run(cmd, capture_output=True, text=True)
-
-        try:
-            audio_duration = int(float(process.stdout.strip()))
-        except (ValueError, TypeError):
-            audio_duration = 0
+        waveform, audio_duration = await generate_waveform(data)
 
         file = await client.save_file(voice)
 
