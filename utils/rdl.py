@@ -16,6 +16,47 @@ from utils.db import db
 from utils.scripts import format_exc, progress
 
 
+async def _download_and_send(
+    client: Client, tchat, from_chat: int, msg_id: int, status_msg=None, c_time: float = None
+):
+    if c_time is None:
+        c_time = time.time()
+    try:
+        selected_message = await client.get_messages(from_chat, msg_id)
+        if not selected_message:
+            return
+        file_text = selected_message.caption
+        try:
+            file = await client.download_media(
+                selected_message,
+                progress=progress,
+                progress_args=(status_msg, c_time, "<code>Trying to download...</code>"),
+            )
+            await client.send_document(
+                tchat,
+                file,
+                caption=file_text,
+                progress=progress,
+                progress_args=(status_msg, c_time, "<code>Uploading...</code>"),
+            )
+            os.remove(file)
+        except ValueError:
+            await client.copy_message(tchat, from_chat, msg_id)
+        except ChatForwardsRestricted:
+            pass
+    except Exception:
+        pass
+
+
+def _check_chosen_order(reactions, temoji: str) -> bool:
+    if not reactions:
+        return False
+    for r in reactions:
+        if r.chosen_order is not None and r.emoji == temoji:
+            return True
+    return False
+
+
 @Client.on_message(filters.command("rdl_chat", prefix) & filters.me)
 async def rdl_chat(client: Client, message: Message):
     if len(message.command) > 1:
@@ -43,65 +84,28 @@ async def rdl_emoji(client: Client, message: Message):
         db.set("custom.rdl", "emoji", temoji)
         return await message.edit_text(f"Emoji: {temoji} set.")
     else:
-        return await message.edit_text("Please provide an emoji.")
+        db.remove("custom.rdl", "emoji")
+        return await message.edit_text("Emoji: 🌚 set.")
 
 
 @on_message_reactions_updated()
-async def rdl(client: Client, update: MessageReactionsUpdated):
-    tchat = db.get("custom.rdl", "chat_id", default="me")
+async def rdl_reactions(client: Client, update: MessageReactionsUpdated):
     temoji = db.get("custom.rdl", "emoji", default="🌚")
+    if not _check_chosen_order(update.reactions, temoji):
+        return
+    tchat = db.get("custom.rdl", "chat_id", default="me")
     if not tchat:
         return
-
-    if not update.reactions:
-        return
-
-    self_reacted = False
-    for r in update.reactions:
-        if r.chosen_order is not None and r.emoji == temoji:
-            self_reacted = True
-            break
-
-    if not self_reacted:
-        return
-
-    from_chat = update.chat.id
-    selected_id = update.msg_id
     c_time = time.time()
-    try:
-        ms = await client.send_message(tchat, f"Working on message {selected_id}...")
-        selected_message = await client.get_messages(from_chat, selected_id)
-        file_text = selected_message.caption
-
-        try:
-            file = await client.download_media(
-                selected_message,
-                progress=progress,
-                progress_args=(ms, c_time, "<code>Trying to download...</code>"),
-            )
-            await client.send_document(
-                tchat,
-                file,
-                caption=file_text,
-                progress=progress,
-                progress_args=(ms, c_time, "<code>Uploading...</code>"),
-            )
-            os.remove(file)
-        except ValueError:
-            await client.copy_message(tchat, from_chat, selected_id)
-        except ChatForwardsRestricted:
-            pass
-        await ms.delete()
-    except Exception:
-        pass
+    ms = await client.send_message(tchat, f"Working on message {update.msg_id}...")
+    await _download_and_send(client, tchat, update.chat.id, update.msg_id, ms, c_time)
+    await ms.delete()
 
 
 @Client.on_message(filters.command("rdl", prefix) & filters.me)
 async def dl(client: Client, message: Message):
-    # Extract command arguments
     args = message.command[1:]
 
-    # Check if the required arguments are provided
     if len(args) < 2:
         await message.edit_text(
             "Kindly use `.rdl channel_link message_id [number_of_messages]`"
@@ -115,7 +119,6 @@ async def dl(client: Client, message: Message):
     num_messages = int(args[2]) if len(args) > 2 else 1
 
     try:
-        # Join the chat if not already a participant
         await client.join_chat(ch_gp_link)
     except UserAlreadyParticipant:
         pass
@@ -124,37 +127,12 @@ async def dl(client: Client, message: Message):
         return
 
     try:
-        # Get the chat object
         chat = await client.get_chat(ch_gp_link)
         from_chat = chat.id
 
-        # Download and re-upload the specified number of messages
         for _ in range(num_messages):
             ms = await message.edit_text(f"Working on message {selected_id}...")
-            selected_message = await client.get_messages(from_chat, selected_id)
-            file_text = selected_message.caption
-
-            try:
-                # Try to download the media
-                file = await client.download_media(
-                    selected_message,
-                    progress=progress,
-                    progress_args=(ms, c_time, "<code>Trying to download...</code>"),
-                )
-                await client.send_document(
-                    chat_id,
-                    file,
-                    caption=file_text,
-                    progress=progress,
-                    progress_args=(ms, c_time, "<code>Uploading...</code>"),
-                )
-                os.remove(file)
-            except ValueError:
-                # If downloading is restricted, try to copy the message
-                await client.copy_message(chat_id, from_chat, selected_id)
-            except ChatForwardsRestricted:
-                pass
-
+            await _download_and_send(client, chat_id, from_chat, selected_id, ms, c_time)
             selected_id += 1
 
         await ms.delete()
