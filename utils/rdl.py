@@ -13,7 +13,6 @@ from utils import (
     prefix,
 )
 from utils.db import db
-from utils.reaction_handler import PeerReaction
 from utils.scripts import format_exc, progress
 
 
@@ -51,47 +50,50 @@ async def rdl_emoji(client: Client, message: Message):
 async def rdl(client: Client, update: MessageReactionsUpdated):
     tchat = db.get("custom.rdl", "chat_id", default="me")
     temoji = db.get("custom.rdl", "emoji", default="🌚")
-    if (
-        not tchat
-        or not update.recent_reactions
-        or not update.recent_reactions[0].from_user.is_self
-    ):
+    if not tchat:
         return
-    reaction: PeerReaction = update.recent_reactions[0]
-    if reaction.reaction.emoji == temoji:
-        from_chat = update.chat.id
-        selected_id = update.msg_id
-        c_time = time.time()
-        try:
-            ms = await client.send_message(
-                tchat, f"Working on message {selected_id}..."
-            )
-            selected_message = await client.get_messages(from_chat, selected_id)
-            file_text = selected_message.caption
 
-            try:
-                # Try to download the media
-                file = await client.download_media(
-                    selected_message,
-                    progress=progress,
-                    progress_args=(ms, c_time, "<code>Trying to download...</code>"),
-                )
-                await client.send_document(
-                    tchat,
-                    file,
-                    caption=file_text,
-                    progress=progress,
-                    progress_args=(ms, c_time, "<code>Uploading...</code>"),
-                )
-                os.remove(file)
-            except ValueError:
-                # If downloading is restricted, try to copy the message
-                await client.copy_message(tchat, from_chat, selected_id)
-            except ChatForwardsRestricted:
-                pass
-            await ms.delete()
-        except Exception:
+    if not update.reactions:
+        return
+
+    self_reacted = False
+    for r in update.reactions:
+        if r.chosen_order is not None and r.emoji == temoji:
+            self_reacted = True
+            break
+
+    if not self_reacted:
+        return
+
+    from_chat = update.chat.id
+    selected_id = update.msg_id
+    c_time = time.time()
+    try:
+        ms = await client.send_message(tchat, f"Working on message {selected_id}...")
+        selected_message = await client.get_messages(from_chat, selected_id)
+        file_text = selected_message.caption
+
+        try:
+            file = await client.download_media(
+                selected_message,
+                progress=progress,
+                progress_args=(ms, c_time, "<code>Trying to download...</code>"),
+            )
+            await client.send_document(
+                tchat,
+                file,
+                caption=file_text,
+                progress=progress,
+                progress_args=(ms, c_time, "<code>Uploading...</code>"),
+            )
+            os.remove(file)
+        except ValueError:
+            await client.copy_message(tchat, from_chat, selected_id)
+        except ChatForwardsRestricted:
             pass
+        await ms.delete()
+    except Exception:
+        pass
 
 
 @Client.on_message(filters.command("rdl", prefix) & filters.me)
