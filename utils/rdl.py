@@ -51,7 +51,11 @@ async def rdl_emoji(client: Client, message: Message):
 async def rdl(client: Client, update: MessageReactionsUpdated):
     tchat = db.get("custom.rdl", "chat_id", default="me")
     temoji = db.get("custom.rdl", "emoji", default="🌚")
-    if not tchat or not update.recent_reactions:
+    if (
+        not tchat
+        or not update.recent_reactions
+        or not update.recent_reactions[0].from_user.is_self
+    ):
         return
     reaction: PeerReaction = update.recent_reactions[0]
     if reaction.reaction.emoji == temoji:
