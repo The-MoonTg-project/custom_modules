@@ -1,18 +1,18 @@
-#  Moon-Userbot - telegram userbot
-#  Copyright (C) 2020-present Moon Userbot Organization
+#  Moon-Userbot - telegram userbot
+#  Copyright (C) 2020-present Moon Userbot Organization
 #
-#  This program is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
 
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
 
-#  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from pyrogram import Client, filters
 from pyrogram.types import Message
@@ -31,6 +31,7 @@ async def ebook_search(_, message: Message):
     text = message.text.split(maxsplit=1)[1]
     m = await message.edit("Searching...")
     s = LibgenSearch()
+    links = []
     results = s.search_title_filtered(
         text,
         {
@@ -38,13 +39,18 @@ async def ebook_search(_, message: Message):
             "Language": "English",
         },
     )
-    await m.edit(
-        f"<b>Search Query:</b>\n<code>{text}</code>\n\n<b>Results:</b>\n{''.join([f'<a href="{i['Mirror_1']}">{i['Title']}</a>\n\n' for i in results])}",
-        disable_web_page_preview=True,
+    for i in results:
+        links.append(f"<a href='{i['Mirror_1']}'>{i['Title']}</a>")
+    response = (
+        f"<b>Search Query:</b>\n<code>{text}</code>\n\n"
+        f"<b>Results:</b>\n" + "\n\n".join(links)
     )
+    await m.edit(response, disable_web_page_preview=True)
+
 
 
 modules_help["ebook"] = {
     "ebook": "Search for ebooks on libgen.rs"
-    f"\n<b>Example:</b> <code>{prefix}ebook Pride and Prejudice</code>",
+    f"\n<b>Example:</b> <code>{prefix}ebook Pride and Prejudice</
+    code>",
 }
