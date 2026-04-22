@@ -1,12 +1,10 @@
 import json
 import os
 import time
-
 import aiohttp
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from utils.scripts import progress
-
 from utils import modules_help, prefix
 
 
@@ -60,7 +58,7 @@ async def spotify_download(client: Client, message: Message):
             )
             return
 
-        song_download_link = download_result["data"].get("url")
+        song_download_link = download_result["data"].get("download")
         if not song_download_link or not song_download_link.startswith("http"):
             await status_message.edit_text(
                 "<code>Song isn't available for download.</code>"
