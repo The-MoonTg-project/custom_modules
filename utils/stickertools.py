@@ -128,7 +128,7 @@ async def img_to_file(client: Client, message: Message):
         os.remove(img)
 
 
-modules_help["sticker_tools"] = {
+modules_help["stickertools"] = {
     "stoi": "Converts sticker to image",
     "stof": "Converts sticker to file format",
     "ftoi": "Converts a file to image",
