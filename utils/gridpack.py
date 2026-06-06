@@ -119,7 +119,7 @@ async def make_grid(client: Client, message: Message):
 
     link = f"https://t.me/addstickers/{name}"
     await op.edit(
-        f"__Successfully Created Gridpack\nYou can find it Here :-__ [{pack}]({link})\n\n**By @MoonUB**",
+        f"__Successfully Created Gridpack\nYou can find it Here :-__ [{pack}]({link})\n\n**By @moonuserbot**",
         disable_web_page_preview=True,
     )
     if os.path.exists(ok):
