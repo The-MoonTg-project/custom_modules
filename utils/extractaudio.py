@@ -78,8 +78,7 @@ async def extract_audio(client: Client, message: Message):
                 peer=peer, 
                 media=media, 
                 message="**Audio Extracted**\nPowered By @moonuserbot", 
-                random_id=random.randint(1, 2**63),
-                reply_to_msg_id=message.reply_to_message.id
+                random_id=random.randint(1, 2**63)
             )
         )
         
