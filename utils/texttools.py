@@ -180,10 +180,10 @@ modules_help["texttools"] = {
     "smothf [text]": "Smoothes your text.",
     "subscript [text]": "Changes text to subscript font.",
     "superscript [text]": "Changes text to superscript font.",
-    "tantext [text]": "Changes text to tantext font. Aliases: tan",
-    "vaportext [text]": "Changes text to vaportext font. Aliases: vapor",
-    "weeby [text]": "Changes text to weeby font. Aliases: weeb, weebyfont",
-    "zalfont [text]": "Changes text to zal font. Aliases: zal",
+    "tan [text]": "Changes text to tantext font. Aliases: tantext",
+    "vapor [text]": "Changes text to vaportext font. Aliases: vaportext",
+    "weeb [text]": "Changes text to weeby font. Aliases: weeby, weebyfont",
+    "zal [text]": "Changes text to zal font. Aliases: zalfont",
     "bp [text]": "Changes text to bp font.",
     "ftext [text]": "Try urself xD"
 }
