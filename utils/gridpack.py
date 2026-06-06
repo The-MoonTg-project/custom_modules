@@ -60,7 +60,7 @@ async def make_grid(client: Client, message: Message):
         input_text = message.text.split(None, 1)[1]
 
     if not input_text or "|" not in input_text:
-        await message.edit("**Invalid Syntax:**\n**Format:** `.gridpack pack name|emoji`")
+        await message.edit(f"**Invalid Syntax:**\n**Format:** `{prefix}gridpack pack name|emoji`")
         return
 
     kk = input_text.split("|")
