@@ -36,7 +36,7 @@ async def crop_and_divide(img):
             )
             mimg = mimg.resize((512, 512))
             image = io.BytesIO()
-            image.name = "Friday.png"
+            image.name = "Moon.png"
             mimg.save(image, "PNG")
             media.append(image.getvalue())
             new_width += scale_width
@@ -72,7 +72,7 @@ async def make_grid(client: Client, message: Message):
     ok = await client.download_media(message.reply_to_message)
 
     emoji = stcr
-    name = "FridayUB_" + "".join(
+    name = "MoonUB_" + "".join(
         random.choice(list(string.ascii_lowercase + string.ascii_uppercase))
         for _ in range(16)
     )
@@ -119,7 +119,7 @@ async def make_grid(client: Client, message: Message):
 
     link = f"https://t.me/addstickers/{name}"
     await op.edit(
-        f"__Successfully Created Gridpack\nYou can find it Here :-__ [{pack}]({link})\n\n__**By @FridayUB**__",
+        f"__Successfully Created Gridpack\nYou can find it Here :-__ [{pack}]({link})\n\n__**By @MoonUB**__",
         disable_web_page_preview=True,
     )
     if os.path.exists(ok):
