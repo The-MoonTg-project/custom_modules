@@ -12,16 +12,9 @@ async def send_app(client: Client, message: Message):
         await message.edit("`Provide an app name to search.`")
         return
         
-    args = message.command[1:]
+    app_name = " ".join(message.command[1:])
     gl = "IN"
     forced_us = False
-    
-    if args[0].startswith("-") and len(args[0]) == 3:
-        gl = args[0][1:].upper()
-        forced_us = (gl == "US")
-        app_name = " ".join(args[1:])
-    else:
-        app_name = " ".join(args)
         
     if not app_name:
         await message.edit("`Provide an app name to search.`")
@@ -120,6 +113,5 @@ async def send_app(client: Client, message: Message):
         await mg.edit(f"`Error occurred while searching:` {e}")
 
 modules_help["app"] = {
-    "app [name]": "Search for an app in the Google Play Store (defaults to India, auto-falls back to US for banned apps).",
-    "app -us [name]": "Search for an app explicitly in the US region."
+    "app [name]": "Search for an app in the Google Play Store (auto-falls back to US store for banned apps)."
 }
