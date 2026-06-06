@@ -43,45 +43,13 @@ async def extract_audio(client: Client, message: Message):
     await process.communicate()
     
     if os.path.exists(audio_path):
-        await op.edit("`Generating waveform...`")
-        with open(audio_path, "rb") as f:
-            audio_data = f.read()
-            
-        try:
-            from utils.scripts import generate_waveform
-            waveform, duration = await generate_waveform(audio_data)
-        except Exception:
-            waveform, duration = None, 0
-            
         await op.edit("`Uploading extracted audio...`")
-        
-        # Determine mime type
-        mime_type = "audio/mpeg"
-        if audio_format in ("ogg", "opus"):
-            mime_type = "audio/ogg"
-        elif audio_format == "wav":
-            mime_type = "audio/x-wav"
-        elif audio_format == "flac":
-            mime_type = "audio/flac"
-            
-        import random
-        from pyrogram.raw.functions.messages import SendMedia
-        from pyrogram.raw.types import DocumentAttributeAudio, InputMediaUploadedDocument
-        
-        file = await client.save_file(audio_path)
-        attr = DocumentAttributeAudio(duration=duration, voice=False, waveform=waveform)
-        media = InputMediaUploadedDocument(file=file, mime_type=mime_type, attributes=[attr])
-        peer = await client.resolve_peer(message.chat.id)
-        
-        await client.invoke(
-            SendMedia(
-                peer=peer, 
-                media=media, 
-                message="**Audio Extracted**\nPowered By @moonuserbot", 
-                random_id=random.randint(1, 2**63)
-            )
+        await client.send_audio(
+            message.chat.id, 
+            audio_path, 
+            caption="**Audio Extracted**\nPowered By @moonuserbot",
+            reply_to_message_id=message.reply_to_message.id
         )
-        
         await op.delete()
         os.remove(file_path)
         os.remove(audio_path)
