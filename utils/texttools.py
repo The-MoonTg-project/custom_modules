@@ -164,6 +164,5 @@ async def ftext(client: Client, message: Message):
 
 modules_help["texttools"] = {
     "[font name] [text]": "Available fonts: ancient, boxf, bubbles, bbubbles, doublef, downf, egyptf, ghostf, handcf, handsf, musical, nmare, sdownf, smallf, smothf, subscript, superscript, tantext, vaportext, weeby, zalfont, bp",
-    "figlet [text]|[style]": "Converts text into ASCII art. Styles: slant, 3d, 5line, alpha, banner, doh, iso, letter, allig, dotm, bubble, bulb, digi",
     "ftext [text]": "Try urself xD"
 }
