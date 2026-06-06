@@ -163,6 +163,27 @@ async def ftext(client: Client, message: Message):
     await message.edit(pay)
 
 modules_help["texttools"] = {
-    "[font name] [text]": "Available fonts: ancient, boxf, bubbles, bbubbles, doublef, downf, egyptf, ghostf, handcf, handsf, musical, nmare, sdownf, smallf, smothf, subscript, superscript, tantext, vaportext, weeby, zalfont, bp",
+    "ancient [text]": "Ancientify your text.",
+    "boxf [text]": "Changes text to box font.",
+    "bubbles [text]": "Changes text to bubble font.",
+    "bbubbles [text]": "Changes text to black bubbles font.",
+    "doublef [text]": "Changes text to double text font.",
+    "downf [text]": "Changes text to uppercase downside font.",
+    "egyptf [text]": "Changes text to Egyptian font.",
+    "ghostf [text]": "Changes text to Ghost font.",
+    "handcf [text]": "Changes text to uppercase handwritten font.",
+    "handsf [text]": "Changes text to lowercase handwritten font.",
+    "musical [text]": "Musify your text.",
+    "nmare [text]": "Changes text to Nightmare font.",
+    "sdownf [text]": "Changes text to lowercase upside down font.",
+    "smallf [text]": "Changes text to Small Uppercase font.",
+    "smothf [text]": "Smoothes your text.",
+    "subscript [text]": "Changes text to subscript font.",
+    "superscript [text]": "Changes text to superscript font.",
+    "tantext [text]": "Changes text to tantext font. Aliases: tan",
+    "vaportext [text]": "Changes text to vaportext font. Aliases: vapor",
+    "weeby [text]": "Changes text to weeby font. Aliases: weeb, weebyfont",
+    "zalfont [text]": "Changes text to zal font. Aliases: zal",
+    "bp [text]": "Changes text to bp font.",
     "ftext [text]": "Try urself xD"
 }
