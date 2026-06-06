@@ -18,7 +18,7 @@ async def send_app(client: Client, message: Message):
     
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://play.google.com/store/search?q={app_name}&c=apps", headers=headers) as page:
+            async with session.get(f"https://play.google.com/store/search?q={app_name}&c=apps&gl=US&hl=en", headers=headers) as page:
                 content = await page.text()
                 
             soup = bs4.BeautifulSoup(content, 'html.parser')
@@ -30,7 +30,7 @@ async def send_app(client: Client, message: Message):
                 
             app_link = "https://play.google.com" + links[0]['href']
             
-            async with session.get(app_link, headers=headers) as detail_page:
+            async with session.get(f"{app_link}&gl=US&hl=en", headers=headers) as detail_page:
                 d_content = await detail_page.text()
                 
             dsoup = bs4.BeautifulSoup(d_content, 'html.parser')
