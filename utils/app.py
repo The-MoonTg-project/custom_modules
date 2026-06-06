@@ -11,14 +11,26 @@ async def send_app(client: Client, message: Message):
         await message.edit("`Provide an app name to search.`")
         return
         
-    app_name = " ".join(message.command[1:])
-    mg = await message.edit("`Searching Play Store...`")
+    args = message.command[1:]
+    gl = "IN"
+    
+    if args[0].startswith("-") and len(args[0]) == 3:
+        gl = args[0][1:].upper()
+        app_name = " ".join(args[1:])
+    else:
+        app_name = " ".join(args)
+        
+    if not app_name:
+        await message.edit("`Provide an app name to search.`")
+        return
+        
+    mg = await message.edit(f"`Searching Play Store ({gl})...`")
     
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
     
     try:
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://play.google.com/store/search?q={app_name}&c=apps&gl=US&hl=en", headers=headers) as page:
+            async with session.get(f"https://play.google.com/store/search?q={app_name}&c=apps&gl={gl}&hl=en", headers=headers) as page:
                 content = await page.text()
                 
             soup = bs4.BeautifulSoup(content, 'html.parser')
@@ -30,7 +42,7 @@ async def send_app(client: Client, message: Message):
                 
             app_link = "https://play.google.com" + links[0]['href']
             
-            async with session.get(f"{app_link}&gl=US&hl=en", headers=headers) as detail_page:
+            async with session.get(f"{app_link}&gl={gl}&hl=en", headers=headers) as detail_page:
                 d_content = await detail_page.text()
                 
             dsoup = bs4.BeautifulSoup(d_content, 'html.parser')
@@ -59,5 +71,6 @@ async def send_app(client: Client, message: Message):
         await mg.edit(f"`Error occurred while searching:` {e}")
 
 modules_help["app"] = {
-    "app [name]": "Search for an app in the Google Play Store."
+    "app [name]": "Search for an app in the Google Play Store (defaults to India region).",
+    "app -us [name]": "Search for an app in the US region (bypasses local bans)."
 }
