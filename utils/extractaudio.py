@@ -47,7 +47,7 @@ async def extract_audio(client: Client, message: Message):
         await client.send_audio(
             message.chat.id, 
             audio_path, 
-            caption="**Audio Extracted**\nPowered By @MoonUB",
+            caption="**Audio Extracted**\nPowered By @moonuserbot",
             reply_to_message_id=message.reply_to_message.id
         )
         await op.delete()
