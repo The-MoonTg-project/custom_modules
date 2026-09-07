@@ -27,6 +27,7 @@ anime/neko
 dl/aiodl
 dl/aria2p
 dl/ebook
+dl/gdrive
 dl/repo
 dl/savetube
 dl/spotdl
