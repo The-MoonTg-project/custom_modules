@@ -121,6 +121,7 @@ utils/calculator
 utils/compress
 utils/currency
 utils/date
+utils/db_warmup
 utils/direct
 utils/domaininfo
 utils/dub
