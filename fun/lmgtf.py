@@ -23,7 +23,7 @@ async def lmgtf_cmd(client: Client, message: Message):
     # Base URL for let me google that for you
     long_url = f"https://lmgtfy.com/?q={encoded_query}"
 
-    text = f"[Here is your answer]({long_url})\n`{long_url}`"
+    text = f"[Here is your answer]({long_url})"
 
     await message.edit(
         text, disable_web_page_preview=True, parse_mode=ParseMode.MARKDOWN
