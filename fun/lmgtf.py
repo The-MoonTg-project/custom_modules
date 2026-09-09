@@ -10,8 +10,8 @@ async def lmgtf_cmd(client: Client, message: Message):
     query = ""
     if len(message.command) > 1:
         query = " ".join(message.command[1:])
-    elif message.reply_to_message and message.reply_to_message.text:
-        query = message.reply_to_message.text
+    elif message.reply_to_message and (message.reply_to_message.text or message.reply_to_message.caption):
+        query = message.reply_to_message.text or message.reply_to_message.caption
 
     if not query:
         await message.edit(
@@ -23,7 +23,7 @@ async def lmgtf_cmd(client: Client, message: Message):
     # Base URL for let me google that for you
     long_url = f"https://lmgtfy.com/?q={encoded_query}"
 
-    text = f"[Here is your answer]({long_url})\n`{long_url}`"
+    text = f"[Here is your answer]({long_url})"
 
     await message.edit(
         text, disable_web_page_preview=True, parse_mode=ParseMode.MARKDOWN
